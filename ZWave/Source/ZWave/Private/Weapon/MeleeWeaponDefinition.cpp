@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "WeaponDefinition.h"
+#include "Weapon/MeleeWeaponDefinition.h"
 
