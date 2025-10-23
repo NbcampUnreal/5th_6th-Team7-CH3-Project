@@ -12,7 +12,8 @@ enum class EEquipSlot : uint8
 {
 	First,
 	Second,
-	Third
+	Third,
+	None,
 };
 
 class AWeaponBase;
@@ -47,6 +48,6 @@ protected:
 	// Equip Component에서 관리 (프로토 타입용)
 	// 차후 이 클래스 대신 Inventory 등에서 대신 SetSlotData 등을 호출하여 바꿔준다
 	// - 지금은 Slot 별 무기 데이터 고정
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TMap<EEquipSlot,TObjectPtr<UWeaponDefinition>> WeaponDefinitionMap;
 };

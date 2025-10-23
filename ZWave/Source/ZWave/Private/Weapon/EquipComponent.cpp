@@ -15,6 +15,8 @@ void UEquipComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CurrentSlot = EEquipSlot::None;
+
 	if (WeaponDefinitionMap.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Weapon Setting Not Completed!"));
@@ -93,21 +95,24 @@ void UEquipComponent::SetSlotData(EEquipSlot Slot, const UWeaponDefinition* Weap
 			return;
 		}
 
-		if (WeaponActor->Init(WeaponDef))
+		if (WeaponActor->Init(WeaponDef) == false)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("WeaponDef is Not Valid to Weapon Class!"));
 			WeaponActor->Destroy();
 			return;
 		}
 
-		if (AWeaponBase* FindWeapon = SlotMaps.Find(Slot)->Get())
+		if (TObjectPtr<AWeaponBase>* FoundPtr = SlotMaps.Find(Slot))
 		{
-			FindWeapon->Destroy();
-			SlotMaps[Slot] = nullptr;
+			if (AWeaponBase* FindWeapon = FoundPtr->Get())
+			{
+				FindWeapon->Destroy();
+				*FoundPtr = nullptr;
+			}
 		}
 
 		UGameplayStatics::FinishSpawningActor(WeaponActor, FTransform::Identity);
-		SlotMaps[Slot] = WeaponActor;
+		SlotMaps.Add(Slot, WeaponActor);
 	}
 }
 
