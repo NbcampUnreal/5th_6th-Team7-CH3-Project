@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/ZWavePlayerCharacter.h"
+#include "Player/TaskPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"   
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/CharacterActionComponent.h" 
 #include "EnhancedInputComponent.h"
-#include "Player/ZWavePlayerController.h"
+#include "Player/TaskPlayerController.h"
 
-AZWavePlayerCharacter::AZWavePlayerCharacter()
+ATaskPlayer::ATaskPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -27,7 +27,7 @@ AZWavePlayerCharacter::AZWavePlayerCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
-void AZWavePlayerCharacter::BeginPlay()
+void ATaskPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
@@ -37,7 +37,7 @@ void AZWavePlayerCharacter::BeginPlay()
 	}
 }
 
-void AZWavePlayerCharacter::Tick(float DeltaTime)
+void ATaskPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (ActionComp)
@@ -54,13 +54,13 @@ void AZWavePlayerCharacter::Tick(float DeltaTime)
 
 }
 
-void AZWavePlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		if (AZWavePlayerController* PlayerController = Cast<AZWavePlayerController>(GetController()))
+		if (ATaskPlayerController* PlayerController = Cast<ATaskPlayerController>(GetController()))
 		{
 			if (PlayerController->MoveAction)
 			{

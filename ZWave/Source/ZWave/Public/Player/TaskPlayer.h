@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Base/BaseCharacter.h"
 #include "InputActionValue.h"
-#include "ZWavePlayerCharacter.generated.h"
+#include "TaskPlayer.generated.h"
 
 class UCharacterActionComponent;
 class UCameraComponent;
@@ -13,12 +13,12 @@ class USpringArmComponent;
 class UInputAction;
 
 UCLASS()
-class ZWAVE_API AZWavePlayerCharacter : public ACharacter
+class ZWAVE_API ATaskPlayer : public ABaseCharacter
 {
 	GENERATED_BODY()
 
 public:
-	AZWavePlayerCharacter();
+	ATaskPlayer();
 
 protected:
 
