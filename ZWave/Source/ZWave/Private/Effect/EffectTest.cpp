@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "Effect/StaggerEffect.h"
 #include "Mode/ModeDefinition.h"
+#include "DamageCalculator/DamageCalculator.h"
 
 AEffectTest::AEffectTest()
 {
@@ -51,8 +52,7 @@ void AEffectTest::Move()
 
 void AEffectTest::TestEffect()
 {
-	UEffectApplyManager* Manager = GetWorld()->GetSubsystem<UEffectApplyManager>();
-	Manager->ApplyEffect(this, ModeData->EffectStruct.EffectValue, ModeData->EffectClass);
+	UDamageCalculator::DamageCalculate(GetWorld(), this, ModeData->EffectStruct.EffectValue, ModeData->EffectClass);
 }
 
 
