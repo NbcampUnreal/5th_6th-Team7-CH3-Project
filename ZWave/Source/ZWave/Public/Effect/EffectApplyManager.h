@@ -6,37 +6,6 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "EffectApplyManager.generated.h"
 
-
-UENUM(BlueprintType)
-enum EEffectType : uint8
-{
-	None,
-	Stagger
-};
-
-UENUM(BlueprintType)
-enum EAbilityType : uint8
-{
-	Active,
-	Passive
-};
-
-USTRUCT(BlueprintType)
-struct FEffectStruct
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditDefaultsOnly)
-	float EffectValue;
-
-	UPROPERTY(EditDefaultsOnly)
-	TEnumAsByte<EEffectType> EffectType;
-
-	UPROPERTY(EditDefaultsOnly)
-	TEnumAsByte<EAbilityType> AbilityType;
-};
-
-
 class UModeDefinition;
 class UEffectBase;
 
@@ -56,5 +25,4 @@ private:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EffectArray")
 	TArray<UEffectBase*> CurrentApplyEffects;
-
 };

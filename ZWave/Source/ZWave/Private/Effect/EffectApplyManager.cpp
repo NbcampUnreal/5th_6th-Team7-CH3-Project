@@ -11,40 +11,23 @@ void UEffectApplyManager::ApplyEffect(AActor* Target, float EffectValue, TSubcla
 {
 	if (UEffectBase* CreatingEffect = CreateEffect(EffectClass))
 	{
+		CurrentActiveEffects.Add(CreatingEffect);
 		CreatingEffect->ApplyEffect(Target, EffectValue);
 	}
 }
 
-//void UEffectApplyManager::RemoveAllEffect()
-//{
-//	for(int i = 0; i < CurrentApplyEffects.Num(); ++i)
-//	{
-//		CurrentApplyEffects[i]->RemoveEffect();
-//		CurrentApplyEffects[i] = nullptr;
-//	}
-//
-//	CurrentApplyEffects.Empty();
-//}
-//
-//void UEffectApplyManager::RemoveEffect(UEffectBase* RemoveClass)
-//{
-//	for (int i = 0; i < CurrentApplyEffects.Num(); ++i)
-//	{
-//		if (CurrentApplyEffects[i] == RemoveClass)
-//		{
-//			CurrentApplyEffects[i] = nullptr;
-//			CurrentApplyEffects.RemoveAt(i);
-//			break;
-//		}
-//	}
-//}
+void UEffectApplyManager::RemoveEffectInstance(UEffectBase* EffectToRemove)
+{
+    if (!EffectToRemove) return;
+
+    CurrentActiveEffects.Remove(EffectToRemove);
+	EffectToRemove->MarkAsGarbage();
+}
+
 
 UEffectBase* UEffectApplyManager::CreateEffect(TSubclassOf<UEffectBase> EffectClass)
 {
 	UEffectBase* FindEffect = nullptr;
 	FindEffect = NewObject<UEffectBase>(GetWorld(), EffectClass);
-
-	CurrentApplyEffects.Add(FindEffect);
-
 	return FindEffect == nullptr ? nullptr : FindEffect;
 }

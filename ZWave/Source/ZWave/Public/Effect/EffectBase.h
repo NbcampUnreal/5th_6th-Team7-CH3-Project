@@ -19,6 +19,7 @@ public:
 
 	virtual void ApplyEffect(AActor* TargetActor, float Value);
 	virtual void RemoveEffect();
+	virtual void BeginDestroy() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Target")

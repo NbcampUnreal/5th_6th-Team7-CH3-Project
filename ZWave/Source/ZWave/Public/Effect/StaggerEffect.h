@@ -19,6 +19,7 @@ public:
 
 	virtual void ApplyEffect(AActor* TargetActor, float Value) override;
 	virtual void RemoveEffect() override;
+	virtual void BeginDestroy() override;
 
 private:
 	FTimerHandle Handle;

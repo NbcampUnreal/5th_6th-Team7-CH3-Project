@@ -12,3 +12,8 @@ void UEffectBase::ApplyEffect(AActor* TargetActor, float Value)
 void UEffectBase::RemoveEffect()
 {
 }
+
+void UEffectBase::BeginDestroy()
+{
+	Super::BeginDestroy();
+}

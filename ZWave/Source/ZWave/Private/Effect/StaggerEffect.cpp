@@ -1,6 +1,7 @@
 #include "Effect/StaggerEffect.h"
 #include "Effect/EffectTest.h"
 #include "Engine/World.h"
+#include "Effect/EffectApplyManager.h"
 
 
 UStaggerEffect::UStaggerEffect()
@@ -46,4 +47,28 @@ void UStaggerEffect::RemoveEffect()
 		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Off : %f"), Test->GetSpeed());
 		Target = nullptr;
 	}
+
+
+	if (UObject* Outer = GetOuter())
+	{
+		if (UWorld* World = Outer->GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(Handle);
+			
+			/*if (UEffectApplyManager* Manager = World->GetSubsystem<UEffectApplyManager>())
+			{
+				Manager->RemoveEffectInstance(this);
+			}*/
+		}
+	}
+	MarkAsGarbage();
+}
+
+//µð¹ö±ë¿ë
+void UStaggerEffect::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	
+	UE_LOG(LogTemp, Warning, TEXT("UStaggerEffect '%s' has been successfully collected by GC."), *GetName());
 }

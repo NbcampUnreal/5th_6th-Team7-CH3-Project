@@ -36,7 +36,7 @@ void AEffectTest::BeginPlay()
 		this,
 		&AEffectTest::TestEffect,
 		3.0f,
-		true
+		false
 	);
 }
 
