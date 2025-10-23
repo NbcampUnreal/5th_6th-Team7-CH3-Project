@@ -4,6 +4,7 @@
 #include "Effect/EffectTest.h"
 #include "Effect/EffectApplyManager.h"
 #include "Engine/World.h"
+#include "Effect/StaggerEffect.h"
 
 AEffectTest::AEffectTest()
 {
@@ -50,7 +51,7 @@ void AEffectTest::Move()
 void AEffectTest::TestEffect()
 {
 	UEffectApplyManager* Manager = GetWorld()->GetSubsystem<UEffectApplyManager>();
-	Manager->ApplyEffect(this);
+	Manager->ApplyEffect(this, 0.3f, UStaggerEffect::StaticClass());
 }
 
 

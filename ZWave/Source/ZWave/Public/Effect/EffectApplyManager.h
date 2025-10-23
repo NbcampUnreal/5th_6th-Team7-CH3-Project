@@ -14,6 +14,13 @@ enum EEffectType : uint8
 	Stagger
 };
 
+UENUM(BlueprintType)
+enum EAbilityType : uint8
+{
+	Active,
+	Passive
+};
+
 USTRUCT(BlueprintType)
 struct FEffectStruct
 {
@@ -24,6 +31,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TEnumAsByte<EEffectType> EffectType;
+
+	UPROPERTY(EditDefaultsOnly)
+	TEnumAsByte<EAbilityType> AbilityType;
 };
 
 
@@ -38,12 +48,10 @@ class ZWAVE_API UEffectApplyManager : public UWorldSubsystem
 public:
 	UEffectApplyManager();
 
-	void ApplyEffect(AActor* Target);
-	void RemoveAllEffect();
-	void RemoveEffect(UEffectBase* RemoveClass);
+	void ApplyEffect(AActor* Target, float EffectValue, TSubclassOf<UEffectBase> EffectClass);
 
 private:
-	UEffectBase* CreateEffect(const EEffectType& Type);
+	UEffectBase* CreateEffect(TSubclassOf<UEffectBase> EffectClass);
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EffectArray")
