@@ -41,5 +41,5 @@ protected:
 	bool bEquipped = false;
 
 	UPROPERTY(VisibleAnywhere)
-	bool bCanAttack = false;
+	bool bCanAttack = true;
 };
