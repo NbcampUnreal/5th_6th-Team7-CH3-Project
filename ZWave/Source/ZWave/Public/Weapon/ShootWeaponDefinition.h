@@ -31,7 +31,7 @@ public:
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class ZWAVE_API UShootWeaponDefinition : public UWeaponDefinition
 {
 	GENERATED_BODY()

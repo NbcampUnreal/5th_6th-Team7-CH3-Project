@@ -21,7 +21,7 @@ public:
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class ZWAVE_API UWeaponDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
