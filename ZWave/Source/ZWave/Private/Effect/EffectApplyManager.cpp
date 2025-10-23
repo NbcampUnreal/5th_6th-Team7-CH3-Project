@@ -11,19 +11,9 @@ void UEffectApplyManager::ApplyEffect(AActor* Target, float EffectValue, TSubcla
 {
 	if (UEffectBase* CreatingEffect = CreateEffect(EffectClass))
 	{
-		CurrentActiveEffects.Add(CreatingEffect);
 		CreatingEffect->ApplyEffect(Target, EffectValue);
 	}
 }
-
-void UEffectApplyManager::RemoveEffectInstance(UEffectBase* EffectToRemove)
-{
-    if (!EffectToRemove) return;
-
-    CurrentActiveEffects.Remove(EffectToRemove);
-	EffectToRemove->MarkAsGarbage();
-}
-
 
 UEffectBase* UEffectApplyManager::CreateEffect(TSubclassOf<UEffectBase> EffectClass)
 {

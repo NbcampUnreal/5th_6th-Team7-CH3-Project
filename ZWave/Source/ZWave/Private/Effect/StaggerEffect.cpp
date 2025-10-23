@@ -54,11 +54,6 @@ void UStaggerEffect::RemoveEffect()
 		if (UWorld* World = Outer->GetWorld())
 		{
 			World->GetTimerManager().ClearTimer(Handle);
-			
-			/*if (UEffectApplyManager* Manager = World->GetSubsystem<UEffectApplyManager>())
-			{
-				Manager->RemoveEffectInstance(this);
-			}*/
 		}
 	}
 	MarkAsGarbage();
