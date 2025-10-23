@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "EffectTest.generated.h"
 
+
 UCLASS()
 class ZWAVE_API AEffectTest : public AActor
 {
@@ -35,6 +36,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TEST")
 	UStaticMeshComponent* SM;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TEST")
+	class UModeDefinition* ModeData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TEST")
 	float Speed;
