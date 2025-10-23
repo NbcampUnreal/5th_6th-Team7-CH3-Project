@@ -30,15 +30,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool CanAttack() const { return bCanAttack; };
 
-public:
-	// BP 이펙트 처리용
-	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon", meta = (DisplayName = "OnFire"))
-	void K2_OnFire(
-		const TArray<FVector>& ImpactPositions,
-		const TArray<FVector>& ImpactNormals,
-		const TArray<TEnumAsByte<EPhysicalSurface>>& SurfaceTypes
-	);
-
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
