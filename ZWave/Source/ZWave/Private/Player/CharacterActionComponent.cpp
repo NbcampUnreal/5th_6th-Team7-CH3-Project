@@ -6,7 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Player/ZWavePlayerCharacter.h"
+#include "Player/TaskPlayer.h"
 
 UCharacterActionComponent::UCharacterActionComponent()
 {

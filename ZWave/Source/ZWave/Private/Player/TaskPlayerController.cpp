@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/ZWavePlayerController.h"
+#include "Player/TaskPlayerController.h"
 #include "EnhancedInputSubSystems.h"
 
-AZWavePlayerController::AZWavePlayerController()
+ATaskPlayerController::ATaskPlayerController()
 	:InputMappingContext(nullptr),
 	MoveAction(nullptr),
 	LookAction(nullptr),
@@ -15,7 +15,7 @@ AZWavePlayerController::AZWavePlayerController()
 {
 }
 
-void AZWavePlayerController::BeginPlay()
+void ATaskPlayerController::BeginPlay()
 {
 	if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
 	{

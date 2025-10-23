@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "ZWavePlayerController.generated.h"
+#include "TaskPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 
 UCLASS()
-class ZWAVE_API AZWavePlayerController : public APlayerController
+class ZWAVE_API ATaskPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
-	AZWavePlayerController();
+	ATaskPlayerController();
 
 protected:
 	virtual void BeginPlay() override;
