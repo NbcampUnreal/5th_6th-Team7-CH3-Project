@@ -38,4 +38,10 @@ class ZWAVE_API UShootWeaponDefinition : public UWeaponDefinition
 public:
 	UPROPERTY(EditDefaultsOnly)
 	FShootWeaponStats ShootWeaponStat;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName MuzzleSocketName = "Muzzle";
+
+	UPROPERTY(EditDefaultsOnly)
+	float TraceDistance = 10000.f;
 };
