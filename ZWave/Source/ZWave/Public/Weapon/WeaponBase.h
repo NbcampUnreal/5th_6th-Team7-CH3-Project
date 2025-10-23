@@ -21,7 +21,7 @@ public:
 public:
 	virtual void Attack() PURE_VIRTUAL(AWeaponBase::Attack, ;);
 
-	virtual void Init(const UWeaponDefinition* WeaponDefinition) PURE_VIRTUAL(AWeaponBase::Init, ;);
+	virtual bool Init(const UWeaponDefinition* WeaponDefinition) PURE_VIRTUAL(AWeaponBase::Init, return false;);
 
 	virtual void Equip(ACharacter* NewOwner);
 

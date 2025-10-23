@@ -83,13 +83,19 @@ void UEquipComponent::SetSlotData(EEquipSlot Slot, const UWeaponDefinition* Weap
 			return;
 		}
 
+		if (WeaponActor->Init(WeaponDef))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponDef is Not Valid to Weapon Class!"));
+			WeaponActor->Destroy();
+			return;
+		}
+
 		if (AWeaponBase* FindWeapon = SlotMaps.Find(Slot)->Get())
 		{
 			FindWeapon->Destroy();
 			SlotMaps[Slot] = nullptr;
 		}
 
-		WeaponActor->Init(WeaponDef);
 		UGameplayStatics::FinishSpawningActor(WeaponActor, FTransform::Identity);
 		SlotMaps[Slot] = WeaponActor;
 	}
