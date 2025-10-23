@@ -31,7 +31,7 @@ public:
 	FORCEINLINE bool CanAttack() const { return bCanAttack; };
 
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
 	UPROPERTY(VisibleAnywhere)
