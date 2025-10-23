@@ -12,9 +12,11 @@ AWeaponBase::AWeaponBase()
 void AWeaponBase::Equip(ACharacter* NewOwner)
 {
 	OwningCharacter = NewOwner;
+	bEquipped = true;
 }
 
 void AWeaponBase::Unequip()
 {
 	OwningCharacter = nullptr;
+	bEquipped = false;
 }

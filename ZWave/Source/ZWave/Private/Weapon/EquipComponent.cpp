@@ -35,12 +35,22 @@ bool UEquipComponent::Equip(EEquipSlot Slot)
 
 	if (AWeaponBase* FindWeapon = SlotMaps.Find(Slot)->Get())
 	{
+		ACharacter* OwnChara = Cast<ACharacter>(GetOwner());
+		if(OwnChara == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Owner Is Null!"));
+			return false;
+		}
+
+		SlotMaps[Slot]->Unequip();
 		UnEquip(Slot);
 		CurrentSlot = Slot;
 
 		FindWeapon->SetActorHiddenInGame(false);
 		FindWeapon->SetActorEnableCollision(true);
 		FindWeapon->SetActorTickEnabled(true);
+
+		SlotMaps[Slot]->Equip(OwnChara);
 
 		// Attach
 		AttachWeaponToOwner(FindWeapon, WeaponDefinitionMap[Slot]);
