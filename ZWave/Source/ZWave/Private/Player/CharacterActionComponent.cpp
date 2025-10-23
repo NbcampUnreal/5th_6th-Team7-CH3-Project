@@ -23,6 +23,7 @@ void UCharacterActionComponent::InitRefs(UCharacterMovementComponent* InMoveComp
 	{
 		NormalArmLength = SpringArm->TargetArmLength;
 		NormalSocketOffsetY = SpringArm->SocketOffset.Y;
+		SpringArm->SocketOffset = FVector{ 0.f,SpringArmNormalSocketOffsetY, SpringArmSocketOffsetZ };
 	}
 	if (MoveComp.IsValid())
 	{
@@ -44,7 +45,7 @@ void UCharacterActionComponent::Move(const FInputActionValue& Value)
 		{
 			MoveDirection = Axis.X > 0.f ? ECharacterMoveDirection::Foward : ECharacterMoveDirection::Back;
 			OwnerChar->AddMovementInput(OwnerChar->GetActorForwardVector(), Axis.X);
-		}
+		} 
 
 		UE_LOG(LogTemp, Warning, TEXT("%d"),(MoveDirection));
 		LastMoveInput = Axis;
