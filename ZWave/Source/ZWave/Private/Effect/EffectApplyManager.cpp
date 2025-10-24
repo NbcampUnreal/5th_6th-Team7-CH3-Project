@@ -1,4 +1,4 @@
-#include "Effect/EffectApplyManager.h"
+﻿#include "Effect/EffectApplyManager.h"
 #include "Effect/EffectBase.h"
 #include "Effect/StaggerEffect.h"
 #include "Mode/ModeDefinition.h"
@@ -24,6 +24,6 @@ float UEffectApplyManager::ApplyEffect(AActor* Target, const float& BaseDamage, 
 UEffectBase* UEffectApplyManager::CreateEffect(TSubclassOf<UEffectBase> EffectClass)
 {
 	UEffectBase* NewEffectInstance = nullptr;
-	NewEffectInstance = NewObject<UEffectBase>(GetWorld(), EffectClass);
+	NewEffectInstance = NewObject<UEffectBase>(this, EffectClass);
 	return NewEffectInstance;
 }

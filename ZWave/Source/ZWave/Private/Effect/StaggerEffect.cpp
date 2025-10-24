@@ -11,6 +11,7 @@ UStaggerEffect::UStaggerEffect()
 
 float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value)
 {
+	// 플레이어 or 몬스터
 	if (ATaskPlayer* Test = Cast<ATaskPlayer>(TargetActor))
 	{
 		this->Target = Test;
@@ -56,7 +57,8 @@ void UStaggerEffect::RemoveEffect()
 			World->GetTimerManager().ClearTimer(Handle);
 		}
 	}
-	MarkAsGarbage();
+
+	MarkAsGarbage(); //가비지 마킹
 }
 
 
