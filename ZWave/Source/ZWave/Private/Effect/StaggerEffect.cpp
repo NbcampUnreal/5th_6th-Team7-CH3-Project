@@ -1,7 +1,7 @@
-#include "Effect/StaggerEffect.h"
-#include "Effect/EffectTest.h"
+ï»¿#include "Effect/StaggerEffect.h"
 #include "Engine/World.h"
 #include "Effect/EffectApplyManager.h"
+#include "Player/TaskPlayer.h"
 
 
 UStaggerEffect::UStaggerEffect()
@@ -11,13 +11,13 @@ UStaggerEffect::UStaggerEffect()
 
 float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value)
 {
-	if (AEffectTest* Test = Cast<AEffectTest>(TargetActor))
+	if (ATaskPlayer* Test = Cast<ATaskPlayer>(TargetActor))
 	{
 		this->Target = Test;
 
-		Test->SetSpeed(Test->GetSpeed() / StaggerValue);
+		/*Test->SetSpeed(Test->GetSpeed() / StaggerValue);
 
-		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect On : %f"), Test->GetSpeed());
+		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect On : %f"), Test->GetSpeed());*/
 
 		
 		if (UObject* Outer = GetOuter())
@@ -41,10 +41,10 @@ float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, 
 
 void UStaggerEffect::RemoveEffect()
 {
-	if (AEffectTest* Test = Cast<AEffectTest>(Target))
+	if (ATaskPlayer* Test = Cast<ATaskPlayer>(Target))
 	{
-		Test->SetSpeed(Test->GetSpeed() * StaggerValue);
-		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Off : %f"), Test->GetSpeed());
+		/*Test->SetSpeed(Test->GetSpeed() * StaggerValue);
+		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Off : %f"), Test->GetSpeed());*/
 		Target = nullptr;
 	}
 
@@ -59,7 +59,7 @@ void UStaggerEffect::RemoveEffect()
 	MarkAsGarbage();
 }
 
-//µð¹ö±ë¿ë
+
 void UStaggerEffect::BeginDestroy()
 {
 	Super::BeginDestroy();

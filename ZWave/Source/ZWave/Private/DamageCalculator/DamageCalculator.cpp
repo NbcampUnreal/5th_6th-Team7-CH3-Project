@@ -1,4 +1,4 @@
-#include "DamageCalculator/DamageCalculator.h"
+ï»¿#include "DamageCalculator/DamageCalculator.h"
 #include "Effect/EffectApplyManager.h"
 #include "Engine/World.h"
 
@@ -14,7 +14,6 @@ void UDamageCalculator::DamageCalculate(UObject* WorldContextObject, AActor* Cau
 	}
 
 
-	// ¿©±â¼­ µ¥¹ÌÁö Àû¿ë
-
+	// ì—¬ê¸°ì„œ ë°ë¯¸ì§€ ì ìš©
 	UE_LOG(LogTemp, Warning, TEXT("FinalDamage : %f"), FinalDamage);
 }
