@@ -7,6 +7,8 @@
 #include "Weapon/ShootWeaponDefinition.h"
 #include "ShootWeapon.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFireSuccess);
+
 /**
  *
  */
@@ -52,6 +54,10 @@ public:
 		const TArray<TEnumAsByte<EPhysicalSurface>>& SurfaceTypes,
 		bool bHit
 	);
+
+public:
+	UPROPERTY()
+	FOnWeaponFireSuccess OnFireSuccess;
 
 protected:
 	// TODO : 차후 시점 변경이 있다면 Delegate를 구독할 필요 있음
