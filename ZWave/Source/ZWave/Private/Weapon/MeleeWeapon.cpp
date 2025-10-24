@@ -58,6 +58,7 @@ void AMeleeWeapon::Unequip()
 void AMeleeWeapon::StartAttack()
 {
 	SphereCollision->SetGenerateOverlapEvents(true);
+	bCanAttack = false;
 }
 
 void AMeleeWeapon::EndAttack()
@@ -65,6 +66,10 @@ void AMeleeWeapon::EndAttack()
 	SphereCollision->SetGenerateOverlapEvents(false);
 	Attack();
 	OverlappedEnemies.Empty();
+
+	GetWorldTimerManager().SetTimer(AttackTimer, [this]()
+		{bCanAttack = true; }
+	, MeleeWeaponStat.AttackRate, false);
 }
 
 void AMeleeWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

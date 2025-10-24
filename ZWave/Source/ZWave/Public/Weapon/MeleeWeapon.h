@@ -48,4 +48,6 @@ protected:
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> OverlappedEnemies;
+
+	FTimerHandle AttackTimer;
 };
