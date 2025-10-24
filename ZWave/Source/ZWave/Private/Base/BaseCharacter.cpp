@@ -2,6 +2,7 @@
 
 
 #include "Base/BaseCharacter.h"
+#include "Weapon/EquipComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -12,6 +13,8 @@ ABaseCharacter::ABaseCharacter()
 	MaxHealth = Health;
 	SpeedMultiply = 1.f;
 	Armor = 0.f;
+
+	EquipComponent = CreateDefaultSubobject<UEquipComponent>(TEXT("EquipComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -42,8 +45,8 @@ void ABaseCharacter::Attacked(AActor* DamageCauser, float Damage)
 
 void ABaseCharacter::ApplyDamage(float Damage, bool CheckArmor)
 {
-	//¹æ¾î·Â 1ÀÏ°æ¿ì µ¥¹ÌÁö Àû¿ë ºñÀ² 93ÇÁ·Î ~ ¹æ¾î·Â 10ÀÏ °æ¿ì ¾à 63ÇÁ·Î ~ 100ÀÏ°æ¿ì 27ÇÁ·ÎÀÇ µ¥¹ÌÁö°¡ Àû¿ëµÊ
-	//¹æ¾î·ÂÀÌ À½¼öÀÏ°æ¿ì 0À¸·Î Ãë±Ş
+	//ë°©ì–´ë ¥ 1ì¼ê²½ìš° ë°ë¯¸ì§€ ì ìš© ë¹„ìœ¨ 93í”„ë¡œ ~ ë°©ì–´ë ¥ 10ì¼ ê²½ìš° ì•½ 63í”„ë¡œ ~ 100ì¼ê²½ìš° 27í”„ë¡œì˜ ë°ë¯¸ì§€ê°€ ì ìš©ë¨
+	//ë°©ì–´ë ¥ì´ ìŒìˆ˜ì¼ê²½ìš° 0ìœ¼ë¡œ ì·¨ê¸‰
 	float ReductionRatio = CheckArmor ? (1.f / FMath::Log2((FMath::Max(Armor, 0.f) / 10) + 2)) : 1.f;
 	float ApplyDamage = Damage * ReductionRatio;
 
