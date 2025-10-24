@@ -16,7 +16,21 @@ void AShootWeapon::Attack()
 		IsNeedReload())
 		return;
 
+	if (ShootWeaponStat.bReloadAll &&
+		bReloading)
+	{
+		return;
+	}
+
+	if (ShootWeaponStat.bReloadAll == false &&
+		bReloading)
+	{
+		bReloading = false;
+		GetWorldTimerManager().ClearTimer(ReloadTimer);
+	}
+
 	bCanAttack = false;
+
 	
 	ShootOneBullet(false);
 
@@ -53,6 +67,33 @@ void AShootWeapon::Equip(ACharacter* NewOwner)
 void AShootWeapon::Unequip()
 {
 	Super::Unequip();
+
+	GetWorldTimerManager().ClearTimer(FireTimer);
+	GetWorldTimerManager().ClearTimer(ReloadTimer);
+	bReloading = false;
+	bCanAttack = true;
+}
+
+void AShootWeapon::Reload()
+{
+	if (IsFullMagazine() ||
+		bReloading ||
+		RemainSpareAmmo)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ShootWeapon Can't Reload!"));
+		return;
+	}
+
+	bReloading = true;
+
+	if (ShootWeaponStat.bReloadAll)
+	{
+		StartReloadAll();
+	}
+	else
+	{
+		StartReloadOneBullet();
+	}
 }
 
 void AShootWeapon::ShootOneBullet(bool IsFPSSight)
@@ -68,13 +109,9 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight)
 	FVector Start = OwningCharacter->GetActorLocation();
 	FVector Dir = OwningCharacter->GetActorForwardVector();
 
-	if (USkeletalMeshComponent* Mesh = OwningCharacter->GetMesh())
+	if (SkeletalMeshComponent->DoesSocketExist(MuzzleSocketName))
 	{
-		if (Mesh->DoesSocketExist(MuzzleSocketName))
-		{
-			Start = Mesh->GetSocketLocation(MuzzleSocketName);
-			Dir = Mesh->GetForwardVector();
-		}
+		Start = SkeletalMeshComponent->GetSocketLocation(MuzzleSocketName);
 	}
 
 	Points.Add(Start);
@@ -103,6 +140,78 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight)
 			// Damage 계산 함수 요청
 		}
 	}
+	else
+	{
+		Points.Add(End);
+		Normals.Add(FVector::ZeroVector);
+		Surfaces.Add(SurfaceType_Default);
+	}
 
-	K2_OnFire(Points, Normals, Surfaces);
+	K2_OnFire(Points, Normals, Surfaces,bHit);
+}
+
+void AShootWeapon::StartReloadOneBullet()
+{
+	if (IsFullMagazine() || RemainSpareAmmo <= 0)
+	{
+		return;
+	}
+
+	GetWorldTimerManager().SetTimer(ReloadTimer, this, &AShootWeapon::ReloadOneBullet,
+		ShootWeaponStat.ReloadTime, false, ShootWeaponStat.ReloadTime);
+}
+
+void AShootWeapon::ReloadOneBullet()
+{
+	if (IsFullMagazine() || RemainSpareAmmo <= 0)
+	{
+		StopReloadOneBullet();
+		return;
+	}
+
+	RemainSpareAmmo--;
+	NowAmmo++;
+
+	// UI 연동 고려?
+
+	GetWorldTimerManager().SetTimer(ReloadTimer,this, &AShootWeapon::ReloadOneBullet,
+	ShootWeaponStat.ReloadTime, false, ShootWeaponStat.ReloadTime);
+}
+
+void AShootWeapon::StopReloadOneBullet()
+{
+	GetWorldTimerManager().ClearTimer(ReloadTimer);
+	bReloading = false;
+}
+
+void AShootWeapon::StartReloadAll()
+{
+	if (IsFullMagazine() || RemainSpareAmmo <= 0)
+		return;
+
+	bCanAttack = false;
+	bReloading = true;
+
+	GetWorldTimerManager().SetTimer(ReloadTimer, this, &AShootWeapon::ReloadAll,
+		ShootWeaponStat.ReloadTime, false, ShootWeaponStat.ReloadTime);
+}
+
+void AShootWeapon::ReloadAll()
+{
+	if (IsFullMagazine() || RemainSpareAmmo <= 0)
+		return;
+
+	const int NeedBullet = ShootWeaponStat.Magazine - NowAmmo;
+	const int Move = CalcTransferBullet(NeedBullet);
+
+	if (Move <= 0)
+		return;
+
+	RemainSpareAmmo -= Move;
+	NowAmmo += Move;
+
+	bCanAttack = true;
+	bReloading = false;
+
+	// UI 연동 고려?
 }
