@@ -7,17 +7,23 @@ UEffectApplyManager::UEffectApplyManager()
 {
 }
 
-void UEffectApplyManager::ApplyEffect(AActor* Target, float EffectValue, TSubclassOf<UEffectBase> EffectClass)
+float UEffectApplyManager::ApplyEffect(AActor* Target, const float& BaseDamage, float EffectValue, TSubclassOf<UEffectBase> EffectClass)
 {
-	if (UEffectBase* CreatingEffect = CreateEffect(EffectClass))
+	float ApplyEffectDmg = BaseDamage;
+	if (UEffectBase* NewEffect = CreateEffect(EffectClass))
 	{
-		CreatingEffect->ApplyEffect(Target, EffectValue);
+		if (IsValid(Target))
+		{
+			ApplyEffectDmg = NewEffect->ApplyEffect(Target, BaseDamage, EffectValue);
+		}
 	}
+
+	return ApplyEffectDmg;
 }
 
 UEffectBase* UEffectApplyManager::CreateEffect(TSubclassOf<UEffectBase> EffectClass)
 {
-	UEffectBase* FindEffect = nullptr;
-	FindEffect = NewObject<UEffectBase>(GetWorld(), EffectClass);
-	return FindEffect == nullptr ? nullptr : FindEffect;
+	UEffectBase* NewEffectInstance = nullptr;
+	NewEffectInstance = NewObject<UEffectBase>(GetWorld(), EffectClass);
+	return NewEffectInstance;
 }

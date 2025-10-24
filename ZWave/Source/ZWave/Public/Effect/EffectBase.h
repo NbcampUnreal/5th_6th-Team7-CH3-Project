@@ -9,17 +9,14 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ZWAVE_API UEffectBase : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UEffectBase();
-
-	virtual void ApplyEffect(AActor* TargetActor, float Value);
-	virtual void RemoveEffect();
-	virtual void BeginDestroy() override;
+	virtual float ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value) PURE_VIRTUAL(UEffectBase::ApplyEffect, return BaseDamage;);
+	virtual void RemoveEffect() PURE_VIRTUAL(UEffectBase::RemoveEffect, );
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Target")

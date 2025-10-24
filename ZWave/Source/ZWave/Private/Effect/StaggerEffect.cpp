@@ -6,10 +6,10 @@
 
 UStaggerEffect::UStaggerEffect()
 {
-	StaggerValue = 2;
+	StaggerValue = 3;
 }
 
-void UStaggerEffect::ApplyEffect(AActor* TargetActor, float Value)
+float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value)
 {
 	if (AEffectTest* Test = Cast<AEffectTest>(TargetActor))
 	{
@@ -36,7 +36,7 @@ void UStaggerEffect::ApplyEffect(AActor* TargetActor, float Value)
 		}
 	}
 
-	
+	return BaseDamage;
 }
 
 void UStaggerEffect::RemoveEffect()
@@ -63,7 +63,5 @@ void UStaggerEffect::RemoveEffect()
 void UStaggerEffect::BeginDestroy()
 {
 	Super::BeginDestroy();
-
-	
 	UE_LOG(LogTemp, Warning, TEXT("UStaggerEffect '%s' has been successfully collected by GC."), *GetName());
 }

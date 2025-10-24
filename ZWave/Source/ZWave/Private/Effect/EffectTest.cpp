@@ -52,7 +52,7 @@ void AEffectTest::Move()
 
 void AEffectTest::TestEffect()
 {
-	UDamageCalculator::DamageCalculate(GetWorld(), this, ModeData->EffectStruct.EffectValue, ModeData->EffectClass);
+	UDamageCalculator::DamageCalculate(GetWorld(), this, this, 1.0f, ModeData->EffectStruct.EffectValue, ModeData->EffectClass);
 }
 
 
