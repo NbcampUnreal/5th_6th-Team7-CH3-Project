@@ -32,6 +32,9 @@ public:
 	virtual void Die() override;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Component|Equip")
+	TObjectPtr<class UEquipComponent> EquipComponent;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Stat")
 	float MaxHealth;
 
