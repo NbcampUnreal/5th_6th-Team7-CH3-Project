@@ -11,15 +11,10 @@ UStaggerEffect::UStaggerEffect()
 
 float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value)
 {
-	// 플레이어 or 몬스터
+	// 몬스터 이동 속도 제어 여기 내부 작성(몬스터 코드 추가 후)
 	if (ATaskPlayer* Test = Cast<ATaskPlayer>(TargetActor))
 	{
 		this->Target = Test;
-
-		/*Test->SetSpeed(Test->GetSpeed() / StaggerValue);
-
-		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect On : %f"), Test->GetSpeed());*/
-
 		
 		if (UObject* Outer = GetOuter())
 		{
@@ -42,13 +37,11 @@ float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, 
 
 void UStaggerEffect::RemoveEffect()
 {
+	// 경직 효과 제거 (몬스터 코드 추가 후)
 	if (ATaskPlayer* Test = Cast<ATaskPlayer>(Target))
 	{
-		/*Test->SetSpeed(Test->GetSpeed() * StaggerValue);
-		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Off : %f"), Test->GetSpeed());*/
 		Target = nullptr;
 	}
-
 
 	if (UObject* Outer = GetOuter())
 	{
@@ -62,6 +55,7 @@ void UStaggerEffect::RemoveEffect()
 }
 
 
+//디버깅용 코드
 void UStaggerEffect::BeginDestroy()
 {
 	Super::BeginDestroy();
