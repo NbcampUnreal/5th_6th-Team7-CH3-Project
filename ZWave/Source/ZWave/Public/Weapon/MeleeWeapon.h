@@ -14,6 +14,10 @@ UCLASS()
 class ZWAVE_API AMeleeWeapon : public AWeaponBase
 {
 	GENERATED_BODY()
+
+public:
+	AMeleeWeapon();
+
 public:
 	virtual void Attack() override;
 
@@ -23,6 +27,25 @@ public:
 
 	virtual void Unequip() override;
 
+	UFUNCTION(BlueprintCallable)
+	void StartAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void EndAttack();
+
 protected:
+	UFUNCTION()
+	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
+
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	TObjectPtr<class USphereComponent> SphereCollision;
+
 	FMeleeWeaponStats MeleeWeaponStat;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> OverlappedEnemies;
 };

@@ -2,16 +2,31 @@
 
 #include "Weapon/MeleeWeapon.h"
 #include "GameFramework/Character.h"
+#include "Components/SphereComponent.h"
+
+AMeleeWeapon::AMeleeWeapon()
+{
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collision"));
+	SphereCollision->SetGenerateOverlapEvents(false);
+}
 
 void AMeleeWeapon::Attack()
 {
 	if (GetWorld() == nullptr)
 		return;
 
+	if (OverlappedEnemies.Num() == 0)
+		return;
+
 	if (CanAttack() == false ||
 		bEquipped == false ||
 		OwningCharacter == nullptr)
 		return;
+
+	for (TObjectPtr<AActor> TargetActor : OverlappedEnemies)
+	{
+		// DamageCalculator 호출 예정
+	}
 }
 
 bool AMeleeWeapon::Init(const UWeaponDefinition* WeaponDefinition)
@@ -24,6 +39,8 @@ bool AMeleeWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 	}
 
 	MeleeWeaponStat = MeleeDefinition->MeleeWeaponStat;
+	SphereCollision->InitSphereRadius(MeleeWeaponStat.Radius);
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AMeleeWeapon::OnSphereBeginOverlap);
 
 	return true;
 }
@@ -36,4 +53,26 @@ void AMeleeWeapon::Equip(ACharacter* NewOwner)
 void AMeleeWeapon::Unequip()
 {
 	Super::Unequip();
+}
+
+void AMeleeWeapon::StartAttack()
+{
+	SphereCollision->SetGenerateOverlapEvents(true);
+}
+
+void AMeleeWeapon::EndAttack()
+{
+	SphereCollision->SetGenerateOverlapEvents(false);
+	Attack();
+	OverlappedEnemies.Empty();
+}
+
+void AMeleeWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor &&
+		OtherActor != GetOwner() &&
+		OtherActor != OwningCharacter)
+	{
+		OverlappedEnemies.AddUnique(OtherActor);
+	}
 }
