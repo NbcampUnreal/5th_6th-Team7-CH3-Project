@@ -20,18 +20,18 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TestPlayerController|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputMappingContext* InputMappingContext;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TestPlayerController|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* MoveAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TestPlayerController|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* LookAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TestPlayerController|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* JumpAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TestPlayerController|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* ShotAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TestPlayerController|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* SprintAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TestPlayerController|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* ShoulderAction;
 };

@@ -27,7 +27,7 @@ void UCharacterActionComponent::InitRefs(UCharacterMovementComponent* InMoveComp
 	}
 	if (MoveComp.IsValid())
 	{
-		NormalWalkSpeed = MoveComp->MaxWalkSpeed;
+		NormalWalkSpeed = MoveComp->MaxWalkSpeed * SpeedMultiply;
 	}
 }
 
@@ -47,7 +47,6 @@ void UCharacterActionComponent::Move(const FInputActionValue& Value)
 			OwnerChar->AddMovementInput(OwnerChar->GetActorForwardVector(), Axis.X);
 		} 
 
-		UE_LOG(LogTemp, Warning, TEXT("%d"),(MoveDirection));
 		LastMoveInput = Axis;
 	}
 }
@@ -99,7 +98,7 @@ void UCharacterActionComponent::StartShoulder()
 {
 	SpringArm->SocketOffset = FVector{ 0.f,SpringArmShoulderSocketOffsetY, SpringArmSocketOffsetZ };
 	MoveSpeed = ShoulderSpeed;
-	MoveComp->MaxWalkSpeed = MoveSpeed;
+	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
 	bShoulder = true;
 }
 
@@ -107,7 +106,7 @@ void UCharacterActionComponent::StopShoulder()
 {
 	SpringArm->SocketOffset = FVector{ 0.f,SpringArmNormalSocketOffsetY, SpringArmSocketOffsetZ };
 	MoveSpeed = NormalWalkSpeed;
-	MoveComp->MaxWalkSpeed = MoveSpeed;
+	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
 	bShoulder = false;
 }
 
@@ -120,6 +119,22 @@ void UCharacterActionComponent::TickAction(float DeltaTime)
 	CheckMoveSpeed(DeltaTime);
 	UpdateShoulder(DeltaTime);
 	SetMeshDir(DeltaTime);
+}
+
+void UCharacterActionComponent::Attacked(AActor* DamageCauser)
+{
+	//맞는 방향에 맞춰서 애니메이션 재생
+}
+
+void UCharacterActionComponent::Die()
+{
+	//죽는 애니메이션 Montage
+}
+
+void UCharacterActionComponent::ChangeSpeedMultiply(float Multiply)
+{
+	SpeedMultiply = Multiply;
+	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
 }
 
 void UCharacterActionComponent::UpdateShoulder(float DeltaTime)
@@ -155,12 +170,12 @@ void UCharacterActionComponent::CheckMoveSpeed(float DeltaTime)
 		if (MoveSpeed < MaxSprintSpeed)
 		{
 			MoveSpeed += DeltaTime * SprintAnimationSpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed;
+			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
 		}
 		else
 		{
 			MoveSpeed = MaxSprintSpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed;
+			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
 		}
 	}
 	else
@@ -168,12 +183,12 @@ void UCharacterActionComponent::CheckMoveSpeed(float DeltaTime)
 		if (MoveSpeed > NormalWalkSpeed)
 		{
 			MoveSpeed -= DeltaTime * SprintAnimationRecovorySpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed;
+			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
 		}
 		else
 		{
 			MoveSpeed = NormalWalkSpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed;
+			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
 		}
 	}
 }
@@ -210,8 +225,6 @@ void UCharacterActionComponent::SetMeshDir(float DeltaTime)
 	MeshYawOffsetDeg = FMath::FInterpTo(MeshYawOffsetDeg, DesiredRelYaw + BaseMeshYawOffsetDeg, DeltaTime, MeshTurnSpeed);
 	BP_MoveDirDeltaYawDeg = MeshYawOffsetDeg + 90.f;
 	Character->GetMesh()->SetRelativeRotation(FRotator(0.f, MeshYawOffsetDeg, 0.f));
-
-	UE_LOG(LogTemp, Warning, TEXT("BP_MoveDirDeltaYawDeg: %f"), BP_MoveDirDeltaYawDeg);
 }
 
 float UCharacterActionComponent::ConvertAngle(float InDeg)

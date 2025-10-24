@@ -134,3 +134,15 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
+void ATaskPlayer::Attacked(AActor* DamageCauser, float Damage)
+{
+	ActionComp->Attacked(DamageCauser);
+	Super::Attacked(DamageCauser, Damage);
+}
+
+void ATaskPlayer::Die()
+{
+	ActionComp->Die();
+	//사망 시 UI출력?
+}
+

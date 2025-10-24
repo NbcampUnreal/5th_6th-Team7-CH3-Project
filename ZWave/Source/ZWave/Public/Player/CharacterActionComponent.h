@@ -44,6 +44,8 @@ public:
 	void Shot();
 	void TickAction(float DeltaTime);
 
+	void Attacked(AActor* DamageCauser);
+	void Die();
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -58,6 +60,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Facing")
 	ECharacterMoveDirection MoveDirection = ECharacterMoveDirection::Foward;
 
+	UFUNCTION()
+	void ChangeSpeedMultiply(float Multiply = 1.f);
+
 private:
 	TWeakObjectPtr<UCharacterMovementComponent> MoveComp;
 	TWeakObjectPtr<USpringArmComponent>        SpringArm;
@@ -66,6 +71,7 @@ private:
 	float MaxSprintSpeed = 600.f;
 	float NormalWalkSpeed = 300.f;
 	float ShoulderSpeed = 150.f;
+	float SpeedMultiply = 1.f;
 
 	float NormalArmLength = 300.f;
 	float ShoulderArmLength = 150.f;
