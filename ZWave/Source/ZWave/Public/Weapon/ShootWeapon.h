@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int CalcTransferBullet(int Need) const { return FMath::Min(Need, RemainSpareAmmo); }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE EShootType GetShootType() const { return ShootType; }
+
 public:
 	// BP 이펙트 처리용
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon", meta = (DisplayName = "OnFire"))
@@ -82,4 +85,6 @@ protected:
 
 	FTimerHandle FireTimer;
 	FTimerHandle ReloadTimer;
+
+	EShootType ShootType;
 };
