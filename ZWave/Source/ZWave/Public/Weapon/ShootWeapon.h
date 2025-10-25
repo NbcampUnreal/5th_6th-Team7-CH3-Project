@@ -63,9 +63,7 @@ public:
 	FOnWeaponFireSuccess OnFireSuccess;
 
 protected:
-	// TODO : 차후 시점 변경이 있다면 Delegate를 구독할 필요 있음
-	// 샷건 고려시, 총알 각도 계산 변경 필요 (폴리싱 기간 작업 예정)
-	void ShootOneBullet(bool IsFPSSight);
+	void ShootOneBullet(bool IsFPSSight, float SpreadDeg);
 
 	void StartReloadOneBullet();
 	void ReloadOneBullet();
@@ -73,6 +71,8 @@ protected:
 
 	void StartReloadAll();
 	void ReloadAll();
+
+	FVector GetCameraAimPoint();
 
 protected:
 	FShootWeaponStats ShootWeaponStat;
@@ -87,4 +87,6 @@ protected:
 	FTimerHandle ReloadTimer;
 
 	EShootType ShootType;
+
+	bool bIsFPSSight;
 };
