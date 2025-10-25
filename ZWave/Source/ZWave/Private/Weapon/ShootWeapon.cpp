@@ -37,7 +37,7 @@ void AShootWeapon::Attack()
 	bCanAttack = false;
 
 	
-	ShootOneBullet(false);
+	ShootOneBullet(false,0.0f);
 
 	GetWorldTimerManager().SetTimer(FireTimer, [this]() 
 		{bCanAttack = true; }
@@ -67,6 +67,9 @@ bool AShootWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 void AShootWeapon::Equip(ACharacter* NewOwner)
 {
 	Super::Equip(NewOwner);
+
+	// 장착시 시점은 Owner에서 얻어올 것
+	bIsFPSSight = false;
 }
 
 void AShootWeapon::Unequip()
@@ -103,7 +106,7 @@ void AShootWeapon::Reload()
 	}
 }
 
-void AShootWeapon::ShootOneBullet(bool IsFPSSight)
+void AShootWeapon::ShootOneBullet(bool IsFPSSight, float SpreadDeg)
 {
 	if (OwningCharacter == nullptr)
 		return;
@@ -114,18 +117,30 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight)
 	TArray<TEnumAsByte<EPhysicalSurface>> Surfaces;
 
 	FVector Start = OwningCharacter->GetActorLocation();
-	FVector Dir = OwningCharacter->GetActorForwardVector();
 
 	if (SkeletalMeshComponent->DoesSocketExist(MuzzleSocketName))
 	{
 		Start = SkeletalMeshComponent->GetSocketLocation(MuzzleSocketName);
 	}
 
+	FVector CameraAimPoint = GetCameraAimPoint();
+	// PlayerController가 없는 경우는 그냥 정면으로
+	FVector Shootdir = CameraAimPoint != FVector::ZeroVector ? 
+		(CameraAimPoint - Start).GetSafeNormal() : 
+		OwningCharacter->GetActorForwardVector();
+
+	// 탄 퍼짐 옵션
+	if (SpreadDeg > 0.f)
+	{
+		const float HalfRad = FMath::DegreesToRadians(SpreadDeg * 0.5f);
+		Shootdir = FMath::VRandCone(Shootdir, HalfRad);
+	}
+
 	Points.Add(Start);
 	Normals.Add(FVector::ZeroVector);
 	Surfaces.Add(SurfaceType_Default);
 
-	FVector End = Start + Dir * TraceDistance;
+	FVector End = Start + Shootdir * TraceDistance;
 
 	FHitResult Hit;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(ShootWeaponTrace), /*bTraceComplex=*/true);
@@ -221,4 +236,42 @@ void AShootWeapon::ReloadAll()
 	bReloading = false;
 
 	// UI 연동 고려?
+}
+
+FVector AShootWeapon::GetCameraAimPoint()
+{
+	APlayerController* PC = Cast<APlayerController>(OwningCharacter->GetController());
+	if (PC == nullptr)
+		return FVector::ZeroVector;
+
+	FVector ViewLoc; FRotator ViewRot;
+	PC->GetPlayerViewPoint(ViewLoc, ViewRot);
+
+	FVector ViewDir = ViewRot.Vector();
+	if (!bIsFPSSight)
+	{
+		int32 SX, SY;
+		PC->GetViewportSize(SX, SY);
+		const FVector2D Center(SX * 0.5f, SY * 0.5f);
+
+		FVector WorldOrigin, WorldDir;
+		if (PC->DeprojectScreenPositionToWorld(Center.X, Center.Y, WorldOrigin, WorldDir))
+		{
+			ViewLoc = WorldOrigin;
+			ViewDir = WorldDir;
+		}
+	}
+
+	const float CameraTraceDistance = 15000.f;
+
+	FHitResult AimHit;
+	{
+		FCollisionQueryParams Params(SCENE_QUERY_STAT(AimTrace), /*bTraceComplex=*/true);
+		Params.AddIgnoredActor(OwningCharacter);
+		Params.AddIgnoredActor(this);
+		const FVector AimEnd = ViewLoc + ViewDir * CameraTraceDistance;
+		PC->GetWorld()->LineTraceSingleByChannel(AimHit, ViewLoc, AimEnd, ECC_Visibility, Params);
+	}
+
+	return AimHit.bBlockingHit ? AimHit.ImpactPoint : (ViewLoc + ViewDir * CameraTraceDistance);
 }
