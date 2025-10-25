@@ -88,7 +88,7 @@ void AShootWeapon::Reload()
 {
 	if (IsFullMagazine() ||
 		bReloading ||
-		RemainSpareAmmo)
+		RemainSpareAmmo <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ShootWeapon Can't Reload!"));
 		return;
