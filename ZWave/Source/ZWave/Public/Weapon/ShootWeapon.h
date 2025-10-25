@@ -7,6 +7,8 @@
 #include "Weapon/ShootWeaponDefinition.h"
 #include "ShootWeapon.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFireSuccess);
+
 /**
  *
  */
@@ -43,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int CalcTransferBullet(int Need) const { return FMath::Min(Need, RemainSpareAmmo); }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE EShootType GetShootType() const { return ShootType; }
+
 public:
 	// BP 이펙트 처리용
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon", meta = (DisplayName = "OnFire"))
@@ -52,6 +57,10 @@ public:
 		const TArray<TEnumAsByte<EPhysicalSurface>>& SurfaceTypes,
 		bool bHit
 	);
+
+public:
+	UPROPERTY()
+	FOnWeaponFireSuccess OnFireSuccess;
 
 protected:
 	// TODO : 차후 시점 변경이 있다면 Delegate를 구독할 필요 있음
@@ -76,4 +85,6 @@ protected:
 
 	FTimerHandle FireTimer;
 	FTimerHandle ReloadTimer;
+
+	EShootType ShootType;
 };

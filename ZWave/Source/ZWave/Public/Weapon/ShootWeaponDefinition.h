@@ -6,6 +6,14 @@
 #include "WeaponDefinition.h"
 #include "ShootWeaponDefinition.generated.h"
 
+UENUM(BlueprintType)
+enum class EShootType : uint8
+{
+	ST_None,
+	ST_HandHun,
+	ST_ShotHun,
+	ST_Rifle,
+};
 
 USTRUCT(BlueprintType)
 struct FShootWeaponStats : public FCommonWeaponStats
@@ -44,4 +52,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float TraceDistance = 10000.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	EShootType ShootType;
 };

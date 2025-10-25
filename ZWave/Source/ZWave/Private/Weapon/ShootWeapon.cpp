@@ -22,6 +22,11 @@ void AShootWeapon::Attack()
 		return;
 	}
 
+	if (OnFireSuccess.IsBound())
+	{
+		OnFireSuccess.Broadcast();
+	}
+
 	if (ShootWeaponStat.bReloadAll == false &&
 		bReloading)
 	{
@@ -51,9 +56,9 @@ bool AShootWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 	ShootWeaponStat = ShootDefinition->ShootWeaponStat;
 	MuzzleSocketName = ShootDefinition->MuzzleSocketName;
 	TraceDistance = ShootDefinition->TraceDistance;
+	ShootType = ShootDefinition->ShootType;
 	NowAmmo = ShootWeaponStat.Magazine;
 	RemainSpareAmmo = ShootWeaponStat.SpareAmmo;
-	
 	bReloading = false;
 
 	return true;
@@ -72,6 +77,8 @@ void AShootWeapon::Unequip()
 	GetWorldTimerManager().ClearTimer(ReloadTimer);
 	bReloading = false;
 	bCanAttack = true;
+
+	OnFireSuccess.Clear();
 }
 
 void AShootWeapon::Reload()
