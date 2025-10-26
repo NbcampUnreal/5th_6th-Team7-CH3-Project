@@ -23,7 +23,10 @@ void UEquipComponent::BeginPlay()
 		return;
 	}
 
-	SetSlotData(EEquipSlot::First, WeaponDefinitionMap[EEquipSlot::First]);
+	for (const auto& Def : WeaponDefinitionMap)
+	{
+		SetSlotData(Def.Key, Def.Value);
+	}
 	Equip(EEquipSlot::First);
 }
 
@@ -44,18 +47,21 @@ bool UEquipComponent::Equip(EEquipSlot Slot)
 			return false;
 		}
 
-		SlotMaps[Slot]->Unequip();
-		UnEquip(Slot);
+		if (CurrentSlot != EEquipSlot::None)
+		{
+			SlotMaps[CurrentSlot]->Unequip();
+			UnEquip(CurrentSlot);
+		}
 		CurrentSlot = Slot;
 
 		FindWeapon->SetActorHiddenInGame(false);
 		FindWeapon->SetActorEnableCollision(true);
 		FindWeapon->SetActorTickEnabled(true);
 
-		SlotMaps[Slot]->Equip(OwnChara);
+		SlotMaps[CurrentSlot]->Equip(OwnChara);
 
 		// Attach
-		AttachWeaponToOwner(FindWeapon, WeaponDefinitionMap[Slot]);
+		AttachWeaponToOwner(FindWeapon, WeaponDefinitionMap[CurrentSlot]);
 
 		return true;
 	}
@@ -113,6 +119,7 @@ void UEquipComponent::SetSlotData(EEquipSlot Slot, const UWeaponDefinition* Weap
 
 		UGameplayStatics::FinishSpawningActor(WeaponActor, FTransform::Identity);
 		SlotMaps.Add(Slot, WeaponActor);
+		UnEquip(Slot);
 	}
 }
 
