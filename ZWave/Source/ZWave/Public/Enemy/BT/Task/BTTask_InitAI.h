@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "TTask_InitAI.generated.h"
+#include "BTTask_InitAI.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZWAVE_API UTTask_InitAI : public UBTTask_BlackboardBase
+class ZWAVE_API UBTTask_InitAI : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
 
 public:
-	UTTask_InitAI();
+	UBTTask_InitAI();
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

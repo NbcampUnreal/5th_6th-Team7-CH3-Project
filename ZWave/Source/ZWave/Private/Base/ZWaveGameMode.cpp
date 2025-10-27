@@ -3,9 +3,16 @@
 
 #include "Base/ZWaveGameMode.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "Prop/PurificationDevice.h"
 
 void AZWaveGameMode::BeginPlay()
 {
-	PuriDevice = GetWorld()->SpawnActor<APurificationDevice>(PurificationDevice_class, FVector().ZeroVector, FRotator().ZeroRotator);
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APurificationDevice::StaticClass(), FoundActors);
+
+	if (FoundActors.Num() == 1) {
+		PuriDevice = static_cast<APurificationDevice*>(FoundActors[0]);
+	}
 }

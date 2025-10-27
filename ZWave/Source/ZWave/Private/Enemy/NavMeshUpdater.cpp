@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "NavigationSystem.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 ANavMeshUpdater::ANavMeshUpdater()
@@ -40,7 +41,9 @@ void ANavMeshUpdater::HandleHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 	if (NavSystem)
 	{
 		UE_LOG(LogTemp, Display, TEXT("on hit rebuild %d"), NavSystem->IsNavigationUpdateLocked());
-		NavSystem->Build(); // 네비메시 리빌드
+		//NavSystem->Build(); // 네비메시 리빌드
+
+		//ReBuild
 	}
 }
 
