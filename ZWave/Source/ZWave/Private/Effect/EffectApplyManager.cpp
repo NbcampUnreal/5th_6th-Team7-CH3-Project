@@ -1,7 +1,6 @@
 ﻿#include "Effect/EffectApplyManager.h"
 #include "Effect/EffectBase.h"
 #include "Effect/StaggerEffect.h"
-#include "Mode/ModeDefinition.h"
 
 UEffectApplyManager::UEffectApplyManager()
 {
