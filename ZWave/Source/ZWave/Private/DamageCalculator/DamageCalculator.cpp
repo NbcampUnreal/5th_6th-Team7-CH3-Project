@@ -4,7 +4,7 @@
 #include "Base/BaseCharacter.h"
 #include "Engine/World.h"
 
-void UDamageCalculator::DamageCalculate(UObject* WorldContextObject, AActor* Causer, AActor* Target, const float& BaseDamage, float EffectValue,  TSubclassOf<UEffectBase> EffectClass)
+void UDamageCalculator::DamageCalculate(UObject* WorldContextObject, AActor* Causer, AActor* Target, const float& BaseDamage, const float& EffectValue,  TSubclassOf<UEffectBase> EffectClass)
 {
 	float FinalDamage = BaseDamage;
 	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
