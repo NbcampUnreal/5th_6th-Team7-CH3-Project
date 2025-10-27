@@ -26,6 +26,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> Mesh;
+
 
 public:
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
