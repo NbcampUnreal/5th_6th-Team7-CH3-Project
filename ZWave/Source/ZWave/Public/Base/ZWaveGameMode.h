@@ -13,5 +13,13 @@ UCLASS()
 class ZWAVE_API AZWaveGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void BeginPlay() override;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class APurificationDevice> PurificationDevice_class;
+	class APurificationDevice* PuriDevice;
+
 };
