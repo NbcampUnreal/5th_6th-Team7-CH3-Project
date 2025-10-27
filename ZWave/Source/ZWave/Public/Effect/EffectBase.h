@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,7 +15,7 @@ class ZWAVE_API UEffectBase : public UObject
 	GENERATED_BODY()
 
 public:
-	virtual float ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value) PURE_VIRTUAL(UEffectBase::ApplyEffect, return BaseDamage;);
+	virtual float ApplyEffect(AActor* TargetActor, const float& BaseDamage, const float& Value) PURE_VIRTUAL(UEffectBase::ApplyEffect, return BaseDamage;);
 	virtual void RemoveEffect() PURE_VIRTUAL(UEffectBase::RemoveEffect, );
 
 protected:

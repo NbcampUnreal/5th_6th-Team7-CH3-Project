@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -17,7 +17,7 @@ class ZWAVE_API UStaggerEffect : public UEffectBase
 public:
 	UStaggerEffect();
 
-	virtual float ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value) override;
+	virtual float ApplyEffect(AActor* TargetActor, const float& BaseDamage, const float& Value) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
 

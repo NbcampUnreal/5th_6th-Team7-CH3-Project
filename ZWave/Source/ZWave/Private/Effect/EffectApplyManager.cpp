@@ -1,22 +1,33 @@
 ﻿#include "Effect/EffectApplyManager.h"
 #include "Effect/EffectBase.h"
 #include "Effect/StaggerEffect.h"
+#include "Base/Damagable.h"
 
 UEffectApplyManager::UEffectApplyManager()
 {
 }
 
-float UEffectApplyManager::ApplyEffect(AActor* Target, const float& BaseDamage, float EffectValue, TSubclassOf<UEffectBase> EffectClass)
+float UEffectApplyManager::ApplyEffect(
+	TScriptInterface<IDamagable> Target,
+	const float& BaseDamage, 
+	float EffectValue, 
+	TArray<TSubclassOf<UEffectBase>>& EffectClassArray)
 {
 	float ApplyEffectDmg = BaseDamage;
-	if (UEffectBase* NewEffect = CreateEffect(EffectClass))
+
+	for (const auto& EffectClass : EffectClassArray)
 	{
-		if (IsValid(Target))
+		if (UEffectBase* NewEffect = CreateEffect(EffectClass))
 		{
-			ApplyEffectDmg = NewEffect->ApplyEffect(Target, BaseDamage, EffectValue);
+			if (IsValid(Target.GetObject()))
+			{
+				if (AActor* TargetActor = Cast<AActor>(Target.GetObject()))
+				{
+					ApplyEffectDmg += NewEffect->ApplyEffect(TargetActor, BaseDamage, EffectValue);
+				}
+			}
 		}
 	}
-
 	return ApplyEffectDmg;
 }
 
