@@ -18,6 +18,6 @@ class ZWAVE_API UDamageCalculator : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Calculate")
-	static void DamageCalculate(UObject* WorldContextObject, AActor* Causer, AActor* Target, const float& BaseDamage, float EffectValue, TSubclassOf<UEffectBase> EffectClass);
+	static void DamageCalculate(UObject* WorldContextObject, AActor* Causer, AActor* Target, const float& BaseDamage, const float& EffectValue, TSubclassOf<UEffectBase> EffectClass);
 	
 };
