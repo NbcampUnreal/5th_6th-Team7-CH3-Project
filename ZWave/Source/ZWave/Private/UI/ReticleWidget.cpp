@@ -3,4 +3,6 @@
 void UReticleWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
+	OnReticleActivated();
 }
