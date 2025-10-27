@@ -7,27 +7,14 @@
 #include "Level/ZWaveTypes.h"
 #include "ZWaveGameState.generated.h"
 
+class UIngameHUD;
+
 UCLASS()
 class ZWAVE_API AZWaveGameState : public AGameStateBase
 {
     GENERATED_BODY()
 
 public:
-
-    void SetCurrentGameState(EGameState NewState)
-    {
-        CurrentGameState = NewState;
-    }
-
-    void SetCurrentWave(int32 NewWave)
-    {
-        CurrentWave = NewWave;
-    }
-
-    void SetEnemiesRemaining(int32 NewCount)
-    {
-        EnemiesRemaining = NewCount;
-    }
 
     UFUNCTION(BlueprintPure, Category = "Game State")
     EGameState GetCurrentGameState() const { return CurrentGameState; }
@@ -38,6 +25,14 @@ public:
     UFUNCTION(BlueprintPure, Category = "Game State")
     int32 GetEnemiesRemaining() const { return EnemiesRemaining; }
 
+    void SetCurrentGameState(EGameState NewState);
+
+    void SetCurrentWave(int32 NewWave);
+
+    void SetEnemiesRemaining(int32 NewCount, int32 MaxCount);
+
+    void RegisterIngameHUD(UIngameHUD* InHUD);
+
 protected:
     UPROPERTY(BlueprintReadOnly, Category = "Game State")
     EGameState CurrentGameState = EGameState::EGS_None;
@@ -47,4 +42,6 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, Category = "Game State")
     int32 EnemiesRemaining = 0;
+
+    UIngameHUD* IngameHUD;
 };
