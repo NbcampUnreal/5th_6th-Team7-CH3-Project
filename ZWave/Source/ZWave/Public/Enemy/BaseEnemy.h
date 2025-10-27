@@ -32,6 +32,7 @@ protected:
 
 public:
 	bool GetCanEditAttackPriority() const;
+	float GetAttackRange() const;
 
 public:
 	virtual void Attack();

@@ -28,6 +28,11 @@ bool ABaseEnemy::GetCanEditAttackPriority() const
 	return this->bCanEditAttackPriority;
 }
 
+float ABaseEnemy::GetAttackRange() const
+{
+	return this->AttackRange;
+}
+
 void ABaseEnemy::Attack()
 {
 }

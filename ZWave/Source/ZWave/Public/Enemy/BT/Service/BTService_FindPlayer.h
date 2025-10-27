@@ -20,14 +20,12 @@ public:
 	UBTService_FindPlayer();
 
 private:
-	UPROPERTY(EditAnywhere, Category = Blackboard)
-	struct FBlackboardKeySelector OrgTargetLocationKey;
-
 	UPROPERTY(EditAnywhere)
-	float SightRange = 1000;
+	float SightRange = 2000;
 	UPROPERTY(EditAnywhere)
-	float SightDegree = 70;
-
+	float AutoDetectionRange = 200;
+	UPROPERTY(EditAnywhere)
+	float SightDegree = 180;
 
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
