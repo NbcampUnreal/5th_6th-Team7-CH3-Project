@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Player/TaskPlayer.h"
+#include "Weapon/ShootWeaponDefinition.h"
 
 UCharacterActionComponent::UCharacterActionComponent()
 {
@@ -110,28 +111,60 @@ void UCharacterActionComponent::StopShoulder()
 	bShoulder = false;
 }
 
-void UCharacterActionComponent::Shot()
+void UCharacterActionComponent::Shot(EShootType ShootType)
 {
-	if (ACharacter* OwnerChar = Cast<ACharacter>(GetOwner()))
+	if (bIsSprinting)
 	{
+		bIsSprinting = false;
+	}
+
+	if (ATaskPlayer* OwnerChar = Cast<ATaskPlayer>(GetOwner()))
+	{
+		if (CachedAnimInstance)
+		{
+			UnbindMontageNotifies(OwnerChar);
+		}
 		auto MeshCheck = OwnerChar->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
 			{
-				const float PlayedLen = Anim->Montage_Play(
-					FireMontage,
-					1.f,
-					EMontagePlayReturnType::MontageLength,
-					0.f,
-					true
-				);
+				switch (ShootType)
+				{
+				case EShootType::ST_ShotHun:
+				case EShootType::ST_Rifle:
+				{
+
+					const float PlayedLen = Anim->Montage_Play(
+						RifleFireMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
+				case EShootType::ST_None:
+				case EShootType::ST_HandHun:
+				{
+					const float PlayedLen = Anim->Montage_Play(
+						PistolFireMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
+				default:
+					break;
+				}
 			}
 		}
 	}
 }
 
-void UCharacterActionComponent::EquipChange()
+void UCharacterActionComponent::EquipChange(EShootType ShootType)
 {
 	if (ACharacter* OwnerChar = Cast<ACharacter>(GetOwner()))
 	{
@@ -140,34 +173,85 @@ void UCharacterActionComponent::EquipChange()
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
 			{
-				const float PlayedLen = Anim->Montage_Play(
-					EquipMontage,
-					1.f,
-					EMontagePlayReturnType::MontageLength,
-					0.f,
-					true
-				);
+				EnsureBindMontageNotifies(Anim);
+				switch (ShootType)
+				{
+				case EShootType::ST_ShotHun:
+				case EShootType::ST_Rifle:
+				{
+					const float PlayedLen = Anim->Montage_Play(
+						RifleEquipMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
+				case EShootType::ST_None:
+				case EShootType::ST_HandHun:
+				{
+					const float PlayedLen = Anim->Montage_Play(
+						PistolEquipMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
+				default:
+					break;
+				}
 			}
 		}
 	}
 }
 
-void UCharacterActionComponent::Reload()
+void UCharacterActionComponent::Reload(EShootType ShootType)
 {
-	if (ACharacter* OwnerChar = Cast<ACharacter>(GetOwner()))
+	if (ATaskPlayer* OwnerChar = Cast<ATaskPlayer>(GetOwner()))
 	{
+		if (CachedAnimInstance)
+		{
+			UnbindMontageNotifies(OwnerChar);
+		}
+
 		auto MeshCheck = OwnerChar->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
 			{
-				const float PlayedLen = Anim->Montage_Play(
-					ReloadMontage,
-					1.f,
-					EMontagePlayReturnType::MontageLength,
-					0.f,
-					true
-				);
+				switch (ShootType)
+				{
+				case EShootType::ST_ShotHun:
+				case EShootType::ST_Rifle:
+				{
+					const float PlayedLen = Anim->Montage_Play(
+						RifleReloadMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+
+					break;
+				}
+				case EShootType::ST_None:
+				case EShootType::ST_HandHun:
+				{
+					const float PlayedLen = Anim->Montage_Play(
+						PistolReloadMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
+				default:
+					break;
+				}
 			}
 		}
 	}
@@ -194,6 +278,45 @@ void UCharacterActionComponent::ChangeSpeedMultiply(float Multiply)
 {
 	SpeedMultiply = Multiply;
 	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+}
+
+void UCharacterActionComponent::EnsureBindMontageNotifies(UAnimInstance* Anim)
+{
+	if (!Anim) return;
+
+	if (CachedAnimInstance && CachedAnimInstance != Anim)
+	{
+		UnbindMontageNotifies(Cast<ATaskPlayer>(GetOwner()));
+	}
+
+	if (!bNotifyBound)
+	{
+		CachedAnimInstance = Anim;
+		bNotifyBound = true;
+	}
+}
+
+void UCharacterActionComponent::UnbindMontageNotifies(ATaskPlayer* Player)
+{
+	CachedAnimInstance = nullptr;
+	bNotifyBound = false;
+	if(Player)
+		Player->AttachWeaponTo(TEXT("WeaponSocket"));
+}
+
+void UCharacterActionComponent::OnMontageNotifyBegin(FName NotifyName)
+{
+	if (ATaskPlayer* Player = Cast<ATaskPlayer>(GetOwner()))
+	{
+		if (NotifyName == "WeaponL")
+		{
+			Player->AttachWeaponTo(TEXT("RifleMove"));
+		}
+		else if (NotifyName == "WeaponR")
+		{
+			UnbindMontageNotifies(Player);
+		}
+	}
 }
 
 void UCharacterActionComponent::UpdateShoulder(float DeltaTime)

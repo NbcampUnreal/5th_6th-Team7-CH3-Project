@@ -9,7 +9,9 @@
 
 class UCharacterMovementComponent;
 class USpringArmComponent;
-class UCameraComponent;
+class UCameraComponent; 
+class ATaskPlayer;
+enum class EShootType : uint8;
 
 UENUM(BlueprintType)
 enum class ECharacterMoveDirection : uint8
@@ -41,10 +43,10 @@ public:
 	void StopSprint();
 	void StartShoulder();
 	void StopShoulder();
-	void Shot();
+	void Shot(EShootType ShootType);
 	void TickAction(float DeltaTime);
-	void Reload();
-	void EquipChange();
+	void Reload(EShootType ShootType);
+	void EquipChange(EShootType ShootType);
 		
 	void Attacked(AActor* DamageCauser);
 	void Die();
@@ -67,14 +69,34 @@ public:
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
-	TObjectPtr<UAnimMontage> FireMontage = nullptr;
+	TObjectPtr<UAnimMontage> RifleFireMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
-	TObjectPtr<UAnimMontage> ReloadMontage = nullptr;
+	TObjectPtr<UAnimMontage> RifleReloadMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
-	TObjectPtr<UAnimMontage> EquipMontage = nullptr;
+	TObjectPtr<UAnimMontage> RifleEquipMontage = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> PistolFireMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> PistolReloadMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> PistolEquipMontage = nullptr;
+
+
+	UPROPERTY()        
+	UAnimInstance* CachedAnimInstance = nullptr;
+
+	bool bNotifyBound = false;
+
+	void EnsureBindMontageNotifies(UAnimInstance* Anim);
+	void UnbindMontageNotifies(ATaskPlayer* Player);
+
+	UFUNCTION(BlueprintCallable)
+	void OnMontageNotifyBegin(FName NotifyName);
 private:
 	TWeakObjectPtr<UCharacterMovementComponent> MoveComp;
 	TWeakObjectPtr<USpringArmComponent>        SpringArm;

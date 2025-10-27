@@ -29,16 +29,30 @@ ATaskPlayer::ATaskPlayer()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
+void ATaskPlayer::AttachWeaponTo(const FName SocketName)
+{
+	if (NowShootWeapon)
+	{
+		USkeletalMeshComponent* SkeletalMesh = GetMesh();
+		if (SkeletalMesh == nullptr)
+			return;
+
+		if (NowShootWeapon->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon Attached Failed! SocketName : %s"), *SocketName.ToString());
+		}
+	}
+}
+
 void ATaskPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
-	if (ActionComp)
+
+	if (ActionComp && EquipComponent)
 	{
 		ActionComp->InitRefs(GetCharacterMovement(), SpringArmComp, CameraComp);
-	}
-	if (EquipComponent)
-	{
+
 		if (EquipComponent->Equip(EEquipSlot::First))
 		{
 			EquipChange();
@@ -59,6 +73,7 @@ void ATaskPlayer::BeginPlay()
 				{
 					NowShootWeapon = NewShootWeapon;
 					NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+					ActionComp->UnbindMontageNotifies(this);
 				}
 			}
 		}
@@ -116,7 +131,7 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 			}
 			if (PlayerController->EquipSlotThirdAction)
 			{
-				EnhancedInput->BindAction(PlayerController->EquipSlotSecondAction,
+				EnhancedInput->BindAction(PlayerController->EquipSlotThirdAction,
 					ETriggerEvent::Triggered,
 					this,
 					&ATaskPlayer::EquipThirdSlot
@@ -273,11 +288,6 @@ void ATaskPlayer::EquipChange()
 		return;
 	}
 
-	if (ActionComp)
-	{
-		ActionComp->EquipChange();
-	}
-
 	if (NowShootWeapon)
 	{
 		NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShotAction);
@@ -288,6 +298,12 @@ void ATaskPlayer::EquipChange()
 	{
 		NowShootWeapon = NewShootWeapon;
 		NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+
+		if (ActionComp)
+		{
+			ActionComp->EquipChange(NowShootWeapon->GetShootType());
+		}
+
 	}
 	else
 	{
@@ -308,9 +324,9 @@ void ATaskPlayer::Shot()
 
 void ATaskPlayer::ShotAction()
 {
-	if (ActionComp)
+	if (NowShootWeapon && ActionComp)
 	{
-		ActionComp->Shot();
+		ActionComp->Shot(NowShootWeapon->GetShootType());
 ;	}
 }
 
@@ -319,9 +335,17 @@ void ATaskPlayer::Reload()
 	if (NowShootWeapon)
 	{
 		NowShootWeapon->Reload();
+		if (ActionComp)
+		{
+			ActionComp->Reload(NowShootWeapon->GetShootType());
+		}
 	}
-	if (ActionComp)
-	{
-		ActionComp->Reload();
-	}
+}
+
+EShootType ATaskPlayer::GetShootType() const
+{
+	if (!NowShootWeapon)
+		return EShootType::ST_Rifle;
+
+	return NowShootWeapon->GetShootType();
 }

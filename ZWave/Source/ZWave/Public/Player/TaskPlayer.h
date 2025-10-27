@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
 class AShootWeapon;
+enum class EShootType : uint8;
 
 UCLASS()
 class ZWAVE_API ATaskPlayer : public ABaseCharacter
@@ -23,6 +24,8 @@ public:
 
 	UFUNCTION()
 	const bool IsDead() { return Health <= 0.f; };
+
+	void AttachWeaponTo(const FName SocketName);
 
 protected:
 
@@ -45,6 +48,8 @@ protected:
 	UFUNCTION()
 	void ShotAction();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	EShootType GetShootType() const;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|Camera", meta = (AllowPrivateAccess = "true"))
