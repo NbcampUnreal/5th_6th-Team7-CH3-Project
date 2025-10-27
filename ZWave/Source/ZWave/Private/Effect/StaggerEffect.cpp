@@ -9,7 +9,7 @@ UStaggerEffect::UStaggerEffect()
 	StaggerValue = 3;
 }
 
-float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, float Value)
+float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, const float& Value)
 {
 	// 몬스터 이동 속도 제어 여기 내부 작성(몬스터 코드 추가 후)
 	if (ATaskPlayer* Test = Cast<ATaskPlayer>(TargetActor))

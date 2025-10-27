@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,6 +8,7 @@
 
 class UModeDefinition;
 class UEffectBase;
+class IDamagable;
 
 UCLASS()
 class ZWAVE_API UEffectApplyManager : public UWorldSubsystem
@@ -17,7 +18,7 @@ class ZWAVE_API UEffectApplyManager : public UWorldSubsystem
 public:
 	UEffectApplyManager();
 
-	float ApplyEffect(AActor* Target, const float& BaseDamage, float EffectValue, TSubclassOf<UEffectBase> EffectClass);
+	float ApplyEffect(TScriptInterface<IDamagable> Target, const float& BaseDamage, float EffectValue, TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
 
 private:
 	UEffectBase* CreateEffect(TSubclassOf<UEffectBase> EffectClass);

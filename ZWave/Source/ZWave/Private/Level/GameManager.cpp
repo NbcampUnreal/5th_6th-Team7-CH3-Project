@@ -70,6 +70,7 @@ void UGameManager::BeginCombatPhase()
     if (AZWaveGameState* LocalGameState = GetGameState())
     {
         LocalGameState->SetCurrentGameState(CurrentState);
+        LocalGameState->SetCurrentWave(CurrentWaveNumber);
     }
 
     UWaveManager* LocalWaveManager = GetWorld()->GetSubsystem<UWaveManager>();
