@@ -18,6 +18,7 @@ public class ZWave : ModuleRules
             "UMG",
             "CommonUI" ,
             "PhysicsCore",
+            "NavigationSystem",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
