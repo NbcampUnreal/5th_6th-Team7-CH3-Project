@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
+#include "Weapon/ShootWeaponDefinition.h"
 #include "IngameHUD.generated.h"
 
 class UReticleWidget;
@@ -25,7 +26,7 @@ public:
 	void OnHealthChange(float CurrentHealth, float TargetHealth);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnGunChanged(int32 SlotIdx);
+	void OnGunChanged(EShootType SlotIdx);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnAmmoChanged(int32 CurrentAmmo, int32 MaxAmmo, int32 TotalAmmo);
