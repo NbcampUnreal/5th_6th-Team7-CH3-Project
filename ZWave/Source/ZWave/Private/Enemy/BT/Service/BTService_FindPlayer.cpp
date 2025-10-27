@@ -17,6 +17,8 @@ UBTService_FindPlayer::UBTService_FindPlayer()
 
 void UBTService_FindPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
+
 	AAIController* MyController = OwnerComp.GetAIOwner();
 	if (MyController == nullptr) return;
 

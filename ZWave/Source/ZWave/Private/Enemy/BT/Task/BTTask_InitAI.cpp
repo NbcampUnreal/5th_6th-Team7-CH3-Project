@@ -20,6 +20,8 @@ UBTTask_InitAI::UBTTask_InitAI()
 
 EBTNodeResult::Type UBTTask_InitAI::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	Super::ExecuteTask(OwnerComp, NodeMemory);
+
 	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
 	if (OwnerBlackboard == nullptr) return EBTNodeResult::Failed;
 
