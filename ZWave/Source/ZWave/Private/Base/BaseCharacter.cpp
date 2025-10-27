@@ -3,6 +3,7 @@
 
 #include "Base/BaseCharacter.h"
 #include "Weapon/EquipComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -15,6 +16,8 @@ ABaseCharacter::ABaseCharacter()
 	Armor = 0.f;
 
 	EquipComponent = CreateDefaultSubobject<UEquipComponent>(TEXT("EquipComponent"));
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
 
 // Called when the game starts or when spawned
