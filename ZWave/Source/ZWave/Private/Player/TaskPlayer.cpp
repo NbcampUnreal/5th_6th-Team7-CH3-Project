@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Player/TaskPlayer.h"
@@ -8,6 +8,8 @@
 #include "Player/CharacterActionComponent.h" 
 #include "EnhancedInputComponent.h"
 #include "Player/TaskPlayerController.h"
+#include "Weapon/EquipComponent.h"
+#include "Weapon/ShootWeapon.h"
 
 ATaskPlayer::ATaskPlayer()
 {
@@ -34,6 +36,32 @@ void ATaskPlayer::BeginPlay()
 	if (ActionComp)
 	{
 		ActionComp->InitRefs(GetCharacterMovement(), SpringArmComp, CameraComp);
+	}
+	if (EquipComponent)
+	{
+		if (EquipComponent->Equip(EEquipSlot::First))
+		{
+			EquipChange();
+;		}
+		else
+		{
+			if (AWeaponBase* BaseWeapon = EquipComponent->GetCurrentWeapon())
+			{
+				AShootWeapon* NewShootWeapon = Cast<AShootWeapon>(BaseWeapon);
+
+				if (NowShootWeapon)
+				{
+					NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShotAction);
+					NowShootWeapon = nullptr;
+				}
+
+				if (NewShootWeapon)
+				{
+					NowShootWeapon = NewShootWeapon;
+					NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+				}
+			}
+		}
 	}
 }
 
@@ -62,73 +90,118 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	{
 		if (ATaskPlayerController* PlayerController = Cast<ATaskPlayerController>(GetController()))
 		{
-			if (PlayerController->MoveAction)
+			if (PlayerController->ReloadAction)
 			{
-				EnhancedInput->BindAction(PlayerController->MoveAction,
+				EnhancedInput->BindAction(PlayerController->ReloadAction,
 					ETriggerEvent::Triggered,
-					ActionComp,
-					&UCharacterActionComponent::Move
-				);
-				EnhancedInput->BindAction(PlayerController->MoveAction,
-					ETriggerEvent::Completed,
-					ActionComp,
-					&UCharacterActionComponent::StopMove
+					this,
+					&ATaskPlayer::Reload
 				);
 			}
-			if (PlayerController->JumpAction)
+			if (PlayerController->EquipSlotFirstAction)
 			{
-				EnhancedInput->BindAction(PlayerController->JumpAction,
+				EnhancedInput->BindAction(PlayerController->EquipSlotFirstAction,
 					ETriggerEvent::Triggered,
-					ActionComp,
-					&UCharacterActionComponent::StartJump
-				);
-				EnhancedInput->BindAction(PlayerController->JumpAction,
-					ETriggerEvent::Completed,
-					ActionComp,
-					&UCharacterActionComponent::StopJump
+					this,
+					&ATaskPlayer::EquipFirstSlot
 				);
 			}
-			if (PlayerController->LookAction)
+			if (PlayerController->EquipSlotSecondAction)
 			{
-				EnhancedInput->BindAction(PlayerController->LookAction,
+				EnhancedInput->BindAction(PlayerController->EquipSlotSecondAction,
 					ETriggerEvent::Triggered,
-					ActionComp,
-					&UCharacterActionComponent::Look
+					this,
+					&ATaskPlayer::EquipSecondSlot
 				);
 			}
+			if (PlayerController->EquipSlotThirdAction)
+			{
+				EnhancedInput->BindAction(PlayerController->EquipSlotSecondAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ATaskPlayer::EquipThirdSlot
+				);
+			}				
 			if (PlayerController->ShotAction)
 			{
 				EnhancedInput->BindAction(PlayerController->ShotAction,
 					ETriggerEvent::Triggered,
-					ActionComp,
-					&UCharacterActionComponent::Shot
+					this,
+					&ATaskPlayer::Shot
 				);
 			}
-			if (PlayerController->SprintAction)
+
+
+			if (ActionComp)
 			{
-				EnhancedInput->BindAction(PlayerController->SprintAction,
-					ETriggerEvent::Triggered,
-					ActionComp,
-					&UCharacterActionComponent::StartSprint
-				);
-				EnhancedInput->BindAction(PlayerController->SprintAction,
-					ETriggerEvent::Completed,
-					ActionComp,
-					&UCharacterActionComponent::StopSprint
-				);
-			}
-			if (PlayerController->ShoulderAction)
-			{
-				EnhancedInput->BindAction(PlayerController->ShoulderAction,
-					ETriggerEvent::Triggered,
-					ActionComp,
-					&UCharacterActionComponent::StartShoulder
-				);
-				EnhancedInput->BindAction(PlayerController->ShoulderAction,
-					ETriggerEvent::Completed,
-					ActionComp,
-					&UCharacterActionComponent::StopShoulder
-				);
+				if (PlayerController->MoveAction)
+				{
+					EnhancedInput->BindAction(PlayerController->MoveAction,
+						ETriggerEvent::Triggered,
+						ActionComp,
+						&UCharacterActionComponent::Move
+					);
+					EnhancedInput->BindAction(PlayerController->MoveAction,
+						ETriggerEvent::Completed,
+						ActionComp,
+						&UCharacterActionComponent::StopMove
+					);
+				}
+				if (PlayerController->JumpAction)
+				{
+					EnhancedInput->BindAction(PlayerController->JumpAction,
+						ETriggerEvent::Triggered,
+						ActionComp,
+						&UCharacterActionComponent::StartJump
+					);
+					EnhancedInput->BindAction(PlayerController->JumpAction,
+						ETriggerEvent::Completed,
+						ActionComp,
+						&UCharacterActionComponent::StopJump
+					);
+				}
+				if (PlayerController->LookAction)
+				{
+					EnhancedInput->BindAction(PlayerController->LookAction,
+						ETriggerEvent::Triggered,
+						ActionComp,
+						&UCharacterActionComponent::Look
+					);
+				}
+				if (PlayerController->SprintAction)
+				{
+					EnhancedInput->BindAction(PlayerController->SprintAction,
+						ETriggerEvent::Triggered,
+						ActionComp,
+						&UCharacterActionComponent::StartSprint
+					);
+					EnhancedInput->BindAction(PlayerController->SprintAction,
+						ETriggerEvent::Completed,
+						ActionComp,
+						&UCharacterActionComponent::StopSprint
+					);
+				}
+				if (PlayerController->ShoulderAction)
+				{
+					EnhancedInput->BindAction(PlayerController->ShoulderAction,
+						ETriggerEvent::Triggered,
+						ActionComp,
+						&UCharacterActionComponent::StartShoulder
+					);
+					EnhancedInput->BindAction(PlayerController->ShoulderAction,
+						ETriggerEvent::Completed,
+						ActionComp,
+						&UCharacterActionComponent::StopShoulder
+					);
+				}
+				//if (PlayerController->ShotAction)
+				//{
+				//	EnhancedInput->BindAction(PlayerController->ShotAction,
+				//		ETriggerEvent::Triggered,
+				//		this,
+				//		&ATaskPlayer::ShotAction
+				//	);
+				//}
 			}
 		}
 	}
@@ -143,6 +216,112 @@ void ATaskPlayer::Attacked(AActor* DamageCauser, float Damage)
 void ATaskPlayer::Die()
 {
 	ActionComp->Die();
-	//»ç¸Á ½Ã UIÃâ·Â?
+	//ì‚¬ë§ ì‹œ UIì¶œë ¥?
 }
 
+void ATaskPlayer::EquipFirstSlot()
+{
+	if (EquipComponent)
+	{
+		if (EquipComponent->Equip(EEquipSlot::First))
+		{
+			EquipChange();
+		}
+	}
+}
+
+void ATaskPlayer::EquipSecondSlot()
+{
+	if (EquipComponent)
+	{
+		if (EquipComponent->Equip(EEquipSlot::Second))
+		{
+			EquipChange();
+		}
+	}
+}
+
+void ATaskPlayer::EquipThirdSlot()
+{
+	if (EquipComponent)
+	{
+		if (EquipComponent->Equip(EEquipSlot::Third))
+		{
+			EquipChange();
+		}
+	}
+}
+
+void ATaskPlayer::EquipChange()
+{
+	AShootWeapon* NewShootWeapon = nullptr;
+
+	if (AWeaponBase* BaseWeapon = EquipComponent->GetCurrentWeapon())
+	{
+		NewShootWeapon = Cast<AShootWeapon>(BaseWeapon);
+	}
+
+	if (!NewShootWeapon)
+		return;
+
+	if (NewShootWeapon == NowShootWeapon)
+	{
+		if (NowShootWeapon)
+		{
+			NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+		}
+		return;
+	}
+
+	if (ActionComp)
+	{
+		ActionComp->EquipChange();
+	}
+
+	if (NowShootWeapon)
+	{
+		NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShotAction);
+		NowShootWeapon = nullptr;
+	}
+
+	if (NewShootWeapon)
+	{
+		NowShootWeapon = NewShootWeapon;
+		NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Current weapon is not AShootWeapon (or none). Unbound."));
+	}
+}
+
+void ATaskPlayer::Shot()
+{
+	if (EquipComponent)
+	{
+		if(AWeaponBase* Weapon = EquipComponent->GetCurrentWeapon())
+		{
+			Weapon->Attack();
+		}
+	}
+}
+
+void ATaskPlayer::ShotAction()
+{
+	if (ActionComp)
+	{
+		ActionComp->Shot();
+;	}
+}
+
+void ATaskPlayer::Reload()
+{
+	if (NowShootWeapon)
+	{
+		NowShootWeapon->Reload();
+	}
+	if (ActionComp)
+	{
+		ActionComp->Reload();
+	}
+}

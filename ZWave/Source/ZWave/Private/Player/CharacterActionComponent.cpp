@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Player/CharacterActionComponent.h"
@@ -112,6 +112,65 @@ void UCharacterActionComponent::StopShoulder()
 
 void UCharacterActionComponent::Shot()
 {
+	if (ACharacter* OwnerChar = Cast<ACharacter>(GetOwner()))
+	{
+		auto MeshCheck = OwnerChar->GetMesh();
+		if (MeshCheck != nullptr)
+		{
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				const float PlayedLen = Anim->Montage_Play(
+					FireMontage,
+					1.f,
+					EMontagePlayReturnType::MontageLength,
+					0.f,
+					true
+				);
+			}
+		}
+	}
+}
+
+void UCharacterActionComponent::EquipChange()
+{
+	if (ACharacter* OwnerChar = Cast<ACharacter>(GetOwner()))
+	{
+		auto MeshCheck = OwnerChar->GetMesh();
+		if (MeshCheck != nullptr)
+		{
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				const float PlayedLen = Anim->Montage_Play(
+					EquipMontage,
+					1.f,
+					EMontagePlayReturnType::MontageLength,
+					0.f,
+					true
+				);
+			}
+		}
+	}
+}
+
+void UCharacterActionComponent::Reload()
+{
+	if (ACharacter* OwnerChar = Cast<ACharacter>(GetOwner()))
+	{
+		auto MeshCheck = OwnerChar->GetMesh();
+		if (MeshCheck != nullptr)
+		{
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				const float PlayedLen = Anim->Montage_Play(
+					ReloadMontage,
+					1.f,
+					EMontagePlayReturnType::MontageLength,
+					0.f,
+					true
+				);
+			}
+		}
+	}
 }
 
 void UCharacterActionComponent::TickAction(float DeltaTime)
@@ -123,12 +182,12 @@ void UCharacterActionComponent::TickAction(float DeltaTime)
 
 void UCharacterActionComponent::Attacked(AActor* DamageCauser)
 {
-	//¸Â´Â ¹æÇâ¿¡ ¸ÂÃç¼­ ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
+	//ë§ëŠ” ë°©í–¥ì— ë§ì¶°ì„œ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ
 }
 
 void UCharacterActionComponent::Die()
 {
-	//Á×´Â ¾Ö´Ï¸ŞÀÌ¼Ç Montage
+	//ì£½ëŠ” ì• ë‹ˆë©”ì´ì…˜ Montage
 }
 
 void UCharacterActionComponent::ChangeSpeedMultiply(float Multiply)

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,6 +11,7 @@ class UCharacterActionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
+class AShootWeapon;
 
 UCLASS()
 class ZWAVE_API ATaskPlayer : public ABaseCharacter
@@ -20,6 +21,9 @@ class ZWAVE_API ATaskPlayer : public ABaseCharacter
 public:
 	ATaskPlayer();
 
+	UFUNCTION()
+	const bool IsDead() { return Health <= 0.f; };
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -28,6 +32,19 @@ protected:
 
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 	virtual void Die() override;
+
+	void EquipFirstSlot();
+	void EquipSecondSlot();
+	void EquipThirdSlot();
+
+	void EquipChange();
+
+	void Shot();
+	void Reload();
+
+	UFUNCTION()
+	void ShotAction();
+
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|Camera", meta = (AllowPrivateAccess = "true"))
@@ -41,5 +58,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|AimSet", meta = (AllowPrivateAccess = "true"))
 	float ControllerPitch = 0.0f;
+
+	UPROPERTY()
+	AShootWeapon* NowShootWeapon;
 
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -43,7 +43,9 @@ public:
 	void StopShoulder();
 	void Shot();
 	void TickAction(float DeltaTime);
-
+	void Reload();
+	void EquipChange();
+		
 	void Attacked(AActor* DamageCauser);
 	void Die();
 public:
@@ -62,6 +64,16 @@ public:
 
 	UFUNCTION()
 	void ChangeSpeedMultiply(float Multiply = 1.f);
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> FireMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> ReloadMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> EquipMontage = nullptr;
 
 private:
 	TWeakObjectPtr<UCharacterMovementComponent> MoveComp;

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Player/TaskPlayerController.h"
@@ -11,7 +11,11 @@ ATaskPlayerController::ATaskPlayerController()
 	JumpAction(nullptr),
 	ShotAction(nullptr),
 	SprintAction(nullptr),
-	ShoulderAction(nullptr)
+	ShoulderAction(nullptr),
+	ReloadAction(nullptr),
+	EquipSlotFirstAction(nullptr),
+	EquipSlotSecondAction(nullptr),
+	EquipSlotThirdAction(nullptr)
 {
 }
 
