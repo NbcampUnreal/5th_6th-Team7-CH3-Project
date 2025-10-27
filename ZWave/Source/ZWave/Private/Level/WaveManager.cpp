@@ -66,7 +66,7 @@ void UWaveManager::StartWave(int32 WaveNumber)
 
         if (AZWaveGameState* LocalGameState = GetGameState())
         {
-            LocalGameState->SetEnemiesRemaining(EnemiesRemainingInWave);
+            LocalGameState->SetEnemiesRemaining(EnemiesRemainingInWave, EnemiesToSpawnThisWave);
         }
 
         UE_LOG(LogTemp, Log, TEXT("Wave %d Started. Spawning %d enemies."), WaveNumber, EnemiesToSpawnThisWave);
@@ -86,7 +86,7 @@ void UWaveManager::HandleEnemyDied(ABaseCharacter* DiedEnemy)
 
         if (AZWaveGameState* LocalGameState = GetGameState())
         {
-            LocalGameState->SetEnemiesRemaining(EnemiesRemainingInWave);
+            LocalGameState->SetEnemiesRemaining(EnemiesRemainingInWave, EnemiesToSpawnThisWave);
         }
 
         if (EnemiesRemainingInWave == 0 && EnemiesToSpawnThisWave > 0)
