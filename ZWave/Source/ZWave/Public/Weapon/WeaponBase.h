@@ -31,6 +31,9 @@ public:
 	FORCEINLINE bool CanAttack() const { return bCanAttack; };
 
 protected:
+	FORCEINLINE bool IsDamagableActor(AActor* TargetActor) { return TargetActor && TargetActor->GetClass()->ImplementsInterface(UDamagable::StaticClass()); }
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
