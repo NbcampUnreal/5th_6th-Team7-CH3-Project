@@ -3,6 +3,7 @@
 #include "Weapon/MeleeWeapon.h"
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
+#include "DamageCalculator/DamageCalculator.h"
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -25,7 +26,16 @@ void AMeleeWeapon::Attack()
 
 	for (TObjectPtr<AActor> TargetActor : OverlappedEnemies)
 	{
-		// DamageCalculator 호출 예정
+		if (IsDamagableActor(TargetActor) == true)
+		{
+			UDamageCalculator::DamageCalculate(
+				GetWorld(),
+				OwningCharacter,
+				TargetActor,
+				MeleeWeaponStat.AttackPower,
+				StaggerValue,
+				BaseEffectClasses);
+		}
 	}
 }
 

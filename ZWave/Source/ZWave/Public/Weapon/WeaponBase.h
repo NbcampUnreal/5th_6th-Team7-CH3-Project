@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "WeaponDefinition.h"
 #include "Engine/EngineTypes.h"
+#include "Base/Damagable.h"
+#include "Effect/EffectBase.h"
 #include "WeaponBase.generated.h"
 
 class ACharacter;
@@ -45,4 +47,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	bool bCanAttack = true;
+
+	// 프로토타입 코드 - 차후 Moding 클래스 개발 이후 수정 예정
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<UEffectBase>> BaseEffectClasses;
+
+	// 프로토타입 코드 - 차후 Moding 클래스 개발 이후 수정 예정
+	UPROPERTY(EditDefaultsOnly)
+	float StaggerValue;
 };
