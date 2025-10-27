@@ -4,6 +4,7 @@
 #include "Weapon/ShootWeapon.h"
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "DamageCalculator/DamageCalculator.h"
 
 void AShootWeapon::Attack()
 {
@@ -35,9 +36,10 @@ void AShootWeapon::Attack()
 	}
 
 	bCanAttack = false;
-
 	
 	ShootOneBullet(false,0.0f);
+
+	UE_LOG(LogTemp, Warning, TEXT("Remain Ammo : %d"), NowAmmo);
 
 	GetWorldTimerManager().SetTimer(FireTimer, [this]() 
 		{bCanAttack = true; }
@@ -157,9 +159,17 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight, float SpreadDeg)
 		Normals.Add(Hit.ImpactNormal);
 		Surfaces.Add(UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get()));
 
-		if (AActor* TargetActor = Hit.GetActor())
+		AActor* TargetActor = Hit.GetActor();
+
+		if (IsDamagableActor(TargetActor) == true)
 		{
-			// Damage 계산 함수 요청
+			UDamageCalculator::DamageCalculate(
+				GetWorld(),
+				OwningCharacter,
+				TargetActor,
+				ShootWeaponStat.AttackPower,
+				StaggerValue,
+				BaseEffectClasses);
 		}
 	}
 	else
@@ -231,6 +241,8 @@ void AShootWeapon::ReloadAll()
 
 	RemainSpareAmmo -= Move;
 	NowAmmo += Move;
+
+	UE_LOG(LogTemp, Warning, TEXT("Remain Ammo : %d"), NowAmmo);
 
 	bCanAttack = true;
 	bReloading = false;
