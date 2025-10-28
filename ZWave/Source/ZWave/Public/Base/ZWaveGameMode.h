@@ -20,6 +20,8 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class APurificationDevice> PurificationDevice_class;
+
+public:
 	class APurificationDevice* PuriDevice;
 
 };

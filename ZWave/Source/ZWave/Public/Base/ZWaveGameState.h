@@ -25,6 +25,8 @@ public:
     UFUNCTION(BlueprintPure, Category = "Game State")
     int32 GetEnemiesRemaining() const { return EnemiesRemaining; }
 
+    UIngameHUD* IngameHUD;
+
     void SetCurrentGameState(EGameState NewState);
 
     void SetCurrentWave(int32 NewWave);
@@ -43,5 +45,4 @@ protected:
     UPROPERTY(BlueprintReadOnly, Category = "Game State")
     int32 EnemiesRemaining = 0;
 
-    UIngameHUD* IngameHUD;
 };
