@@ -10,6 +10,8 @@
 #include "Player/TaskPlayerController.h"
 #include "Weapon/EquipComponent.h"
 #include "Weapon/ShootWeapon.h"
+#include "UI/IngameHUD.h"
+#include "Base/ZWaveGameState.h"
 
 ATaskPlayer::ATaskPlayer()
 {
@@ -29,16 +31,30 @@ ATaskPlayer::ATaskPlayer()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
+void ATaskPlayer::AttachWeaponTo(const FName SocketName)
+{
+	if (NowShootWeapon)
+	{
+		USkeletalMeshComponent* SkeletalMesh = GetMesh();
+		if (SkeletalMesh == nullptr)
+			return;
+
+		if (NowShootWeapon->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon Attached Failed! SocketName : %s"), *SocketName.ToString());
+		}
+	}
+}
+
 void ATaskPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
-	if (ActionComp)
+
+	if (ActionComp && EquipComponent)
 	{
 		ActionComp->InitRefs(GetCharacterMovement(), SpringArmComp, CameraComp);
-	}
-	if (EquipComponent)
-	{
+
 		if (EquipComponent->Equip(EEquipSlot::First))
 		{
 			EquipChange();
@@ -51,14 +67,15 @@ void ATaskPlayer::BeginPlay()
 
 				if (NowShootWeapon)
 				{
-					NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShotAction);
+					NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShootingAction);
 					NowShootWeapon = nullptr;
 				}
 
 				if (NewShootWeapon)
 				{
 					NowShootWeapon = NewShootWeapon;
-					NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+					NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShootingAction);
+					ActionComp->UnbindMontageNotifies(this);
 				}
 			}
 		}
@@ -116,21 +133,12 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 			}
 			if (PlayerController->EquipSlotThirdAction)
 			{
-				EnhancedInput->BindAction(PlayerController->EquipSlotSecondAction,
+				EnhancedInput->BindAction(PlayerController->EquipSlotThirdAction,
 					ETriggerEvent::Triggered,
 					this,
 					&ATaskPlayer::EquipThirdSlot
 				);
 			}				
-			if (PlayerController->ShotAction)
-			{
-				EnhancedInput->BindAction(PlayerController->ShotAction,
-					ETriggerEvent::Triggered,
-					this,
-					&ATaskPlayer::Shot
-				);
-			}
-
 
 			if (ActionComp)
 			{
@@ -194,6 +202,20 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 						&UCharacterActionComponent::StopShoulder
 					);
 				}
+				if (PlayerController->ShootingAction)
+				{
+					EnhancedInput->BindAction(PlayerController->ShootingAction,
+						ETriggerEvent::Triggered,
+						this,
+						&ATaskPlayer::CheckShooting
+					);
+					EnhancedInput->BindAction(PlayerController->ShootingAction,
+						ETriggerEvent::Completed,
+						ActionComp,
+						&UCharacterActionComponent::StopShooting
+					);
+				}
+
 				//if (PlayerController->ShotAction)
 				//{
 				//	EnhancedInput->BindAction(PlayerController->ShotAction,
@@ -224,7 +246,7 @@ void ATaskPlayer::EquipFirstSlot()
 	if (EquipComponent)
 	{
 		if (EquipComponent->Equip(EEquipSlot::First))
-		{
+		{	
 			EquipChange();
 		}
 	}
@@ -268,26 +290,32 @@ void ATaskPlayer::EquipChange()
 	{
 		if (NowShootWeapon)
 		{
-			NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+			NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShootingAction);
 		}
 		return;
 	}
 
-	if (ActionComp)
-	{
-		ActionComp->EquipChange();
-	}
-
 	if (NowShootWeapon)
 	{
-		NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShotAction);
+		NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShootingAction);
 		NowShootWeapon = nullptr;
 	}
 
 	if (NewShootWeapon)
 	{
 		NowShootWeapon = NewShootWeapon;
-		NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+		NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShootingAction);
+
+		if (ActionComp)
+		{
+			ActionComp->EquipChange(this, NowShootWeapon->GetShootType());
+
+			if (UIngameHUD* nowHud = GetIngameHud())
+			{
+				nowHud->OnGunChanged(NowShootWeapon->GetShootType());
+			}
+		}
+
 	}
 	else
 	{
@@ -295,33 +323,58 @@ void ATaskPlayer::EquipChange()
 	}
 }
 
-void ATaskPlayer::Shot()
+void ATaskPlayer::CheckShooting()
 {
-	if (EquipComponent)
+	if (NowShootWeapon)
 	{
-		if(AWeaponBase* Weapon = EquipComponent->GetCurrentWeapon())
+		if (NowShootWeapon->IsNeedReload())
 		{
-			Weapon->Attack();
+			ActionComp->DryShot(this, NowShootWeapon->GetShootType());
+		}
+		else
+		{
+			NowShootWeapon->Attack();
 		}
 	}
 }
 
-void ATaskPlayer::ShotAction()
+void ATaskPlayer::ShootingAction()
 {
-	if (ActionComp)
+	if (NowShootWeapon && ActionComp)
 	{
-		ActionComp->Shot();
+		ActionComp->Shooting(this, NowShootWeapon->GetShootType());
 ;	}
 }
 
 void ATaskPlayer::Reload()
 {
-	if (NowShootWeapon)
+	if (NowShootWeapon && NowShootWeapon->IsFullMagazine() == false && NowShootWeapon->IsReload() == false)
 	{
 		NowShootWeapon->Reload();
+		if (ActionComp)
+		{
+			ActionComp->Reload(this, NowShootWeapon->GetShootType());
+		}
 	}
-	if (ActionComp)
+}
+
+EShootType ATaskPlayer::GetShootType() const
+{
+	if (!NowShootWeapon)
+		return EShootType::ST_Rifle;
+
+	return NowShootWeapon->GetShootType();
+}
+
+UIngameHUD* ATaskPlayer::GetIngameHud()
+{
+	if (UWorld* World = GetWorld())
 	{
-		ActionComp->Reload();
+		if (AZWaveGameState* ZGS = Cast<AZWaveGameState>(World->GetGameState()))
+		{
+			return ZGS->IngameHUD;
+		}
 	}
+
+	return nullptr;
 }

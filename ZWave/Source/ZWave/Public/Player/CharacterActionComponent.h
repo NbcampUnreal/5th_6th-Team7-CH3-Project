@@ -9,7 +9,9 @@
 
 class UCharacterMovementComponent;
 class USpringArmComponent;
-class UCameraComponent;
+class UCameraComponent; 
+class ATaskPlayer;
+enum class EShootType : uint8;
 
 UENUM(BlueprintType)
 enum class ECharacterMoveDirection : uint8
@@ -41,11 +43,12 @@ public:
 	void StopSprint();
 	void StartShoulder();
 	void StopShoulder();
-	void Shot();
+	void Shooting(ATaskPlayer* OwnerChar, EShootType ShootType);
+	void StopShooting();
 	void TickAction(float DeltaTime);
-	void Reload();
-	void EquipChange();
-		
+	void Reload(ATaskPlayer* OwnerChar, EShootType ShootType);
+	void EquipChange(ATaskPlayer* OwnerChar, EShootType ShootType);
+	void DryShot(ATaskPlayer* OwnerChar, EShootType ShootType);
 	void Attacked(AActor* DamageCauser);
 	void Die();
 public:
@@ -55,6 +58,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bShoulder = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsShooting = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Facing")
 	float BP_MoveDirDeltaYawDeg = 0.f;
@@ -67,14 +73,41 @@ public:
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
-	TObjectPtr<UAnimMontage> FireMontage = nullptr;
+	TObjectPtr<UAnimMontage> RifleFireMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
-	TObjectPtr<UAnimMontage> ReloadMontage = nullptr;
+	TObjectPtr<UAnimMontage> RifleReloadMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
-	TObjectPtr<UAnimMontage> EquipMontage = nullptr;
+	TObjectPtr<UAnimMontage> RifleEquipMontage = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> RifleDryShotMontage = nullptr;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> PistolFireMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> PistolReloadMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> PistolEquipMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> PistolDryShotMontage = nullptr;
+
+
+	UPROPERTY()        
+	UAnimInstance* CachedAnimInstance = nullptr;
+
+	bool bNotifyBound = false;
+
+	void EnsureBindMontageNotifies(UAnimInstance* Anim);
+	void UnbindMontageNotifies(ATaskPlayer* Player);
+
+	UFUNCTION(BlueprintCallable)
+	void OnMontageNotifyBegin(FName NotifyName);
 private:
 	TWeakObjectPtr<UCharacterMovementComponent> MoveComp;
 	TWeakObjectPtr<USpringArmComponent>        SpringArm;
@@ -85,14 +118,14 @@ private:
 	float ShoulderSpeed = 150.f;
 	float SpeedMultiply = 1.f;
 
-	float NormalArmLength = 300.f;
-	float ShoulderArmLength = 150.f;
+	float NormalArmLength = 200.f;
+	float ShoulderArmLength = 65.f;
 	float NormalSocketOffsetY = 0.f;
 	float ArmLerpSpeed = 800.f;
 
-	float SpringArmNormalSocketOffsetY = 42.f;
-	float SpringArmShoulderSocketOffsetY = 55.f;
-	float SpringArmSocketOffsetZ = 80.f;
+	float SpringArmNormalSocketOffsetY = 65.f;
+	float SpringArmShoulderSocketOffsetY = 65.f;
+	float SpringArmSocketOffsetZ = 85.f;
 
 	float SprintAnimationSpeed = 1000.f;
 	float SprintAnimationRecovorySpeed = 1000.f;
@@ -108,8 +141,13 @@ private:
 	float MoveDirDeltaYawDeg = 0.f;
 	FVector2D LastMoveInput = FVector2D::ZeroVector;
 
+	FTimerHandle DryShotBlockHandle;
+	bool bDryShooting = false;
+	void ClearDryShotBlock();
+
 	void UpdateShoulder(float DeltaTime);
 	void CheckMoveSpeed(float DeltaTime);
 	void SetMeshDir(float DeltaTime);
 	float ConvertAngle(float InDeg);
+
 };
