@@ -3,26 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 #include "BTTask_RotateToTarget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZWAVE_API UBTTask_RotateToTarget : public UBTTaskNode
+class ZWAVE_API UBTTask_RotateToTarget : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UBTTask_RotateToTarget();
-	
-private:
-	UPROPERTY(EditAnywhere, Category = Blackboard)
-	struct FBlackboardKeySelector MainTargetLocationKey;
-
-	UPROPERTY(EditAnywhere, Category = Blackboard)
-	struct FBlackboardKeySelector SecondaryTargetLocationKey;
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

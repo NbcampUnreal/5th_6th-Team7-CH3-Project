@@ -9,6 +9,7 @@ AMeleeWeapon::AMeleeWeapon()
 {
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collision"));
 	SphereCollision->SetGenerateOverlapEvents(false);
+	SetRootComponent(SphereCollision);
 }
 
 void AMeleeWeapon::Attack()
@@ -68,7 +69,6 @@ void AMeleeWeapon::Unequip()
 void AMeleeWeapon::StartAttack()
 {
 	SphereCollision->SetGenerateOverlapEvents(true);
-	bCanAttack = false;
 }
 
 void AMeleeWeapon::EndAttack()
@@ -76,6 +76,7 @@ void AMeleeWeapon::EndAttack()
 	SphereCollision->SetGenerateOverlapEvents(false);
 	Attack();
 	OverlappedEnemies.Empty();
+	bCanAttack = false;
 
 	GetWorldTimerManager().SetTimer(AttackTimer, [this]()
 		{bCanAttack = true; }

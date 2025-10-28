@@ -3,6 +3,9 @@
 
 #include "Enemy/BaseEnemy.h"
 
+#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 ABaseEnemy::ABaseEnemy()
 {
 	
@@ -23,6 +26,16 @@ void ABaseEnemy::Die()
 	Super::Die();
 }
 
+void ABaseEnemy::SetMoveSpeed(float MoveSpeed)
+{
+	if (MoveSpeed < 0) return;
+
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+	}
+}
+
 bool ABaseEnemy::GetCanEditAttackPriority() const
 {
 	return this->bCanEditAttackPriority;
@@ -35,4 +48,14 @@ float ABaseEnemy::GetAttackRange() const
 
 void ABaseEnemy::Attack()
 {
+	//USkeletalMeshComponent* Mesh = GetMesh();
+
+	if (GetMesh() && AttackMontage)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->Montage_Play(AttackMontage);
+		}
+	}
 }

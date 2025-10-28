@@ -15,7 +15,6 @@ class ZWAVE_API ABaseEnemy : public ABaseCharacter
 	GENERATED_BODY()
 
 public:
-
 	ABaseEnemy();
 
 public:
@@ -24,11 +23,17 @@ public:
 
 	virtual void Die() override;
 
+public:
+	void SetMoveSpeed(float MoveSpeed);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float AttackRange;
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	bool bCanEditAttackPriority;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	class UAnimMontage* AttackMontage;
 
 public:
 	bool GetCanEditAttackPriority() const;
@@ -36,7 +41,4 @@ public:
 
 public:
 	virtual void Attack();
-
-
-	
 };
