@@ -9,6 +9,7 @@ AMeleeWeapon::AMeleeWeapon()
 {
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collision"));
 	SphereCollision->SetGenerateOverlapEvents(false);
+	SetRootComponent(SphereCollision);
 }
 
 void AMeleeWeapon::Attack()
