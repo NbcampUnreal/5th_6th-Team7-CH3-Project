@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnTimeUpdated(FTimerHandle Timer);
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnChangedWaveMode(bool bIsBattle);
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnFireWeapon(AActor* HitActor);
 	void OnFireWeapon_Implementation(AActor* HitActor);
