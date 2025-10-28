@@ -39,6 +39,9 @@ public:
     int32 WaveNumber;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
+    float PreparationTime;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
     TArray<FMonsterSpawnInfo> MonsterSpawnList;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")

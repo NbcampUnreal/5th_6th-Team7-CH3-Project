@@ -49,7 +49,6 @@ protected:
 	int32 CurrentWaveNumber = 0;
 
 	FTimerHandle PrepPhaseTimerHandle;
-	FTimerHandle GameStartTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game Wave")
 	float DefaultPreparationTime = 5.0f;

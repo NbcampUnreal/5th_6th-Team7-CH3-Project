@@ -35,8 +35,6 @@ public:
 
     void RegisterIngameHUD(UIngameHUD* InHUD);
 
-    UIngameHUD* GetIngameHUD();
-
 protected:
     UPROPERTY(BlueprintReadOnly, Category = "Game State")
     EGameState CurrentGameState = EGameState::EGS_None;
