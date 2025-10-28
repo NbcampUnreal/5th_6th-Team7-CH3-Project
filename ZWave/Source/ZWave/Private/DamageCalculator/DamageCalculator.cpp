@@ -25,5 +25,5 @@ void UDamageCalculator::DamageCalculate(
 
 	// 여기서 데미지 적용
 	UE_LOG(LogTemp, Warning, TEXT("FinalDamage : %f"), FinalDamage);
-	Target->ApplyDamage(FinalDamage);
+	Target->Attacked(Causer, FinalDamage);
 }
