@@ -40,6 +40,9 @@ public:
 	FORCEINLINE bool IsNeedReload() { return NowAmmo <= 0; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE bool IsReload() { return bReloading; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool IsFullMagazine() { return NowAmmo == ShootWeaponStat.Magazine; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
