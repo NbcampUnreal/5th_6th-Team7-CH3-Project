@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DamageCalculator/DamageCalculator.h"
+#include "Base/ZWaveGameState.h"
+#include "UI/IngameHUD.h"
 
 void AShootWeapon::Attack()
 {
@@ -72,6 +74,8 @@ void AShootWeapon::Equip(ACharacter* NewOwner)
 
 	// 장착시 시점은 Owner에서 얻어올 것
 	bIsFPSSight = false;
+	
+	AmmoChangeUIBroadCast();
 }
 
 void AShootWeapon::Unequip()
@@ -108,12 +112,35 @@ void AShootWeapon::Reload()
 	}
 }
 
+UIngameHUD* AShootWeapon::GetIngameHud()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (AZWaveGameState* ZGS = Cast<AZWaveGameState>(World->GetGameState()))
+		{
+			return ZGS->IngameHUD;
+		}
+	}
+
+	return nullptr;
+}
+
+void AShootWeapon::AmmoChangeUIBroadCast()
+{
+	if (UIngameHUD* nowHud = GetIngameHud())
+	{
+		nowHud->OnAmmoChanged(NowAmmo, ShootWeaponStat.Magazine, RemainSpareAmmo);
+	}
+}
+
 void AShootWeapon::ShootOneBullet(bool IsFPSSight, float SpreadDeg)
 {
 	if (OwningCharacter == nullptr)
 		return;
 
 	NowAmmo--;
+
+	AmmoChangeUIBroadCast();
 
 	TArray<FVector> Points, Normals;
 	TArray<TEnumAsByte<EPhysicalSurface>> Surfaces;
@@ -204,7 +231,7 @@ void AShootWeapon::ReloadOneBullet()
 	RemainSpareAmmo--;
 	NowAmmo++;
 
-	// UI 연동 고려?
+	AmmoChangeUIBroadCast();
 
 	GetWorldTimerManager().SetTimer(ReloadTimer,this, &AShootWeapon::ReloadOneBullet,
 	ShootWeaponStat.ReloadTime, false, ShootWeaponStat.ReloadTime);
@@ -242,12 +269,10 @@ void AShootWeapon::ReloadAll()
 	RemainSpareAmmo -= Move;
 	NowAmmo += Move;
 
-	UE_LOG(LogTemp, Warning, TEXT("Remain Ammo : %d"), NowAmmo);
-
 	bCanAttack = true;
 	bReloading = false;
 
-	// UI 연동 고려?
+	AmmoChangeUIBroadCast();
 }
 
 FVector AShootWeapon::GetCameraAimPoint()

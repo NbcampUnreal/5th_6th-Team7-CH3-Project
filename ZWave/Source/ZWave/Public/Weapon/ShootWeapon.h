@@ -66,6 +66,10 @@ public:
 	FOnWeaponFireSuccess OnFireSuccess;
 
 protected:
+	class UIngameHUD* GetIngameHud();
+	void AmmoChangeUIBroadCast();
+
+protected:
 	void ShootOneBullet(bool IsFPSSight, float SpreadDeg);
 
 	void StartReloadOneBullet();
