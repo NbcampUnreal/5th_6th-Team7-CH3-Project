@@ -49,7 +49,6 @@ void UBTService_FindPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 		// the enemy immediately loses sight of the player
 		if (!(ToTargetVector.Size() < AutoDetectionRange && OwnerBlackboard->IsVectorValueSet(GetSelectedBlackboardKey())))
 		{
-			UE_LOG(LogTemp, Display, TEXT("%f < %f !!!!!!!"), ToTargetVector.Size(), AutoDetectionRange);
 			OwnerBlackboard->ClearValue(GetSelectedBlackboardKey());
 			return;
 		}
@@ -65,11 +64,9 @@ void UBTService_FindPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	// 플레이어와의 거리가 공격범위 이내이다 -> 정지
 	if (ToTargetVector.Size() < MyCharacter->GetAttackRange())
 	{
-		UE_LOG(LogTemp, Display, TEXT("Player is In My Attack Range -> Stop Moving"));
 		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), MyCharacter->GetActorLocation());
 	}
 	else {
-		UE_LOG(LogTemp, Display, TEXT("Player Is out of my Attack Range -> Move to Attack Position"));
 		// 그렇지 않다 -> 접근
 
 		FVector TargetLocation = TargetCharacter->GetActorLocation();
