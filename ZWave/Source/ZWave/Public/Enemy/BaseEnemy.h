@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,7 +15,6 @@ class ZWAVE_API ABaseEnemy : public ABaseCharacter
 	GENERATED_BODY()
 
 public:
-
 	ABaseEnemy();
 
 public:
@@ -24,11 +23,18 @@ public:
 
 	virtual void Die() override;
 
+public:
+	void SetMoveSpeed(float MoveSpeed);
+	float GetMoveSpeed();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float AttackRange;
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	bool bCanEditAttackPriority;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	class UAnimMontage* AttackMontage;
 
 public:
 	bool GetCanEditAttackPriority() const;
@@ -36,7 +42,4 @@ public:
 
 public:
 	virtual void Attack();
-
-
-	
 };

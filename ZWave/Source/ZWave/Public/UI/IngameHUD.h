@@ -36,9 +36,14 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnEnemyCountChanged(int32 CurrentEnemyCount, int32 MaxEnemyCount);
-	
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnTimeUpdated(FTimerHandle Timer);
+	void OnBreakTimeStart();
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnBattleStart();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnTimeUpdated();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnChangedWaveMode(bool bIsBattle);

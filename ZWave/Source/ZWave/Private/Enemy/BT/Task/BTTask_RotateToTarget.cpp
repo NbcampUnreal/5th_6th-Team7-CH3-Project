@@ -25,22 +25,15 @@ EBTNodeResult::Type UBTTask_RotateToTarget::ExecuteTask(UBehaviorTreeComponent& 
 
 	ABaseEnemy* MyCharacter = static_cast<ABaseEnemy*>(AIController->GetCharacter());
 	if (MyCharacter == nullptr) return EBTNodeResult::Failed;
-	
-	FVector TargetLocation = OwnerBlackboard->GetValueAsVector(MainTargetLocationKey.SelectedKeyName);
-	if (OwnerBlackboard->IsVectorValueSet(SecondaryTargetLocationKey.SelectedKeyName)) 
-	{
-		ABaseCharacter* TargetCharacter = Cast<ABaseCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (TargetCharacter == nullptr) return EBTNodeResult::Failed;
 
-		TargetLocation = TargetCharacter->GetActorLocation();
-	}
-
+	FVector TargetLocation = OwnerBlackboard->GetValueAsVector(GetSelectedBlackboardKey());
 	FVector ToTargetVector = (TargetLocation - MyCharacter->GetActorLocation()).GetSafeNormal();
+
 	FRotator LookAtRot = ToTargetVector.Rotation();
 	FRotator CurrentRot = MyCharacter->GetActorRotation();
 	FRotator NewRot = FRotator(CurrentRot.Pitch, LookAtRot.Yaw, CurrentRot.Roll);
 
 	MyCharacter->SetActorRotation(NewRot);
-	
+
 	return EBTNodeResult::Succeeded;
 }

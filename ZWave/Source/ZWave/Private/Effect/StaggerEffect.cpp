@@ -2,19 +2,21 @@
 #include "Engine/World.h"
 #include "Effect/EffectApplyManager.h"
 #include "Player/TaskPlayer.h"
+#include "Enemy/BaseEnemy.h"
 
 
 UStaggerEffect::UStaggerEffect()
 {
-	StaggerValue = 3;
+	StaggerSpeedMultiplier = 2;
 }
 
 float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, const float& Value)
 {
-	// 몬스터 이동 속도 제어 여기 내부 작성(몬스터 코드 추가 후)
-	if (ATaskPlayer* Test = Cast<ATaskPlayer>(TargetActor))
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{
-		this->Target = Test;
+		this->Target = Enemy;
+		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() / StaggerSpeedMultiplier);
+		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Active! EnemySpeed : %f"), Enemy->GetMoveSpeed());
 		
 		if (UObject* Outer = GetOuter())
 		{
@@ -28,18 +30,18 @@ float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, 
 					false
 				);
 			}
-			
 		}
 	}
-
 	return BaseDamage;
 }
 
 void UStaggerEffect::RemoveEffect()
 {
 	// 경직 효과 제거 (몬스터 코드 추가 후)
-	if (ATaskPlayer* Test = Cast<ATaskPlayer>(Target))
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
 	{
+		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() * StaggerSpeedMultiplier);
+		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect DeActive! EnemySpeed : %f"), Enemy->GetMoveSpeed());
 		Target = nullptr;
 	}
 

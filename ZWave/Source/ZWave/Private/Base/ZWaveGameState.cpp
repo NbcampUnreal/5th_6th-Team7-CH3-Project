@@ -38,3 +38,8 @@ void AZWaveGameState::RegisterIngameHUD(UIngameHUD* InHUD)
 {
     IngameHUD = InHUD;
 }
+
+UIngameHUD* AZWaveGameState::GetIngameHUD()
+{
+    return IngameHUD;
+}

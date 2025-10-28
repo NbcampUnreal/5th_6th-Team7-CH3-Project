@@ -24,5 +24,5 @@ public:
 private:
 	FTimerHandle Handle;
 
-	float StaggerValue;
+	float StaggerSpeedMultiplier;
 };

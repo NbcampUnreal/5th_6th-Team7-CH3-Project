@@ -11,17 +11,17 @@ float UEffectApplyManager::ApplyEffect(
 	TScriptInterface<IDamagable> Target,
 	const float& BaseDamage, 
 	float EffectValue, 
-	TArray<TSubclassOf<UEffectBase>>& EffectClassArray)
+	const TArray<TSubclassOf<UEffectBase>>& EffectClassArray)
 {
 	float ApplyEffectDmg = BaseDamage;
 
 	for (const auto& EffectClass : EffectClassArray)
 	{
-		if (UEffectBase* NewEffect = CreateEffect(EffectClass))
+		if (IsValid(Target.GetObject()))
 		{
-			if (IsValid(Target.GetObject()))
+			if (AActor* TargetActor = Cast<AActor>(Target.GetObject()))
 			{
-				if (AActor* TargetActor = Cast<AActor>(Target.GetObject()))
+				if (UEffectBase* NewEffect = CreateEffect(EffectClass))
 				{
 					ApplyEffectDmg += NewEffect->ApplyEffect(TargetActor, BaseDamage, EffectValue);
 				}
@@ -31,9 +31,12 @@ float UEffectApplyManager::ApplyEffect(
 	return ApplyEffectDmg;
 }
 
+
+
 UEffectBase* UEffectApplyManager::CreateEffect(TSubclassOf<UEffectBase> EffectClass)
 {
 	UEffectBase* NewEffectInstance = nullptr;
 	NewEffectInstance = NewObject<UEffectBase>(this, EffectClass);
 	return NewEffectInstance;
 }
+
