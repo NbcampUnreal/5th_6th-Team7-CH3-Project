@@ -4,6 +4,7 @@
 #include "Enemy/BaseEnemy.h"
 
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ABaseEnemy::ABaseEnemy()
 {
@@ -23,6 +24,16 @@ void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
 void ABaseEnemy::Die()
 {
 	Super::Die();
+}
+
+void ABaseEnemy::SetMoveSpeed(float MoveSpeed)
+{
+	if (MoveSpeed < 0) return;
+
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+	}
 }
 
 bool ABaseEnemy::GetCanEditAttackPriority() const

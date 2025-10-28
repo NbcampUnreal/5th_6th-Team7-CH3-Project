@@ -15,7 +15,6 @@ class ZWAVE_API ABaseEnemy : public ABaseCharacter
 	GENERATED_BODY()
 
 public:
-
 	ABaseEnemy();
 
 public:
@@ -23,6 +22,9 @@ public:
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 
 	virtual void Die() override;
+
+public:
+	void SetMoveSpeed(float MoveSpeed);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
