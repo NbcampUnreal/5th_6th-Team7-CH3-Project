@@ -80,7 +80,7 @@ void UCharacterActionComponent::StopJump()
 
 void UCharacterActionComponent::StartSprint()
 {
-	if (bShoulder == false)
+	if (bShoulder == false && bIsShooting == false)
 	{
 		bIsSprinting = true;
 	}
@@ -111,14 +111,13 @@ void UCharacterActionComponent::StopShoulder()
 	bShoulder = false;
 }
 
-void UCharacterActionComponent::Shot(EShootType ShootType)
+void UCharacterActionComponent::Shooting(ATaskPlayer* OwnerChar, EShootType ShootType)
 {
-	if (bIsSprinting)
-	{
-		bIsSprinting = false;
-	}
+	MoveSpeed = NormalWalkSpeed;
+	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+	bIsShooting = true;
 
-	if (ATaskPlayer* OwnerChar = Cast<ATaskPlayer>(GetOwner()))
+	if (OwnerChar)
 	{
 		if (CachedAnimInstance)
 		{
@@ -164,15 +163,21 @@ void UCharacterActionComponent::Shot(EShootType ShootType)
 	}
 }
 
-void UCharacterActionComponent::EquipChange(EShootType ShootType)
+void UCharacterActionComponent::StopShooting()
 {
-	if (ACharacter* OwnerChar = Cast<ACharacter>(GetOwner()))
+	bIsShooting = false;
+}
+
+void UCharacterActionComponent::EquipChange(ATaskPlayer* OwnerChar, EShootType ShootType)
+{
+	if (OwnerChar)
 	{
 		auto MeshCheck = OwnerChar->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
 			{
+				ClearDryShotBlock();
 				EnsureBindMontageNotifies(Anim);
 				switch (ShootType)
 				{
@@ -208,9 +213,70 @@ void UCharacterActionComponent::EquipChange(EShootType ShootType)
 	}
 }
 
-void UCharacterActionComponent::Reload(EShootType ShootType)
+void UCharacterActionComponent::DryShot(ATaskPlayer* OwnerChar, EShootType ShootType)
 {
-	if (ATaskPlayer* OwnerChar = Cast<ATaskPlayer>(GetOwner()))
+	if (bDryShooting) return;
+
+	if (OwnerChar)
+	{
+		if (CachedAnimInstance)
+		{
+			UnbindMontageNotifies(OwnerChar);
+		}
+
+		auto MeshCheck = OwnerChar->GetMesh();
+		if (MeshCheck != nullptr)
+		{
+			bDryShooting = true;
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				float PlayedLen = 0.f;
+				switch (ShootType)
+				{
+				case EShootType::ST_ShotHun:
+				case EShootType::ST_Rifle:
+				{
+					PlayedLen = Anim->Montage_Play(
+						RifleDryShotMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
+				case EShootType::ST_None:
+				case EShootType::ST_HandHun:
+				{
+					PlayedLen = Anim->Montage_Play(
+						PistolDryShotMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
+				default:
+					break;
+				}
+
+				GetWorld()->GetTimerManager().SetTimer(
+					DryShotBlockHandle,
+					FTimerDelegate::CreateUObject(this, &UCharacterActionComponent::ClearDryShotBlock),
+					PlayedLen,
+					false
+				);
+
+			}
+		}
+
+	}
+}
+
+void UCharacterActionComponent::Reload(ATaskPlayer* OwnerChar, EShootType ShootType)
+{
+	if (OwnerChar)
 	{
 		if (CachedAnimInstance)
 		{
@@ -222,6 +288,7 @@ void UCharacterActionComponent::Reload(EShootType ShootType)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
 			{
+				ClearDryShotBlock();
 				switch (ShootType)
 				{
 				case EShootType::ST_ShotHun:
@@ -316,6 +383,15 @@ void UCharacterActionComponent::OnMontageNotifyBegin(FName NotifyName)
 		{
 			UnbindMontageNotifies(Player);
 		}
+	}
+}
+
+void UCharacterActionComponent::ClearDryShotBlock()
+{
+	bDryShooting = false;
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(DryShotBlockHandle);
 	}
 }
 

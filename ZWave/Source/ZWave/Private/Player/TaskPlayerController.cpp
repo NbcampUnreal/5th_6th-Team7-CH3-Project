@@ -9,7 +9,7 @@ ATaskPlayerController::ATaskPlayerController()
 	MoveAction(nullptr),
 	LookAction(nullptr),
 	JumpAction(nullptr),
-	ShotAction(nullptr),
+	ShootingAction(nullptr),
 	SprintAction(nullptr),
 	ShoulderAction(nullptr),
 	ReloadAction(nullptr),

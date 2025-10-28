@@ -39,14 +39,12 @@ protected:
 	void EquipFirstSlot();
 	void EquipSecondSlot();
 	void EquipThirdSlot();
-
 	void EquipChange();
-
-	void Shot();
+	void CheckShooting();
 	void Reload();
 
 	UFUNCTION()
-	void ShotAction();
+	void ShootingAction();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EShootType GetShootType() const;

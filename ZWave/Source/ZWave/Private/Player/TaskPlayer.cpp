@@ -65,14 +65,14 @@ void ATaskPlayer::BeginPlay()
 
 				if (NowShootWeapon)
 				{
-					NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShotAction);
+					NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShootingAction);
 					NowShootWeapon = nullptr;
 				}
 
 				if (NewShootWeapon)
 				{
 					NowShootWeapon = NewShootWeapon;
-					NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+					NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShootingAction);
 					ActionComp->UnbindMontageNotifies(this);
 				}
 			}
@@ -137,15 +137,6 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 					&ATaskPlayer::EquipThirdSlot
 				);
 			}				
-			if (PlayerController->ShotAction)
-			{
-				EnhancedInput->BindAction(PlayerController->ShotAction,
-					ETriggerEvent::Triggered,
-					this,
-					&ATaskPlayer::Shot
-				);
-			}
-
 
 			if (ActionComp)
 			{
@@ -209,6 +200,20 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 						&UCharacterActionComponent::StopShoulder
 					);
 				}
+				if (PlayerController->ShootingAction)
+				{
+					EnhancedInput->BindAction(PlayerController->ShootingAction,
+						ETriggerEvent::Triggered,
+						this,
+						&ATaskPlayer::CheckShooting
+					);
+					EnhancedInput->BindAction(PlayerController->ShootingAction,
+						ETriggerEvent::Completed,
+						ActionComp,
+						&UCharacterActionComponent::StopShooting
+					);
+				}
+
 				//if (PlayerController->ShotAction)
 				//{
 				//	EnhancedInput->BindAction(PlayerController->ShotAction,
@@ -283,25 +288,25 @@ void ATaskPlayer::EquipChange()
 	{
 		if (NowShootWeapon)
 		{
-			NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+			NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShootingAction);
 		}
 		return;
 	}
 
 	if (NowShootWeapon)
 	{
-		NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShotAction);
+		NowShootWeapon->OnFireSuccess.RemoveDynamic(this, &ATaskPlayer::ShootingAction);
 		NowShootWeapon = nullptr;
 	}
 
 	if (NewShootWeapon)
 	{
 		NowShootWeapon = NewShootWeapon;
-		NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShotAction);
+		NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShootingAction);
 
 		if (ActionComp)
 		{
-			ActionComp->EquipChange(NowShootWeapon->GetShootType());
+			ActionComp->EquipChange(this, NowShootWeapon->GetShootType());
 		}
 
 	}
@@ -311,33 +316,37 @@ void ATaskPlayer::EquipChange()
 	}
 }
 
-void ATaskPlayer::Shot()
+void ATaskPlayer::CheckShooting()
 {
-	if (EquipComponent)
+	if (NowShootWeapon)
 	{
-		if(AWeaponBase* Weapon = EquipComponent->GetCurrentWeapon())
+		if (NowShootWeapon->IsNeedReload())
 		{
-			Weapon->Attack();
+			ActionComp->DryShot(this, NowShootWeapon->GetShootType());
+		}
+		else
+		{
+			NowShootWeapon->Attack();
 		}
 	}
 }
 
-void ATaskPlayer::ShotAction()
+void ATaskPlayer::ShootingAction()
 {
 	if (NowShootWeapon && ActionComp)
 	{
-		ActionComp->Shot(NowShootWeapon->GetShootType());
+		ActionComp->Shooting(this, NowShootWeapon->GetShootType());
 ;	}
 }
 
 void ATaskPlayer::Reload()
 {
-	if (NowShootWeapon)
+	if (NowShootWeapon && (NowShootWeapon->IsFullMagazine() == false))
 	{
 		NowShootWeapon->Reload();
 		if (ActionComp)
 		{
-			ActionComp->Reload(NowShootWeapon->GetShootType());
+			ActionComp->Reload(this, NowShootWeapon->GetShootType());
 		}
 	}
 }
