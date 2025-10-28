@@ -30,13 +30,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	bool bCanEditAttackPriority;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	class UAnimMontage* AttackMontage;
+
 public:
 	bool GetCanEditAttackPriority() const;
 	float GetAttackRange() const;
 
 public:
 	virtual void Attack();
-
-
-	
 };

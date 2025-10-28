@@ -3,6 +3,8 @@
 
 #include "Enemy/BaseEnemy.h"
 
+#include "Components/SkeletalMeshComponent.h"
+
 ABaseEnemy::ABaseEnemy()
 {
 	
@@ -35,4 +37,14 @@ float ABaseEnemy::GetAttackRange() const
 
 void ABaseEnemy::Attack()
 {
+	//USkeletalMeshComponent* Mesh = GetMesh();
+
+	if (GetMesh() && AttackMontage)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->Montage_Play(AttackMontage);
+		}
+	}
 }
