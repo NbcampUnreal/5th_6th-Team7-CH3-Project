@@ -6,6 +6,7 @@
 #include "Base/ZWaveGameState.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "UI/IngameHUD.h"
 
 void UGameManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -13,7 +14,13 @@ void UGameManager::Initialize(FSubsystemCollectionBase& Collection)
 
     UE_LOG(LogTemp, Warning, TEXT("GameManagerSubsystem Initialized"));
 
-    StartGame();
+    GetWorld()->GetTimerManager().SetTimer(
+        GameStartTimerHandle,
+        this,
+        &UGameManager::StartGame,
+        1.0f,
+        false
+    );
 }
 
 void UGameManager::BindPlayerEvents(APawn* PlayerPawn)
@@ -39,23 +46,33 @@ void UGameManager::BeginPreparationPhase()
     CurrentState = EGameState::EGS_Preparing;
 
     CurrentWaveNumber++;
-    float PrepTime = DefaultPreparationTime;
 
-
-    UE_LOG(LogTemp, Warning, TEXT("Preparation Phase Started for Wave %d. (Time: %.1fs)"), CurrentWaveNumber, PrepTime);
+    UE_LOG(LogTemp, Warning, TEXT("Preparation Phase Started for Wave %d. (Time: 30s)"), CurrentWaveNumber);
 
     if (AZWaveGameState* LocalGameState = GetGameState())
     {
         LocalGameState->SetCurrentGameState(CurrentState);
         LocalGameState->SetCurrentWave(CurrentWaveNumber);
+
+        UIngameHUD* LocalHUD = LocalGameState->GetIngameHUD();
+        if (IsValid(LocalHUD))
+        {
+            LocalHUD->OnChangedWaveMode(false);
+            LocalHUD->OnBreakTimeStart();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("GameManger : IngameHUD was Invalid."), CurrentWaveNumber);
+        }
     }
 
     GetWorld()->GetTimerManager().SetTimer(
         PrepPhaseTimerHandle,
         this,
         &UGameManager::BeginCombatPhase,
-        PrepTime,
-        false);
+        DefaultPreparationTime
+        ,false
+    );
 }
 
 void UGameManager::BeginCombatPhase()
@@ -71,6 +88,17 @@ void UGameManager::BeginCombatPhase()
     {
         LocalGameState->SetCurrentGameState(CurrentState);
         LocalGameState->SetCurrentWave(CurrentWaveNumber);
+
+        UIngameHUD* LocalHUD = LocalGameState->GetIngameHUD();
+        if(IsValid(LocalHUD))
+        {
+            LocalHUD->OnChangedWaveMode(true);
+            LocalHUD->OnBattleStart();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("GameManger : IngameHUD was Invalid."), CurrentWaveNumber);
+        }
     }
 
     UWaveManager* LocalWaveManager = GetWorld()->GetSubsystem<UWaveManager>();
