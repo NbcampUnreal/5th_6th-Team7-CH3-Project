@@ -206,6 +206,11 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight, float SpreadDeg)
 				ShootWeaponStat.AttackPower,
 				StaggerValue,
 				BaseEffectClasses);
+
+			if (UIngameHUD* nowHud = GetIngameHud())
+			{
+				nowHud->OnFireWeapon(TargetActor);
+			}
 		}
 	}
 	else
