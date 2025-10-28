@@ -68,6 +68,7 @@ public:
 protected:
 	class UIngameHUD* GetIngameHud();
 	void AmmoChangeUIBroadCast();
+	void ReloadUIBroadCast();
 
 protected:
 	void ShootOneBullet(bool IsFPSSight, float SpreadDeg);

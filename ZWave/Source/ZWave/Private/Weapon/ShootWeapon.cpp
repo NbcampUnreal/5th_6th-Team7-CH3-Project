@@ -101,6 +101,7 @@ void AShootWeapon::Reload()
 	}
 
 	bReloading = true;
+	ReloadUIBroadCast();
 
 	if (ShootWeaponStat.bReloadAll)
 	{
@@ -130,6 +131,14 @@ void AShootWeapon::AmmoChangeUIBroadCast()
 	if (UIngameHUD* nowHud = GetIngameHud())
 	{
 		nowHud->OnAmmoChanged(NowAmmo, ShootWeaponStat.Magazine, RemainSpareAmmo);
+	}
+}
+
+void AShootWeapon::ReloadUIBroadCast()
+{
+	if (UIngameHUD* nowHud = GetIngameHud())
+	{
+		nowHud->OnReloadWeapon(ShootWeaponStat.ReloadTime);
 	}
 }
 
