@@ -215,6 +215,14 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 						&UCharacterActionComponent::StopShooting
 					);
 				}
+				if (PlayerController->GrenadeAction)
+				{
+					EnhancedInput->BindAction(PlayerController->GrenadeAction,
+						ETriggerEvent::Triggered,
+						this,
+						&ATaskPlayer::Grenade
+					);
+				}
 
 				//if (PlayerController->ShotAction)
 				//{
@@ -356,6 +364,11 @@ void ATaskPlayer::Reload()
 			ActionComp->Reload(this, NowShootWeapon->GetShootType());
 		}
 	}
+}
+
+void ATaskPlayer::Grenade()
+{
+	ActionComp->Grenade(this);
 }
 
 EShootType ATaskPlayer::GetShootType() const

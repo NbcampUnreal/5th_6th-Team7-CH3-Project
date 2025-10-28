@@ -43,6 +43,7 @@ protected:
 	void EquipChange();
 	void CheckShooting();
 	void Reload();
+	void Grenade();
 
 	UFUNCTION()
 	void ShootingAction();

@@ -15,7 +15,8 @@ ATaskPlayerController::ATaskPlayerController()
 	ReloadAction(nullptr),
 	EquipSlotFirstAction(nullptr),
 	EquipSlotSecondAction(nullptr),
-	EquipSlotThirdAction(nullptr)
+	EquipSlotThirdAction(nullptr),
+	GrenadeAction(nullptr)
 {
 }
 

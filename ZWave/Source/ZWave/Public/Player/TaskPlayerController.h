@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "UI/IngameHUD.h"
 #include "TaskPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -18,6 +19,13 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UIngameHUD> IngameHUDClass;
+
+	UPROPERTY()
+	UIngameHUD* IngameHUD = nullptr;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
@@ -38,6 +46,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* ReloadAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
+	UInputAction* GrenadeAction;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* EquipSlotFirstAction;
@@ -45,4 +56,5 @@ public:
 	UInputAction* EquipSlotSecondAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* EquipSlotThirdAction;
+
 };
