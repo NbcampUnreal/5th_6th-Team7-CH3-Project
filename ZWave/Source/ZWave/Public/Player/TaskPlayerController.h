@@ -20,12 +20,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UIngameHUD> IngameHUDClass;
+	TSubclassOf<class UIngameHUD> IngameHUDClass;  
 
 	UPROPERTY()
 	UIngameHUD* IngameHUD = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	TSubclassOf<UUserWidget> MainMenuWidgetClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
+	UUserWidget* MainMenuWidgetInstance;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
@@ -57,4 +61,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* EquipSlotThirdAction;
 
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void ShowGameHUD();
+
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void ShowMainMenu();
 };
