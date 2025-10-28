@@ -67,7 +67,7 @@ void UEnemySpawnManager::RequestSpawn(TSubclassOf<ABaseCharacter> MonsterClass, 
             if (NewMonster)
             {
                 ActiveEnemies.Add(NewMonster);
-
+                NewMonster->SpawnDefaultController();
                 NewMonster->OnDestroyed.AddDynamic(this, &UEnemySpawnManager::HandleEnemyDied);
             }
         }
