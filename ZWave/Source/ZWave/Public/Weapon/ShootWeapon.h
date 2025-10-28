@@ -40,6 +40,9 @@ public:
 	FORCEINLINE bool IsNeedReload() { return NowAmmo <= 0; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE bool IsReload() { return bReloading; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool IsFullMagazine() { return NowAmmo == ShootWeaponStat.Magazine; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -61,6 +64,11 @@ public:
 public:
 	UPROPERTY()
 	FOnWeaponFireSuccess OnFireSuccess;
+
+protected:
+	class UIngameHUD* GetIngameHud();
+	void AmmoChangeUIBroadCast();
+	void ReloadUIBroadCast();
 
 protected:
 	void ShootOneBullet(bool IsFPSSight, float SpreadDeg);
