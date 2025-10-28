@@ -342,6 +342,32 @@ void UCharacterActionComponent::Die()
 	//죽는 애니메이션 Montage
 }
 
+void UCharacterActionComponent::Grenade(ATaskPlayer* OwnerChar)
+{
+	if (OwnerChar)
+	{
+		if (CachedAnimInstance)
+		{
+			UnbindMontageNotifies(OwnerChar);
+		}
+
+		auto MeshCheck = OwnerChar->GetMesh();
+		if (MeshCheck != nullptr)
+		{
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				float const PlayedLen = Anim->Montage_Play(
+					GrenadeMontage,
+					1.f,
+					EMontagePlayReturnType::MontageLength,
+					0.f,
+					true
+				);
+			}
+		}
+	}
+}
+
 void UCharacterActionComponent::ChangeSpeedMultiply(float Multiply)
 {
 	SpeedMultiply = Multiply;

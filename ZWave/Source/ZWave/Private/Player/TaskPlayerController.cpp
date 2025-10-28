@@ -3,6 +3,7 @@
 
 #include "Player/TaskPlayerController.h"
 #include "EnhancedInputSubSystems.h"
+#include "Components/TextBlock.h"
 
 ATaskPlayerController::ATaskPlayerController()
 	:InputMappingContext(nullptr),
@@ -15,7 +16,8 @@ ATaskPlayerController::ATaskPlayerController()
 	ReloadAction(nullptr),
 	EquipSlotFirstAction(nullptr),
 	EquipSlotSecondAction(nullptr),
-	EquipSlotThirdAction(nullptr)
+	EquipSlotThirdAction(nullptr),
+	GrenadeAction(nullptr)
 {
 }
 
@@ -29,6 +31,69 @@ void ATaskPlayerController::BeginPlay()
 			{
 				EnhancedSubsystem->AddMappingContext(InputMappingContext, 0);
 			}
+		}
+	}
+
+	FString CurrentMapName = GetWorld()->GetMapName();
+	if (CurrentMapName.Contains("TitleLevel"))
+	{
+		ShowMainMenu();
+	}
+	else
+	{
+		ShowGameHUD();
+	}
+}
+
+void ATaskPlayerController::ShowMainMenu()
+{
+	if (MainMenuWidgetInstance)
+	{
+		MainMenuWidgetInstance->RemoveFromParent();
+		MainMenuWidgetInstance = nullptr;
+	}
+
+	if (IngameHUD)
+	{
+		IngameHUD->RemoveFromParent();
+		IngameHUD = nullptr;
+	}
+
+	if (MainMenuWidgetClass)
+	{
+		MainMenuWidgetInstance = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
+		if (MainMenuWidgetInstance)
+		{
+			MainMenuWidgetInstance->AddToViewport();
+			bShowMouseCursor = true;
+			SetInputMode(FInputModeUIOnly());
+		}
+	}
+}
+
+void ATaskPlayerController::ShowGameHUD()
+{
+
+	if (MainMenuWidgetInstance)
+	{
+		MainMenuWidgetInstance->RemoveFromParent();
+		MainMenuWidgetInstance = nullptr;
+	}
+
+	if (IngameHUD)
+	{
+		IngameHUD->RemoveFromParent();
+		IngameHUD = nullptr;
+	}
+
+	if (IngameHUDClass)
+	{
+		IngameHUD = CreateWidget<UIngameHUD>(this, IngameHUDClass);
+		if (IngameHUD)
+		{
+			IngameHUD->AddToViewport();
+			bShowMouseCursor = false;
+			SetInputMode(FInputModeGameOnly());
 		}
 	}
 }

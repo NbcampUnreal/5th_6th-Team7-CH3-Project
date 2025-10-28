@@ -51,6 +51,7 @@ public:
 	void DryShot(ATaskPlayer* OwnerChar, EShootType ShootType);
 	void Attacked(AActor* DamageCauser);
 	void Die();
+	void Grenade(ATaskPlayer* OwnerChar);
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -97,6 +98,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
 	TObjectPtr<UAnimMontage> PistolDryShotMontage = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> GrenadeMontage = nullptr;
 
 	UPROPERTY()        
 	UAnimInstance* CachedAnimInstance = nullptr;
