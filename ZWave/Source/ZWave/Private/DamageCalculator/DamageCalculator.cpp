@@ -19,7 +19,7 @@ void UDamageCalculator::DamageCalculate(
 	{
 		if (UEffectApplyManager* EffectApplyManager = World->GetSubsystem<UEffectApplyManager>())
 		{
-			EffectApplyManager->ApplyEffect(Target, BaseDamage, EffectValue, EffectClassArray);
+			FinalDamage += EffectApplyManager->ApplyEffect(Target, BaseDamage, EffectValue, EffectClassArray);
 		}
 	}
 

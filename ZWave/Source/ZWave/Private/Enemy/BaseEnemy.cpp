@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Enemy/BaseEnemy.h"
@@ -34,6 +34,16 @@ void ABaseEnemy::SetMoveSpeed(float MoveSpeed)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	}
+}
+
+float ABaseEnemy::GetMoveSpeed()
+{
+	if (GetCharacterMovement())
+	{
+		return GetCharacterMovement()->MaxWalkSpeed;
+	}
+
+	return 0;
 }
 
 bool ABaseEnemy::GetCanEditAttackPriority() const
