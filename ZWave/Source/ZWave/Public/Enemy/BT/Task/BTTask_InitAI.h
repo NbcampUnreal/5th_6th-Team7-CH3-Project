@@ -3,23 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_AnyTest.generated.h"
+#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "BTTask_InitAI.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZWAVE_API UBTTask_AnyTest : public UBTTaskNode
+class ZWAVE_API UBTTask_InitAI : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
 
 public:
-	UBTTask_AnyTest();
-
+	UBTTask_InitAI();
 
 protected:
-
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	
 };
