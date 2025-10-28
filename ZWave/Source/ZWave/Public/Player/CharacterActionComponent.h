@@ -118,14 +118,14 @@ private:
 	float ShoulderSpeed = 150.f;
 	float SpeedMultiply = 1.f;
 
-	float NormalArmLength = 300.f;
-	float ShoulderArmLength = 150.f;
+	float NormalArmLength = 200.f;
+	float ShoulderArmLength = 65.f;
 	float NormalSocketOffsetY = 0.f;
 	float ArmLerpSpeed = 800.f;
 
-	float SpringArmNormalSocketOffsetY = 42.f;
-	float SpringArmShoulderSocketOffsetY = 55.f;
-	float SpringArmSocketOffsetZ = 80.f;
+	float SpringArmNormalSocketOffsetY = 65.f;
+	float SpringArmShoulderSocketOffsetY = 65.f;
+	float SpringArmSocketOffsetZ = 85.f;
 
 	float SprintAnimationSpeed = 1000.f;
 	float SprintAnimationRecovorySpeed = 1000.f;

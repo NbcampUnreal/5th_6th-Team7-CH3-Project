@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
 class AShootWeapon;
+class UIngameHUD;
 enum class EShootType : uint8;
 
 UCLASS()
@@ -64,5 +65,7 @@ private:
 
 	UPROPERTY()
 	AShootWeapon* NowShootWeapon;
+
+	UIngameHUD* GetIngameHud();
 
 };

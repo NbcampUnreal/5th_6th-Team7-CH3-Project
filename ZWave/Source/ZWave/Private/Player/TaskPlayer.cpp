@@ -10,6 +10,8 @@
 #include "Player/TaskPlayerController.h"
 #include "Weapon/EquipComponent.h"
 #include "Weapon/ShootWeapon.h"
+#include "UI/IngameHUD.h"
+#include "Base/ZWaveGameState.h"
 
 ATaskPlayer::ATaskPlayer()
 {
@@ -244,7 +246,7 @@ void ATaskPlayer::EquipFirstSlot()
 	if (EquipComponent)
 	{
 		if (EquipComponent->Equip(EEquipSlot::First))
-		{
+		{	
 			EquipChange();
 		}
 	}
@@ -307,6 +309,11 @@ void ATaskPlayer::EquipChange()
 		if (ActionComp)
 		{
 			ActionComp->EquipChange(this, NowShootWeapon->GetShootType());
+
+			if (UIngameHUD* nowHud = GetIngameHud())
+			{
+				nowHud->OnGunChanged(NowShootWeapon->GetShootType());
+			}
 		}
 
 	}
@@ -341,7 +348,7 @@ void ATaskPlayer::ShootingAction()
 
 void ATaskPlayer::Reload()
 {
-	if (NowShootWeapon && (NowShootWeapon->IsFullMagazine() == false))
+	if (NowShootWeapon && NowShootWeapon->IsFullMagazine() == false && NowShootWeapon->IsReload() == false)
 	{
 		NowShootWeapon->Reload();
 		if (ActionComp)
@@ -357,4 +364,17 @@ EShootType ATaskPlayer::GetShootType() const
 		return EShootType::ST_Rifle;
 
 	return NowShootWeapon->GetShootType();
+}
+
+UIngameHUD* ATaskPlayer::GetIngameHud()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (AZWaveGameState* ZGS = Cast<AZWaveGameState>(World->GetGameState()))
+		{
+			return ZGS->IngameHUD;
+		}
+	}
+
+	return nullptr;
 }

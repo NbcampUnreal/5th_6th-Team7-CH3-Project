@@ -19,10 +19,11 @@ void UCharacterActionComponent::InitRefs(UCharacterMovementComponent* InMoveComp
 	MoveComp = InMoveComp;
 	SpringArm = InSpringArm;
 	Camera = InCamera;
+	SpringArmNormalSocketOffsetY = SpringArmShoulderSocketOffsetY;
 
 	if (SpringArm.IsValid())
 	{
-		NormalArmLength = SpringArm->TargetArmLength;
+		//NormalArmLength = SpringArm->TargetArmLength;
 		NormalSocketOffsetY = SpringArm->SocketOffset.Y;
 		SpringArm->SocketOffset = FVector{ 0.f,SpringArmNormalSocketOffsetY, SpringArmSocketOffsetZ };
 	}
