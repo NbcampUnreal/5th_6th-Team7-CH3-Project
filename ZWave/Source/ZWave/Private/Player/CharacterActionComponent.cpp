@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Player/TaskPlayer.h"
 #include "Weapon/ShootWeaponDefinition.h"
+#include <Kismet/KismetSystemLibrary.h>
 
 UCharacterActionComponent::UCharacterActionComponent()
 {
@@ -23,7 +24,6 @@ void UCharacterActionComponent::InitRefs(UCharacterMovementComponent* InMoveComp
 
 	if (SpringArm.IsValid())
 	{
-		//NormalArmLength = SpringArm->TargetArmLength;
 		NormalSocketOffsetY = SpringArm->SocketOffset.Y;
 		SpringArm->SocketOffset = FVector{ 0.f,SpringArmNormalSocketOffsetY, SpringArmSocketOffsetZ };
 	}
@@ -132,10 +132,19 @@ void UCharacterActionComponent::Shooting(ATaskPlayer* OwnerChar, EShootType Shoo
 				switch (ShootType)
 				{
 				case EShootType::ST_ShotHun:
+				{
+					Anim->Montage_Play(
+						ShotgunFireMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+					break;
+				}
 				case EShootType::ST_Rifle:
 				{
-
-					const float PlayedLen = Anim->Montage_Play(
+					Anim->Montage_Play(
 						RifleFireMontage,
 						1.f,
 						EMontagePlayReturnType::MontageLength,
@@ -147,7 +156,7 @@ void UCharacterActionComponent::Shooting(ATaskPlayer* OwnerChar, EShootType Shoo
 				case EShootType::ST_None:
 				case EShootType::ST_HandHun:
 				{
-					const float PlayedLen = Anim->Montage_Play(
+					Anim->Montage_Play(
 						PistolFireMontage,
 						1.f,
 						EMontagePlayReturnType::MontageLength,
@@ -185,7 +194,7 @@ void UCharacterActionComponent::EquipChange(ATaskPlayer* OwnerChar, EShootType S
 				case EShootType::ST_ShotHun:
 				case EShootType::ST_Rifle:
 				{
-					const float PlayedLen = Anim->Montage_Play(
+					Anim->Montage_Play(
 						RifleEquipMontage,
 						1.f,
 						EMontagePlayReturnType::MontageLength,
@@ -197,7 +206,7 @@ void UCharacterActionComponent::EquipChange(ATaskPlayer* OwnerChar, EShootType S
 				case EShootType::ST_None:
 				case EShootType::ST_HandHun:
 				{
-					const float PlayedLen = Anim->Montage_Play(
+					Anim->Montage_Play(
 						PistolEquipMontage,
 						1.f,
 						EMontagePlayReturnType::MontageLength,
@@ -293,6 +302,17 @@ void UCharacterActionComponent::Reload(ATaskPlayer* OwnerChar, EShootType ShootT
 				switch (ShootType)
 				{
 				case EShootType::ST_ShotHun:
+				{
+					const float PlayedLen = Anim->Montage_Play(
+						ShotgunReloadMontage,
+						1.f,
+						EMontagePlayReturnType::MontageLength,
+						0.f,
+						true
+					);
+
+					break;
+				}
 				case EShootType::ST_Rifle:
 				{
 					const float PlayedLen = Anim->Montage_Play(
@@ -332,14 +352,118 @@ void UCharacterActionComponent::TickAction(float DeltaTime)
 	SetMeshDir(DeltaTime);
 }
 
-void UCharacterActionComponent::Attacked(AActor* DamageCauser)
+void UCharacterActionComponent::Attacked(ATaskPlayer* OwnerChar, AActor* DamageCauser)
 {
-	//맞는 방향에 맞춰서 애니메이션 재생
+	if (!IsValid(DamageCauser))
+		return;
+
+	if (OwnerChar)
+	{
+		FVector SelfLocation = OwnerChar->GetActorLocation();
+		FVector CauserLocation = DamageCauser->GetActorLocation();
+		FVector ToCauser = (CauserLocation - SelfLocation).GetSafeNormal();
+		FVector Forward = OwnerChar->GetActorForwardVector();
+		FVector Right = OwnerChar->GetActorRightVector();
+
+		float ForwardDot = FVector::DotProduct(Forward, ToCauser);
+		float RightDot = FVector::DotProduct(Right, ToCauser);
+
+		FString HitDirection;
+		UAnimMontage* PlayAnim = nullptr;
+
+		if (ForwardDot > 0.707f)
+		{
+			PlayAnim = GetAttackedMontage(EHitDirection::Front);
+		}
+		else if (ForwardDot < -0.707f)
+		{
+			PlayAnim = GetAttackedMontage(EHitDirection::Back);
+		}
+		else if (RightDot > 0)
+		{
+			PlayAnim = GetAttackedMontage(EHitDirection::Right);
+		}
+		else
+		{
+			PlayAnim = GetAttackedMontage(EHitDirection::Left);
+		}
+
+		auto MeshCheck = OwnerChar->GetMesh();
+		if (PlayAnim != nullptr && MeshCheck != nullptr)
+		{
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				float const PlayedLen = Anim->Montage_Play(
+					PlayAnim,
+					1.f,
+					EMontagePlayReturnType::MontageLength,
+					0.f,
+					true
+				);
+			}
+		}
+	}
 }
 
-void UCharacterActionComponent::Die()
+
+UAnimMontage* UCharacterActionComponent::GetAttackedMontage(EHitDirection Direction)
 {
-	//죽는 애니메이션 Montage
+	switch (Direction)
+	{
+	case EHitDirection::Front:
+		return FrontHitMontage.Get();
+	case EHitDirection::Back:
+		return BackHitMontage.Get();
+	case EHitDirection::Left:
+		return LeftHitMontage.Get();
+	case EHitDirection::Right:
+		return RightHitMontage.Get();
+	default:
+		return nullptr;
+	}
+}
+
+void UCharacterActionComponent::Die(ATaskPlayer* OwnerChar)
+{
+	if (bIsDead) return;
+
+	if (OwnerChar)
+	{
+		auto MeshCheck = OwnerChar->GetMesh();
+		if (MeshCheck != nullptr)
+		{
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				bIsDead = true;
+
+				OwnerChar->GetCharacterMovement()->DisableMovement();
+				OwnerChar->DisableInput(Cast<APlayerController>(OwnerChar->GetController()));
+				OwnerChar->bUseControllerRotationYaw = false;
+
+				float const PlayedLen = Anim->Montage_Play(
+					DeathMontage,
+					1.f,
+					EMontagePlayReturnType::MontageLength,
+					0.f,
+					true
+				);
+
+				GetWorld()->GetTimerManager().SetTimer(
+					StopMotionHandler,
+					FTimerDelegate::CreateUObject(this, &UCharacterActionComponent::SetStopMotion),
+					PlayedLen -0.1f,
+					false
+				);
+
+				GetWorld()->GetTimerManager().SetTimer(
+					DeathHandler,
+					FTimerDelegate::CreateUObject(this, &UCharacterActionComponent::GameOver),
+					PlayedLen + 2.f,
+					false
+				);
+			}
+		}
+	}
 }
 
 void UCharacterActionComponent::Grenade(ATaskPlayer* OwnerChar)
@@ -422,6 +546,24 @@ void UCharacterActionComponent::ClearDryShotBlock()
 	}
 }
 
+void UCharacterActionComponent::SetStopMotion()
+{
+	ACharacter* Character = Cast<ACharacter>(GetOwner());
+	if (Character)
+	{
+		if (USkeletalMeshComponent* MeshComp = Character->GetMesh())
+		{
+			MeshComp->bPauseAnims = true; 
+			MeshComp->SetComponentTickEnabled(false);
+		}
+	}
+}
+
+void UCharacterActionComponent::GameOver()
+{
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
+}
+
 void UCharacterActionComponent::UpdateShoulder(float DeltaTime)
 {
 	if (bShoulder)
@@ -447,6 +589,7 @@ void UCharacterActionComponent::UpdateShoulder(float DeltaTime)
 		}
 	}
 }
+
 
 void UCharacterActionComponent::CheckMoveSpeed(float DeltaTime)
 {

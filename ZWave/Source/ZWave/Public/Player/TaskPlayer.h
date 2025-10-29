@@ -23,7 +23,7 @@ class ZWAVE_API ATaskPlayer : public ABaseCharacter
 public:
 	ATaskPlayer();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	const bool IsDead() { return Health <= 0.f; };
 
 	void AttachWeaponTo(const FName SocketName);

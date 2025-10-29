@@ -17,6 +17,9 @@ ATaskPlayer::ATaskPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	Health = 100;
+	MaxHealth = 100;
+
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 300.f;
@@ -239,13 +242,23 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ATaskPlayer::Attacked(AActor* DamageCauser, float Damage)
 {
-	ActionComp->Attacked(DamageCauser);
+	float CurrentHealth = Health;
 	Super::Attacked(DamageCauser, Damage);
+
+	if (UIngameHUD* nowHud = GetIngameHud())
+	{
+		nowHud->OnHealthChange(CurrentHealth, Health);
+	}
+
+	if (IsDead())
+		return;
+
+	ActionComp->Attacked(this, DamageCauser);
 }
 
 void ATaskPlayer::Die()
 {
-	ActionComp->Die();
+	ActionComp->Die(this);
 	//사망 시 UI출력?
 }
 

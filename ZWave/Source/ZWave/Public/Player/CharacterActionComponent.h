@@ -22,6 +22,14 @@ enum class ECharacterMoveDirection : uint8
 	Right
 };
 
+UENUM(BlueprintType)
+enum class EHitDirection : uint8
+{
+	Front,
+	Back,
+	Left,
+	Right
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ZWAVE_API UCharacterActionComponent : public UActorComponent
@@ -49,9 +57,10 @@ public:
 	void Reload(ATaskPlayer* OwnerChar, EShootType ShootType);
 	void EquipChange(ATaskPlayer* OwnerChar, EShootType ShootType);
 	void DryShot(ATaskPlayer* OwnerChar, EShootType ShootType);
-	void Attacked(AActor* DamageCauser);
-	void Die();
 	void Grenade(ATaskPlayer* OwnerChar);
+
+	void Attacked(ATaskPlayer* OwnerChar, AActor* DamageCauser);
+	void Die(ATaskPlayer* OwnerChar);
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -98,8 +107,34 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
 	TObjectPtr<UAnimMontage> PistolDryShotMontage = nullptr;
 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> ShotgunFireMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> ShotgunReloadMontage = nullptr;
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
 	TObjectPtr<UAnimMontage> GrenadeMontage = nullptr;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> FrontHitMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> BackHitMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> LeftHitMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> RightHitMontage = nullptr;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> DeathMontage = nullptr;
+
 
 	UPROPERTY()        
 	UAnimInstance* CachedAnimInstance = nullptr;
@@ -145,12 +180,18 @@ private:
 	FVector2D LastMoveInput = FVector2D::ZeroVector;
 
 	FTimerHandle DryShotBlockHandle;
+	FTimerHandle StopMotionHandler;
+	FTimerHandle DeathHandler;
+	bool bIsDead = false;
 	bool bDryShooting = false;
 	void ClearDryShotBlock();
+	void SetStopMotion();
+	void GameOver();
 
 	void UpdateShoulder(float DeltaTime);
 	void CheckMoveSpeed(float DeltaTime);
 	void SetMeshDir(float DeltaTime);
 	float ConvertAngle(float InDeg);
+	UAnimMontage* GetAttackedMontage(EHitDirection Direction);
 
 };
