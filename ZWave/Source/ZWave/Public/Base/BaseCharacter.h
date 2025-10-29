@@ -35,7 +35,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Component|Equip")
 	TObjectPtr<class UEquipComponent> EquipComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Stat")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character|Stat")
 	float MaxHealth;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Stat")
