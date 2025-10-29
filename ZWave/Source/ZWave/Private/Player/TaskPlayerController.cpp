@@ -94,6 +94,8 @@ void ATaskPlayerController::ShowGameHUD()
 			IngameHUD->AddToViewport();
 			bShowMouseCursor = false;
 			SetInputMode(FInputModeGameOnly());
+
+			IngameHUD->OnEnemyCountChanged(0, 0);
 		}
 	}
 }
