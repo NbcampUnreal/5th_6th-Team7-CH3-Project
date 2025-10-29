@@ -38,8 +38,11 @@ void AShootWeapon::Attack()
 	}
 
 	bCanAttack = false;
-	
+
+	NowAmmo--;
+
 	ShootOneBullet(false,0.0f);
+
 
 	UE_LOG(LogTemp, Warning, TEXT("Remain Ammo : %d"), NowAmmo);
 
@@ -146,8 +149,6 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight, float SpreadDeg)
 {
 	if (OwningCharacter == nullptr)
 		return;
-
-	NowAmmo--;
 
 	AmmoChangeUIBroadCast();
 
