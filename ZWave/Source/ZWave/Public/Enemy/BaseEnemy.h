@@ -35,6 +35,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
 	class UAnimMontage* AttackMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	class UAnimMontage* DieMontage;
 
 public:
 	bool GetCanEditAttackPriority() const;
