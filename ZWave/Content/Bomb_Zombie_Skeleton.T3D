@@ -1,0 +1,19 @@
+Begin Object Class=/Script/Engine.Skeleton Name="Bomb_Zombie_Skeleton" ExportPath="/Script/Engine.Skeleton'/Game/Resources/ZombiesMeshes/Bomb_Zombie/Bomb_Zombie_Skeleton.Bomb_Zombie_Skeleton'"
+   Begin Object Class=/Script/Engine.AnimCurveMetaData Name="AnimCurveMetaData_0" ExportPath="/Script/Engine.AnimCurveMetaData'/Game/Resources/ZombiesMeshes/Bomb_Zombie/Bomb_Zombie_Skeleton.Bomb_Zombie_Skeleton:AnimCurveMetaData_0'"
+   End Object
+   Begin Object Class=/Script/Engine.SkeletalMeshSocket Name="SkeletalMeshSocket_1" ExportPath="/Script/Engine.SkeletalMeshSocket'/Game/Resources/ZombiesMeshes/Bomb_Zombie/Bomb_Zombie_Skeleton.Bomb_Zombie_Skeleton:SkeletalMeshSocket_1'"
+   End Object
+   Begin Object Name="AnimCurveMetaData_0" ExportPath="/Script/Engine.AnimCurveMetaData'/Game/Resources/ZombiesMeshes/Bomb_Zombie/Bomb_Zombie_Skeleton.Bomb_Zombie_Skeleton:AnimCurveMetaData_0'"
+   End Object
+   Begin Object Name="SkeletalMeshSocket_1" ExportPath="/Script/Engine.SkeletalMeshSocket'/Game/Resources/ZombiesMeshes/Bomb_Zombie/Bomb_Zombie_Skeleton.Bomb_Zombie_Skeleton:SkeletalMeshSocket_1'"
+      SocketName="weapon_l"
+      BoneName="LeftHand"
+      RelativeLocation=(X=0.000000,Y=-13.577020,Z=1.754015)
+   End Object
+   BoneTree(68)=()
+   VirtualBoneGuid=F2DEDFCE420F0C162A266AA772588CE9
+   Sockets(0)="/Script/Engine.SkeletalMeshSocket'SkeletalMeshSocket_1'"
+   SlotGroups(0)=(SlotNames=("DefaultSlot"))
+   PreviewSkeletalMesh="/Game/Resources/ZombiesMeshes/Bomb_Zombie/Bomb_Zombie.Bomb_Zombie"
+   AssetUserData(0)="/Script/Engine.AnimCurveMetaData'AnimCurveMetaData_0'"
+End Object
