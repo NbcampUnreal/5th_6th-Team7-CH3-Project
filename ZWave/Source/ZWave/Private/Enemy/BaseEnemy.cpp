@@ -5,6 +5,10 @@
 
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "BehaviorTree/BehaviorTree.h"	
+#include "BrainComponent.h"
+
+#include "Enemy/BaseAIController.h"
 
 ABaseEnemy::ABaseEnemy()
 {
@@ -72,6 +76,12 @@ void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
 void ABaseEnemy::Die()
 {
 	//Super::Die();
+	if (ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController()))
+	{
+		AIController->StopMovement();
+		AIController->StopBehaviorTree();
+	}
+
 	if (GetMesh() && DieMontage)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();

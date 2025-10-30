@@ -22,5 +22,8 @@ public:
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	class UBehaviorTree* BehaviorTreeComp = nullptr;
+	class UBehaviorTree* BehaviorTree = nullptr;
+
+public:
+	void StopBehaviorTree();
 };
