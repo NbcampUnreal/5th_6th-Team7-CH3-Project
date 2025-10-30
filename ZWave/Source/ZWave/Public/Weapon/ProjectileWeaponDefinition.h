@@ -22,7 +22,7 @@ public:
 	float InitialSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeapon Stats")
-	TSubclassOf<UNiagaraSystem> ExplosionVFX;
+	UNiagaraSystem* ExplosionVFX;
 };
 
 /**
