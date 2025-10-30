@@ -3,6 +3,13 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 
+void UHoveredDescWidgetBase::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	SetVisibility(ESlateVisibility::HitTestInvisible);
+}
+
 void UHoveredDescWidgetBase::OnActivated_Implementation(const FItemUIInfo& Info)
 {
 	bIsActivated = true;
