@@ -28,6 +28,11 @@ void UEquipComponent::BeginPlay()
 		SetSlotData(Def.Key, Def.Value);
 	}
 	Equip(EEquipSlot::First);
+
+	for (const auto& Def : ConsumeDefinitionMap)
+	{
+		SetSlotConsumeData(Def.Key, Def.Value);
+	}
 }
 
 bool UEquipComponent::Equip(EEquipSlot Slot)
@@ -158,3 +163,41 @@ void UEquipComponent::AttachWeaponToOwner(AWeaponBase* Weapon, const UWeaponDefi
 	}
 }
 
+void UEquipComponent::SetSlotConsumeData(EConsumeSlot Slot, const UWeaponDefinition* WeaponDef)
+{
+	if (WeaponDef == nullptr ||
+		GetOwner() == nullptr)
+		return;
+
+	if (UWorld* World = GetWorld())
+	{
+		AWeaponBase* WeaponActor = World->SpawnActorDeferred<AWeaponBase>(
+			WeaponDef->WeaponClass,
+			FTransform::Identity,
+			GetOwner(),
+			Cast<APawn>(GetOwner())
+		);
+
+		if (WeaponActor == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon SpawnDeffered Failed!"));
+			return;
+		}
+
+		if (WeaponActor->Init(WeaponDef) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponDef is Not Valid to Weapon Class!"));
+			WeaponActor->Destroy();
+			return;
+		}
+
+
+		UGameplayStatics::FinishSpawningActor(WeaponActor, FTransform::Identity);
+		ConsumeMaps.Add(Slot, WeaponActor);
+
+		WeaponActor->Init(WeaponDef);
+		WeaponActor->SetActorHiddenInGame(true);
+		WeaponActor->SetActorEnableCollision(false);
+		WeaponActor->SetActorTickEnabled(false);
+	}
+}
