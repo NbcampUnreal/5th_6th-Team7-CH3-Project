@@ -6,6 +6,16 @@
 #include "Base/BaseCharacter.h"
 #include "BaseEnemy.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EHitDir : uint8
+{
+	Front,
+	Back,
+	Left,
+	Right
+};
+
 /**
  * 
  */
@@ -31,7 +41,18 @@ public:
 /// </summary>
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* FrontHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* BackHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* RightHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* LeftHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
 	class UAnimMontage* DieMontage;
+
+private:
+	UAnimMontage* GetAttackedMontage(EHitDir Direction);
 
 public:
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
