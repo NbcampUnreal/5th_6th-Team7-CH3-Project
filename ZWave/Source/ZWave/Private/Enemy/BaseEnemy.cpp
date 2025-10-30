@@ -70,6 +70,8 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 
 void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
 {
+	if (Health <= 0.f) return;
+
 	Super::ApplyDamage(Damage, CheckArmor);
 }
 
