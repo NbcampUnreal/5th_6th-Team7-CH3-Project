@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Weapon/EquipComponent.h"
@@ -9,6 +9,11 @@
 
 UEquipComponent::UEquipComponent()
 {
+}
+
+void UEquipComponent::EquipConsumeItem(EConsumeSlot Slot)
+{
+	CurrentConsumeSlot = Slot;
 }
 
 void UEquipComponent::BeginPlay()
@@ -28,6 +33,11 @@ void UEquipComponent::BeginPlay()
 		SetSlotData(Def.Key, Def.Value);
 	}
 	Equip(EEquipSlot::First);
+
+	for (const auto& Def : ConsumeDefinitionMap)
+	{
+		SetSlotConsumeData(Def.Key, Def.Value);
+	}
 }
 
 bool UEquipComponent::Equip(EEquipSlot Slot)
@@ -137,6 +147,10 @@ void UEquipComponent::ClearSlotData(EEquipSlot Slot)
 	}
 }
 
+void UEquipComponent::AmmoSupply(int32 AmmoAmount)
+{
+}
+
 
 void UEquipComponent::AttachWeaponToOwner(AWeaponBase* Weapon, const UWeaponDefinition* WeaponDef)
 {
@@ -159,8 +173,41 @@ void UEquipComponent::AttachWeaponToOwner(AWeaponBase* Weapon, const UWeaponDefi
 	}
 }
 
-void UEquipComponent::AmmoSupply(int32 AmmoAmount)
+void UEquipComponent::SetSlotConsumeData(EConsumeSlot Slot, const UWeaponDefinition* WeaponDef)
 {
-	// 여기 부분에 탄창 추가 로직 작성
-}
+	if (WeaponDef == nullptr ||
+		GetOwner() == nullptr)
+		return;
 
+	if (UWorld* World = GetWorld())
+	{
+		AWeaponBase* WeaponActor = World->SpawnActorDeferred<AWeaponBase>(
+			WeaponDef->WeaponClass,
+			FTransform::Identity,
+			GetOwner(),
+			Cast<APawn>(GetOwner())
+		);
+
+		if (WeaponActor == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon SpawnDeffered Failed!"));
+			return;
+		}
+
+		if (WeaponActor->Init(WeaponDef) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponDef is Not Valid to Weapon Class!"));
+			WeaponActor->Destroy();
+			return;
+		}
+
+
+		UGameplayStatics::FinishSpawningActor(WeaponActor, FTransform::Identity);
+		ConsumeMaps.Add(Slot, WeaponActor);
+
+		WeaponActor->Init(WeaponDef);
+		WeaponActor->SetActorHiddenInGame(true);
+		WeaponActor->SetActorEnableCollision(false);
+		WeaponActor->SetActorTickEnabled(false);
+	}
+}

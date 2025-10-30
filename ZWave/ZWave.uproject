@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"CommonUI",
 				"AIModule",
-				"Engine"
+				"Engine",
+				"CoreUObject"
 			]
 		}
 	],

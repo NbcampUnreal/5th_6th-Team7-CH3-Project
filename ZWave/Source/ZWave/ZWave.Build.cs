@@ -19,6 +19,7 @@ public class ZWave : ModuleRules
             "CommonUI" ,
             "PhysicsCore",
             "NavigationSystem",
+            "Niagara",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });

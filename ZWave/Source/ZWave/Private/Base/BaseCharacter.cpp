@@ -10,8 +10,8 @@ ABaseCharacter::ABaseCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Health = 1;
-	MaxHealth = Health;
+	MaxHealth = 1;
+	Health = MaxHealth;
 	SpeedMultiply = 1.f;
 	Armor = 0.f;
 
@@ -25,7 +25,7 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MaxHealth = Health;
+	Health = MaxHealth;
 }
 
 // Called every frame
