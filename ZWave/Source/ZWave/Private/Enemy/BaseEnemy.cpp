@@ -22,12 +22,26 @@ void ABaseEnemy::BeginPlay()
 
 UAnimMontage* ABaseEnemy::GetAttackedMontage(EHitDir Direction)
 {
-	return nullptr;
+	switch (Direction)
+	{
+	case EHitDir::Front:
+		return FrontHitMontage;
+	case EHitDir::Back:
+		return BackHitMontage;
+	case EHitDir::Left:
+		return LeftHitMontage;
+	case EHitDir::Right:
+		return RightHitMontage;
+	default:
+		return nullptr;
+	}
 }
 
 void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 {
 	Super::Attacked(DamageCauser, Damage);
+
+	if (Health <= 0.f) return;
 	
 	if (GetMesh())
 	{
@@ -63,7 +77,7 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
-
+			AnimInstance->Montage_Play(PlayAnim);
 		}
 	}
 }
