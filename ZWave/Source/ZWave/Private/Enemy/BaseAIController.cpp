@@ -67,3 +67,11 @@ void ABaseAIController::SetValueAsBoolToBlackboard(FName BlackboardKeyName, bool
 	OwnerBlackboardComp->SetValueAsBool(BlackboardKeyName, Value);
 }
 
+void ABaseAIController::SetValueAsObjectToBlackboard(FName BlackboardKeyName, UObject* Object)
+{
+	UBlackboardComponent* OwnerBlackboardComp = GetBlackboardComponent();
+	if (OwnerBlackboardComp == nullptr) return;
+
+	OwnerBlackboardComp->SetValueAsObject(BlackboardKeyName, Object);
+}
+

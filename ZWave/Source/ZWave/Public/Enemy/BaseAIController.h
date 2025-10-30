@@ -35,4 +35,5 @@ public:
 	FVector GetAttackLocation(FVector TargetLocation);
 	void SetValueAsVectorToBlackboard(FName BlackboardKeyName, FVector Value);
 	void SetValueAsBoolToBlackboard(FName BlackboardKeyName, bool Value);
+	void SetValueAsObjectToBlackboard(FName BlackboardKeyName, UObject* Object);
 };
