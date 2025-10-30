@@ -34,7 +34,8 @@ protected:
 	UFUNCTION()
 	void OnProjectileStop(const FHitResult& ImpactResult);
 
-
+	// DamageCalculator 변환 전 테스트용 함수
+	void DamageBoom();
 	void Explode();
 
 protected:
