@@ -16,9 +16,6 @@ UCLASS(Abstract)
 class ZWAVE_API AWeaponBase : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	AWeaponBase();
 
 public:
 	virtual void Attack() PURE_VIRTUAL(AWeaponBase::Attack, ;);
@@ -36,9 +33,6 @@ protected:
 	FORCEINLINE bool IsDamagableActor(AActor* TargetActor) { return TargetActor && TargetActor->GetClass()->ImplementsInterface(UDamagable::StaticClass()); }
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<ACharacter> OwningCharacter;
 

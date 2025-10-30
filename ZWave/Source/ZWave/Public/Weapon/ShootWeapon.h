@@ -16,6 +16,10 @@ UCLASS()
 class ZWAVE_API AShootWeapon : public AWeaponBase
 {
 	GENERATED_BODY()
+
+public:
+	AShootWeapon();
+
 public:
 	virtual void Attack() override;
 
@@ -83,6 +87,9 @@ protected:
 	FVector GetCameraAimPoint();
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
 	FShootWeaponStats ShootWeaponStat;
 	FName MuzzleSocketName;
 	float TraceDistance;

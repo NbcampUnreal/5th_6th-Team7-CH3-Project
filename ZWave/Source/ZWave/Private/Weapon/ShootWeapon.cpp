@@ -8,6 +8,11 @@
 #include "Base/ZWaveGameState.h"
 #include "UI/IngameHUD.h"
 
+AShootWeapon::AShootWeapon()
+{
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+}
+
 void AShootWeapon::Attack()
 {
 	if (GetWorld() == nullptr)
