@@ -10,7 +10,7 @@ UStaggerEffect::UStaggerEffect()
 	StaggerSpeedMultiplier = 2;
 }
 
-float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, const float& Value)
+void UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage)
 {
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{
@@ -26,13 +26,12 @@ float UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage, 
 					Handle,
 					this,
 					&UStaggerEffect::RemoveEffect,
-					Value,
+					StaggerTime,
 					false
 				);
 			}
 		}
 	}
-	return BaseDamage;
 }
 
 void UStaggerEffect::RemoveEffect()

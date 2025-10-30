@@ -10,7 +10,6 @@ void UDamageCalculator::DamageCalculate(
 	AActor* Causer, 
 	TScriptInterface<IDamagable> Target, 
 	const float& BaseDamage, 
-	const float& EffectValue,  
 	TArray<TSubclassOf<UEffectBase>>& EffectClassArray 
 )
 {
@@ -19,7 +18,7 @@ void UDamageCalculator::DamageCalculate(
 	{
 		if (UEffectApplyManager* EffectApplyManager = World->GetSubsystem<UEffectApplyManager>())
 		{
-			FinalDamage += EffectApplyManager->ApplyEffect(Target, BaseDamage, EffectValue, EffectClassArray);
+			EffectApplyManager->ApplyEffect(Target, BaseDamage, EffectClassArray);
 		}
 	}
 

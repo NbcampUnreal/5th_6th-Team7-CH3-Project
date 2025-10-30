@@ -16,6 +16,7 @@ struct FCustomDamageEvent : public FDamageEvent
 public:
 	FCustomDamageEvent() { DamageTypeClass = UDamageType::StaticClass(); }
 
+	UPROPERTY(EditDefaultsOnly, Category = "EffectArray")
 	TArray<TSubclassOf<class UEffectBase>> EffectArray;
 };
 

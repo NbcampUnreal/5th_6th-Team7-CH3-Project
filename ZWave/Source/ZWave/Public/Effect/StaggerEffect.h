@@ -17,12 +17,18 @@ class ZWAVE_API UStaggerEffect : public UEffectBase
 public:
 	UStaggerEffect();
 
-	virtual float ApplyEffect(AActor* TargetActor, const float& BaseDamage, const float& Value) override;
+	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect|Value")
+	float StaggerTime;
 
 private:
 	FTimerHandle Handle;
 
 	float StaggerSpeedMultiplier;
+
+	
 };

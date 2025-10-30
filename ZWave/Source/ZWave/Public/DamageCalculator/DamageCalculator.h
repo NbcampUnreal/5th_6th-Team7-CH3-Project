@@ -24,7 +24,6 @@ public:
 		AActor* Causer, 
 		TScriptInterface<IDamagable> Target,
 		const float& BaseDamage,
-		const float& EffectValue, 
 		TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
 	
 };
