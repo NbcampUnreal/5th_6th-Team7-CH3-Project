@@ -45,7 +45,9 @@ public:
 	FORCEINLINE AWeaponBase* GetCurrentWeapon() { return SlotMaps[CurrentSlot]; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE AWeaponBase* GetConsumeItem(EConsumeSlot Slot) { return ConsumeMaps[Slot]; }
+	FORCEINLINE AWeaponBase* GetConsumeItem() { return ConsumeMaps[CurrentConsumeSlot]; }
+
+	void EquipConsumeItem(EConsumeSlot Slot);
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,6 +64,7 @@ protected:
 
 	// 차후 AWeaponBase 가 아니라 IConsumable 같은 용도로 바꿀 예정
 	TMap<EConsumeSlot, TObjectPtr<AWeaponBase>> ConsumeMaps;
+	EConsumeSlot CurrentConsumeSlot;
 
 protected:
 	// Equip Component에서 관리 (프로토 타입용)

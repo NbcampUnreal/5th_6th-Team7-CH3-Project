@@ -11,6 +11,11 @@ UEquipComponent::UEquipComponent()
 {
 }
 
+void UEquipComponent::EquipConsumeItem(EConsumeSlot Slot)
+{
+	CurrentConsumeSlot = Slot;
+}
+
 void UEquipComponent::BeginPlay()
 {
 	Super::BeginPlay();
