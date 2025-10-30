@@ -5,8 +5,7 @@
 
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "BehaviorTree/BehaviorTree.h"	
-#include "BrainComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 #include "Enemy/BaseAIController.h"
 
@@ -43,6 +42,28 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 
 	if (Health <= 0.f) return;
 	
+	PlayHitAnimMontage(DamageCauser);
+
+	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
+	if (AIController == nullptr) return;
+	
+	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
+	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
+
+	AIController->SetValueAsVectorToBlackboard(FName(TEXT("SecondaryTargetLocation")), SecondaryTargetLocation);
+	AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
+	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+}
+
+void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
+{
+	if (Health <= 0.f) return;
+
+	Super::ApplyDamage(Damage, CheckArmor);
+}
+
+void ABaseEnemy::PlayHitAnimMontage(AActor* DamageCauser)
+{
 	if (GetMesh())
 	{
 		FVector SelfLocation = GetActorLocation();
@@ -80,13 +101,6 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 			AnimInstance->Montage_Play(PlayAnim);
 		}
 	}
-}
-
-void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
-{
-	if (Health <= 0.f) return;
-
-	Super::ApplyDamage(Damage, CheckArmor);
 }
 
 void ABaseEnemy::Die()

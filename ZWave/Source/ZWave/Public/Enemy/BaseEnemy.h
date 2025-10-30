@@ -58,6 +58,8 @@ public:
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 
+	virtual void PlayHitAnimMontage(AActor* DamageCauser);
+
 	virtual void Die() override;
 
 /// <summary>

@@ -20,10 +20,19 @@ public:
 public:
 	virtual void OnPossess(APawn* InPawn) override;
 
+
+/// <summary>
+/// BT 관련함수
+/// </summary>
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	class UBehaviorTree* BehaviorTree = nullptr;
 
 public:
 	void StopBehaviorTree();
+
+public:
+	FVector GetAttackLocation(FVector TargetLocation);
+	void SetValueAsVectorToBlackboard(FName BlackboardKeyName, FVector Value);
+	void SetValueAsBoolToBlackboard(FName BlackboardKeyName, bool Value);
 };

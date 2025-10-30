@@ -8,6 +8,7 @@
 #include "NavigationSystem.h"
 
 #include "Base/BaseCharacter.h"
+#include "Enemy/BaseAIController.h"
 #include "Enemy/BaseEnemy.h"
 
 UBTService_FindPlayer::UBTService_FindPlayer()
@@ -19,7 +20,47 @@ void UBTService_FindPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	AAIController* MyController = OwnerComp.GetAIOwner();
+	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
+	if (OwnerBlackboard == nullptr) return;
+
+	bool bIsAggroed = OwnerBlackboard->GetValueAsBool(FName(TEXT("IsAggroed")));
+	if (bIsAggroed)
+	{
+		TickWithIsAggroedCondtion(OwnerComp, NodeMemory, DeltaSeconds);
+	}
+	else
+	{
+		TickWithIsNotAggroedCondition(OwnerComp, NodeMemory, DeltaSeconds);
+	}
+}
+
+void UBTService_FindPlayer::TickWithIsAggroedCondtion(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
+	if (OwnerBlackboard == nullptr) return;
+
+	ABaseAIController* MyController = static_cast<ABaseAIController*>(OwnerComp.GetAIOwner());
+	if (MyController == nullptr) return;
+
+	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(MyController->GetCharacter());
+	if (MyCharacter == nullptr || MyCharacter->GetCanEditAttackPriority() == false) return;
+
+	ABaseCharacter* TargetCharacter = Cast<ABaseCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (TargetCharacter == nullptr) return;
+
+	FVector ToTargetVector = TargetCharacter->GetActorLocation() - MyCharacter->GetActorLocation();
+
+	// 어그로에 끌리면 해당 타겟을 일단 인식범위 안에 한번은 꼭넣어야함 
+	// -> 이후 어그로 해제(타겟은 시야범위안에있는 타겟이 됨, 이후 놓치면 놓치는거임)
+	if (ToTargetVector.Size() < SightRange)
+	{
+		OwnerBlackboard->SetValueAsBool(FName("IsAggroed"), false);
+	}
+}
+
+void UBTService_FindPlayer::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	ABaseAIController* MyController = static_cast<ABaseAIController*>(OwnerComp.GetAIOwner());
 	if (MyController == nullptr) return;
 
 	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(MyController->GetCharacter());
@@ -31,57 +72,67 @@ void UBTService_FindPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	ABaseCharacter* TargetCharacter = Cast<ABaseCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (TargetCharacter == nullptr) return;
 
-	// �þ߹��� �ȿ� �ִ��� �˻�
 	FVector ToTargetVector = TargetCharacter->GetActorLocation() - MyCharacter->GetActorLocation();
-	if (ToTargetVector.Length() > SightRange)
+
+	// 시야범위 안에 들어왔는지
+	if (CheckSightRange(ToTargetVector, SightRange) == false)
 	{
-		OwnerBlackboard->ClearValue(GetSelectedBlackboardKey());
+		ClearTarget(OwnerBlackboard);
 		return;
 	}
 
-	// �þ߰� �ȿ� �ִ��� �˻� 
-	FVector MyForwardVector = MyCharacter->GetActorForwardVector().GetSafeNormal();
+	// 시야각 안에 들어왔는지
+	bool bIsSecondaryTargetLocation = OwnerBlackboard->IsVectorValueSet(GetSelectedBlackboardKey());
+	if (CheckSightDegree(MyCharacter, ToTargetVector, bIsSecondaryTargetLocation) == false)
+	{
+		ClearTarget(OwnerBlackboard);
+		return;
+	}
+
+	// 장애물은 없는지
+	if (!MyController->LineOfSightTo(TargetCharacter))
+	{
+		ClearTarget(OwnerBlackboard);
+		return;
+	}
+
+	FVector TargetLocation = TargetCharacter->GetActorLocation();
+	OwnerBlackboard->SetValueAsVector(FName(TEXT("SecondaryTargetLocation")), TargetLocation);
+	if (ToTargetVector.Size() < MyCharacter->GetAttackRange()) // 공격범위 안에있다면 -> 정지
+	{
+		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), MyCharacter->GetActorLocation());
+	}
+	else  // 공격범위 밖에 있다면 -> 이동
+	{
+		FVector Destination = MyController->GetAttackLocation(TargetCharacter->GetActorLocation());
+		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
+	}
+}
+
+bool UBTService_FindPlayer::CheckSightRange(FVector ToTargetVector, float sightRange)
+{
+	return !(ToTargetVector.Length() > SightRange);
+}
+
+bool UBTService_FindPlayer::CheckSightDegree(AActor* StdActor, FVector ToTargetVector, bool bIsSecondaryTargetLocationSet)
+{
+	FVector MyForwardVector = StdActor->GetActorForwardVector().GetSafeNormal();
 	float DotRes = MyForwardVector.Dot(ToTargetVector.GetSafeNormal());
 	bool IsInSight = SightDegree > FMath::RadiansToDegrees(FMath::Acos(DotRes));
 	if (!IsInSight)
 	{
 		// When the player instantly moves behind an enemy and goes out of its field of view, 
 		// the enemy immediately loses sight of the player
-		if (!(ToTargetVector.Size() < AutoDetectionRange && OwnerBlackboard->IsVectorValueSet(GetSelectedBlackboardKey())))
+		if (!(ToTargetVector.Size() < AutoDetectionRange && bIsSecondaryTargetLocationSet))
 		{
-			OwnerBlackboard->ClearValue(GetSelectedBlackboardKey());
-			return;
+			return false;
 		}
 	}
+	return true;
+}
 
-	// ��ֹ� �Ǵ�
-	if (!MyController->LineOfSightTo(TargetCharacter))
-	{
-		OwnerBlackboard->ClearValue(GetSelectedBlackboardKey());
-		return;
-	}
-
-	// �÷��̾���� �Ÿ��� ���ݹ��� �̳��̴� -> ����
-	if (ToTargetVector.Size() < MyCharacter->GetAttackRange())
-	{
-		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), MyCharacter->GetActorLocation());
-	}
-	else {
-		// �׷��� �ʴ� -> ����
-
-		FVector TargetLocation = TargetCharacter->GetActorLocation();
-		FVector ToTarget = (TargetLocation - MyCharacter->GetActorLocation()).GetSafeNormal();
-		float AttakRange = MyCharacter->GetAttackRange();
-
-		UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-		if (!NavSystem) return;
-
-		FNavLocation ProjectedLocation;
-		bool bFoundNavLocation = NavSystem->ProjectPointToNavigation(TargetLocation - ToTarget * AttakRange, ProjectedLocation, FVector(100, 100, 100.0f));
-		FVector Destination = bFoundNavLocation ? ProjectedLocation.Location : TargetLocation - ToTarget * AttakRange;
-
-		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
-	}
-
-	//OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), TargetCharacter->GetActorLocation());
+void UBTService_FindPlayer::ClearTarget(UBlackboardComponent* OwnerBlackboard)
+{
+	OwnerBlackboard->ClearValue(FName(TEXT("SecondaryTargetLocation")));
+	OwnerBlackboard->ClearValue(GetSelectedBlackboardKey());
 }
