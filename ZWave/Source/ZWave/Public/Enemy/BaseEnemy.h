@@ -17,6 +17,8 @@ class ZWAVE_API ABaseEnemy : public ABaseCharacter
 public:
 	ABaseEnemy();
 
+	virtual void BeginPlay() override;
+
 public:
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;

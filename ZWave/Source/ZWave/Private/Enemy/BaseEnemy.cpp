@@ -11,6 +11,12 @@ ABaseEnemy::ABaseEnemy()
 	
 }
 
+void ABaseEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	//Health = MaxHealth;
+}
+
 void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 {
 	Super::Attacked(DamageCauser, Damage);
