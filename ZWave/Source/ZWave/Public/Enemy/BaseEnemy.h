@@ -30,7 +30,7 @@ public:
 /// 피격, 사망 관련
 /// </summary>
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
 	class UAnimMontage* DieMontage;
 
 public:
@@ -43,18 +43,22 @@ public:
 /// 공격 관련
 /// </summary>
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
+	bool bIsAttackPlayerOnly;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
+	bool bIsDumb;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
 	float SightRange;
-	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
 	float AttackRange;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Attack")
 	class UAnimMontage* AttackMontage;
 	
 	/// <summary>
 	/// Deprecated Variable
 	/// </summary>
-	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
 	bool bCanEditAttackPriority;
 
 public:
