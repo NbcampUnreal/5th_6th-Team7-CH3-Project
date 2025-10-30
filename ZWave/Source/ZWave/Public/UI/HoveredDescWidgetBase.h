@@ -27,6 +27,8 @@ protected:
 	bool bIsActivated = false;
 
 public:
+	void NativeOnInitialized() override;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnActivated(const FItemUIInfo& Info);
 	void OnActivated_Implementation(const FItemUIInfo& Info);
