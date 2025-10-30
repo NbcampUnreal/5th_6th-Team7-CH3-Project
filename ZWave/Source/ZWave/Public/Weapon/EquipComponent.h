@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -31,6 +31,7 @@ public:
 
 	void SetSlotData(EEquipSlot Slot, const UWeaponDefinition* WeaponDef);
 	void ClearSlotData(EEquipSlot Slot);
+	void AmmoSupply(int32 AmmoAmount);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE AWeaponBase* GetCurrentWeapon() { return SlotMaps[CurrentSlot]; }

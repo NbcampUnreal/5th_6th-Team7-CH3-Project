@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Base/BaseCharacter.h"
+#include "Player/TaskPlayer.h"
+#include "Enemy/BaseEnemy.h"
 #include "EffectBase.generated.h"
 
 /**

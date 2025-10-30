@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Base/BaseCharacter.h"
@@ -64,5 +64,15 @@ void ABaseCharacter::ApplyDamage(float Damage, bool CheckArmor)
 void ABaseCharacter::Die()
 {
 	SetLifeSpan(0.05f);
+}
+
+float ABaseCharacter::GetMaxHealth()
+{
+	return MaxHealth;
+}
+
+void ABaseCharacter::SetHealth(float SetHealAmount)
+{
+	Health = FMath::Clamp(Health + SetHealAmount, 0.0f, MaxHealth);
 }
 

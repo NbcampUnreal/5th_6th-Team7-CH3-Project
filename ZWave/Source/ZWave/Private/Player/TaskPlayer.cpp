@@ -256,6 +256,8 @@ void ATaskPlayer::Attacked(AActor* DamageCauser, float Damage)
 	ActionComp->Attacked(this, DamageCauser);
 }
 
+
+
 void ATaskPlayer::Die()
 {
 	ActionComp->Die(this);
@@ -403,4 +405,15 @@ UIngameHUD* ATaskPlayer::GetIngameHud()
 	}
 
 	return nullptr;
+}
+
+void ATaskPlayer::SetHealth(float SetHealAmount)
+{
+	float CurrentHealth = Health;
+	Super::SetHealth(SetHealAmount);
+
+	if (UIngameHUD* nowHud = GetIngameHud())
+	{
+		nowHud->OnHealthChange(CurrentHealth, Health);
+	}
 }

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Weapon/EquipComponent.h"
@@ -137,6 +137,7 @@ void UEquipComponent::ClearSlotData(EEquipSlot Slot)
 	}
 }
 
+
 void UEquipComponent::AttachWeaponToOwner(AWeaponBase* Weapon, const UWeaponDefinition* WeaponDef)
 {
 	if (Weapon == nullptr ||
@@ -156,5 +157,10 @@ void UEquipComponent::AttachWeaponToOwner(AWeaponBase* Weapon, const UWeaponDefi
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Weapon Attached Failed! SocketName : %s"), *SocketName.ToString());
 	}
+}
+
+void UEquipComponent::AmmoSupply(int32 AmmoAmount)
+{
+	// 여기 부분에 탄창 추가 로직 작성
 }
 
