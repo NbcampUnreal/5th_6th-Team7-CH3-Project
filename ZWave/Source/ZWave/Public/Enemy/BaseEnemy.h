@@ -19,26 +19,43 @@ public:
 
 	virtual void BeginPlay() override;
 
+/// <summary>
+/// 기본 영역
+/// </summary>
+public:
+	void SetMoveSpeed(float MoveSpeed);
+	float GetMoveSpeed();
+
+/// <summary>
+/// 피격, 사망 관련
+/// </summary>
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	class UAnimMontage* DieMontage;
+
 public:
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 
 	virtual void Die() override;
 
-public:
-	void SetMoveSpeed(float MoveSpeed);
-	float GetMoveSpeed();
-
+/// <summary>
+/// 공격 관련
+/// </summary>
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	float AttackRange;
+	float SightRange;
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	bool bCanEditAttackPriority;
+	float AttackRange;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
 	class UAnimMontage* AttackMontage;
-	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
-	class UAnimMontage* DieMontage;
+	
+	/// <summary>
+	/// Deprecated Variable
+	/// </summary>
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	bool bCanEditAttackPriority;
 
 public:
 	bool GetCanEditAttackPriority() const;
