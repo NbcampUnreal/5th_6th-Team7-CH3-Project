@@ -29,7 +29,7 @@ public:
 	FORCEINLINE UWeaponDefinition* GetModeWeaponDef() const { return ModeStat; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE UEffectBase* GetModeEffect() const { return ModeEffect; }
+	FORCEINLINE TSubclassOf<UEffectBase> GetModeEffectClass() const { return ModeEffectClass; }
 
 protected:
 	FName ModeName;
@@ -38,5 +38,5 @@ protected:
 
 	TObjectPtr<UWeaponDefinition> ModeStat;
 
-	TObjectPtr<UEffectBase> ModeEffect;
+	TSubclassOf<UEffectBase> ModeEffectClass;
 };

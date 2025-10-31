@@ -66,5 +66,5 @@ protected:
 
 	// 내부 Effect 관리용
 	UPROPERTY(VisibleAnywhere)
-	TMap<EModingSlot, TObjectPtr<UEffectBase>> EquipModingEffectsMap;
+	TMap<EModingSlot, TSubclassOf<UEffectBase>> EquipModingEffectClassMap;
 };

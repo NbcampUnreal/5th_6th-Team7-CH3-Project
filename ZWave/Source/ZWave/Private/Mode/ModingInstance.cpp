@@ -12,8 +12,16 @@ bool UModingInstance::Init(const UModeDefinition* ModeDef)
 
 	ModeName = ModeDef->ModeName;
 	ModeStatApplyType = ModeDef->ModeStatApplyType;
-	ModeStat = NewObject<UWeaponDefinition>(this,ModeDef->StatsDef);
-	ModeEffect = NewObject<UEffectBase>(this,ModeDef->EffectClass);
+	if (ModeDef->StatsDef != nullptr)
+	{
+		ModeStat = NewObject<UWeaponDefinition>(this, ModeDef->StatsDef);
+	}
+	else
+	{
+		ModeStat = nullptr;
+	}
+	
+	ModeEffectClass = ModeDef->EffectClass;
 
 	return true;
 }
