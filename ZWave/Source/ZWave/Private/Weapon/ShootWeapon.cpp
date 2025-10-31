@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Weapon/ShootWeapon.h"
@@ -7,6 +7,7 @@
 #include "DamageCalculator/DamageCalculator.h"
 #include "Base/ZWaveGameState.h"
 #include "UI/IngameHUD.h"
+
 
 AShootWeapon::AShootWeapon()
 {
@@ -65,6 +66,7 @@ bool AShootWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 		return false;
 	}
 
+	ShootWeaponStatBase = ShootDefinition->ShootWeaponStat;
 	ShootWeaponStat = ShootDefinition->ShootWeaponStat;
 	MuzzleSocketName = ShootDefinition->MuzzleSocketName;
 	TraceDistance = ShootDefinition->TraceDistance;
@@ -119,6 +121,76 @@ void AShootWeapon::Reload()
 	{
 		StartReloadOneBullet();
 	}
+}
+
+bool AShootWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInstance)
+{
+	if (ModeInstance == nullptr)
+		return false;
+
+	const UShootWeaponDefinition* ShootDefinition = Cast<UShootWeaponDefinition>(ModeInstance->GetModeWeaponDef());
+	if (ShootDefinition == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("It's Not ShootWeapon Moding!"));
+		return false;
+	}
+
+	if (EquipModingMap.Contains(ModingSlot))
+	{
+		if (EquipModingMap[ModingSlot] != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Need UnEquip Slot"));
+			return false;
+		}
+	}
+
+	if (EquipModingMap.Num() >= ShootWeaponStat.ModingAllows)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Full Moding!"));
+		return false;
+	}
+
+	EquipModingMap[ModingSlot] = ModeInstance;
+	EquipModingEffectClassMap[ModingSlot] = ModeInstance->GetModeEffectClass();
+	ApplyCurrentModing();
+	return true;
+}
+
+void AShootWeapon::UnEquipModing(EModingSlot ModingSlot)
+{
+	if (EquipModingMap.Contains(ModingSlot) == false)
+	{
+		return;
+	}
+	
+	EquipModingMap.Remove(ModingSlot);
+	EquipModingEffectClassMap.Remove(ModingSlot);
+	ApplyCurrentModing();
+}
+
+void AShootWeapon::ApplyCurrentModing()
+{
+	FShootWeaponStats ShootStat = ShootWeaponStatBase;
+
+	for (const auto& Pair : EquipModingMap)
+	{
+		UModingInstance* ModingIns = Pair.Value;
+		if (ModingIns == nullptr)
+			continue;
+
+		UShootWeaponDefinition* ShootDef = Cast<UShootWeaponDefinition>(ModingIns->GetModeWeaponDef());
+		if (ShootDef == nullptr)
+			continue;
+
+		FShootWeaponStats& ModingStat = ShootDef->ShootWeaponStat;
+		EWeaponModifier ModifierType = ModingIns->GetModeApplyType();
+		
+		ApplyStat(ModingStat, ModifierType, ShootStat);
+	}
+
+	ShootWeaponStat = ShootStat;
+
+	AmmoChangeUIBroadCast();
 }
 
 UIngameHUD* AShootWeapon::GetIngameHud()
@@ -205,12 +277,15 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight, float SpreadDeg)
 
 		if (IsDamagableActor(TargetActor) == true)
 		{
+			TArray<TSubclassOf<UEffectBase>> EffectClasses;
+			EquipModingEffectClassMap.GenerateValueArray(EffectClasses);
+
 			UDamageCalculator::DamageCalculate(
 				GetWorld(),
 				OwningCharacter,
 				TargetActor,
 				ShootWeaponStat.AttackPower,
-				BaseEffectClasses);
+				EffectClasses);
 
 			if (UIngameHUD* nowHud = GetIngameHud())
 			{
@@ -330,4 +405,38 @@ FVector AShootWeapon::GetCameraAimPoint()
 	}
 
 	return AimHit.bBlockingHit ? AimHit.ImpactPoint : (ViewLoc + ViewDir * CameraTraceDistance);
+}
+
+void AShootWeapon::ApplyStat(const FShootWeaponStats& ModingStat, EWeaponModifier ModifierType, FShootWeaponStats& OutStat)
+{
+	switch (ModifierType)
+	{
+	case EWeaponModifier::EWM_Add:
+	{
+		OutStat.AttackPower += ModingStat.AttackPower;
+		OutStat.AttackRate	+= ModingStat.AttackRate;
+		OutStat.Magazine	+= ModingStat.Magazine;
+		OutStat.ReloadTime	+= ModingStat.ReloadTime;
+		OutStat.SpareAmmo	+= ModingStat.SpareAmmo;
+	}
+		break;
+	case EWeaponModifier::EWM_Percent:
+	{
+		OutStat.AttackPower *= (1.0f + ModingStat.AttackPower);
+		OutStat.AttackRate	*= (1.0f + ModingStat.AttackRate);
+		OutStat.Magazine	*= (1.0f + ModingStat.Magazine);
+		OutStat.ReloadTime	*= (1.0f + ModingStat.ReloadTime);
+		OutStat.SpareAmmo	*= (1.0f + ModingStat.SpareAmmo);
+	}
+		break;
+	case EWeaponModifier::EWM_Multiple:
+	{
+		OutStat.AttackPower	*= ModingStat.AttackPower;
+		OutStat.AttackRate	*= ModingStat.AttackRate;
+		OutStat.Magazine	*= ModingStat.Magazine;
+		OutStat.ReloadTime	*= ModingStat.ReloadTime;
+		OutStat.SpareAmmo	*= ModingStat.SpareAmmo;
+	}
+		break;
+	}
 }
