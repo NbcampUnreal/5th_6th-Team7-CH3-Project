@@ -11,6 +11,17 @@
 #include "WeaponBase.generated.h"
 
 class ACharacter;
+class UModingInstance;
+
+UENUM(BlueprintType)
+enum class EModingSlot : uint8
+{
+	EMS_First,
+	EMS_Second,
+	EMS_Third,
+	EMS_Quad,
+	EMS_Default,
+};
 
 UCLASS(Abstract)
 class ZWAVE_API AWeaponBase : public AActor
@@ -22,6 +33,10 @@ public:
 
 	virtual bool Init(const UWeaponDefinition* WeaponDefinition) PURE_VIRTUAL(AWeaponBase::Init, return false;);
 
+	virtual bool EquipModing(EModingSlot ModingSlot,UModingInstance* ModeInstance) PURE_VIRTUAL(AWeaponBase::EquipModing, return false;);
+
+	virtual void UnEquipModing(EModingSlot ModingSlot) PURE_VIRTUAL(AWeaponBase::UnEquipModing,);
+
 	virtual void Equip(ACharacter* NewOwner);
 
 	virtual void Unequip();
@@ -29,8 +44,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool CanAttack() const { return bCanAttack; };
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UModingInstance* GetModing(EModingSlot ModingSlot);
+
 protected:
 	FORCEINLINE bool IsDamagableActor(AActor* TargetActor) { return TargetActor && TargetActor->GetClass()->ImplementsInterface(UDamagable::StaticClass()); }
+
+	virtual void ApplyCurrentModing() PURE_VIRTUAL(AWeaponBase::ApplyCurrentModing, ;);
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -41,12 +61,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	bool bCanAttack = true;
+	UPROPERTY(VisibleAnywhere)
+	TMap<EModingSlot, TObjectPtr<UModingInstance>> EquipModingMap;
 
-	// 프로토타입 코드 - 차후 Moding 클래스 개발 이후 수정 예정
-	UPROPERTY(EditDefaultsOnly)
-	TArray<TSubclassOf<UEffectBase>> BaseEffectClasses;
-
-	// 프로토타입 코드 - 차후 Moding 클래스 개발 이후 수정 예정
-	UPROPERTY(EditDefaultsOnly)
-	float StaggerValue;
+	// 내부 Effect 관리용
+	UPROPERTY(VisibleAnywhere)
+	TMap<EModingSlot, TObjectPtr<UEffectBase>> EquipModingEffectsMap;
 };
