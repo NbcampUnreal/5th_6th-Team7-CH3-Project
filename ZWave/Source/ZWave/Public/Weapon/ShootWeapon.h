@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Weapon/WeaponBase.h"
 #include "Weapon/ShootWeaponDefinition.h"
+#include "Mode/ModingInstance.h"
 #include "ShootWeapon.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFireSuccess);
@@ -31,6 +32,14 @@ public:
 
 	virtual void Reload();
 
+	virtual bool EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInstance) override;
+
+	virtual void UnEquipModing(EModingSlot ModingSlot) override;
+
+protected:
+	virtual void ApplyCurrentModing() override;
+
+public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int GetNowAmmo() { return NowAmmo; }
 
@@ -47,7 +56,7 @@ public:
 	FORCEINLINE bool IsReload() { return bReloading; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE bool IsFullMagazine() { return NowAmmo == ShootWeaponStat.Magazine; }
+	FORCEINLINE bool IsFullMagazine() { return NowAmmo == GetMagazine(); }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int CalcTransferBullet(int Need) const { return FMath::Min(Need, RemainSpareAmmo); }
@@ -86,11 +95,15 @@ protected:
 
 	FVector GetCameraAimPoint();
 
+	void ApplyStat(const FShootWeaponStats& ModingStat, EWeaponModifier ModifierType, FShootWeaponStats& OutStat);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
+	FShootWeaponStats ShootWeaponStatBase;
 	FShootWeaponStats ShootWeaponStat;
+
 	FName MuzzleSocketName;
 	float TraceDistance;
 

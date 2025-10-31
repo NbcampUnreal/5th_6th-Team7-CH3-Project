@@ -147,6 +147,11 @@ void UEquipComponent::ClearSlotData(EEquipSlot Slot)
 	}
 }
 
+void UEquipComponent::AmmoSupply(int32 AmmoAmount)
+{
+}
+
+
 void UEquipComponent::AttachWeaponToOwner(AWeaponBase* Weapon, const UWeaponDefinition* WeaponDef)
 {
 	if (Weapon == nullptr ||

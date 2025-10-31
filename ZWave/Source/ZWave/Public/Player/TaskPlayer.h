@@ -35,6 +35,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
+	virtual void SetHealth(float SetHealAmount) override;
 	virtual void Die() override;
 
 	void EquipFirstSlot();
