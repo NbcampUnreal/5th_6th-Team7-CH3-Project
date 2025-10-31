@@ -144,7 +144,11 @@ bool AShootWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInst
 		}
 	}
 
-	if (EquipModingMap.Num() >= ShootWeaponStat.ModingAllows)
+	int32 EquipNum = EquipModingMap.Num();
+	if (EquipModingMap.Contains(EModingSlot::EMS_Default))
+		EquipNum--;
+
+	if (EquipNum >= ShootWeaponStat.ModingAllows)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Full Moding!"));
 		return false;
