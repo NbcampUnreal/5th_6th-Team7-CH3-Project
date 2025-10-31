@@ -8,6 +8,7 @@
 #include "ZWaveGameState.generated.h"
 
 class UIngameHUD;
+class ASpawnPoint;
 
 UCLASS()
 class ZWAVE_API AZWaveGameState : public AGameStateBase
@@ -25,7 +26,8 @@ public:
     UFUNCTION(BlueprintPure, Category = "Game State")
     int32 GetEnemiesRemaining() const { return EnemiesRemaining; }
 
-    UIngameHUD* IngameHUD;
+    UFUNCTION(BlueprintPure, Category = "Game State")
+    TArray<ASpawnPoint*> GetSpawnPointArray() { return SpawnPoints; }
 
     void SetCurrentGameState(EGameState NewState);
 
@@ -35,7 +37,11 @@ public:
 
     void RegisterIngameHUD(UIngameHUD* InHUD);
 
+    void RegisterSpawnPoint(ASpawnPoint* SP);
+
     UIngameHUD* GetIngameHUD();
+
+    UIngameHUD* IngameHUD;
 
 protected:
     UPROPERTY(BlueprintReadOnly, Category = "Game State")
@@ -46,5 +52,7 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, Category = "Game State")
     int32 EnemiesRemaining = 0;
+
+    TArray<ASpawnPoint*> SpawnPoints;
 
 };

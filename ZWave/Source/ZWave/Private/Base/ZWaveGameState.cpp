@@ -3,6 +3,7 @@
 
 #include "Base/ZWaveGameState.h"
 #include "UI/IngameHUD.h"
+#include "Level/SpawnPoint.h"
 
 
 void AZWaveGameState::SetCurrentGameState(EGameState NewState)
@@ -42,4 +43,9 @@ void AZWaveGameState::RegisterIngameHUD(UIngameHUD* InHUD)
 UIngameHUD* AZWaveGameState::GetIngameHUD()
 {
     return IngameHUD;
+}
+
+void AZWaveGameState::RegisterSpawnPoint(ASpawnPoint* SP)
+{
+    SpawnPoints.Add(SP);
 }
