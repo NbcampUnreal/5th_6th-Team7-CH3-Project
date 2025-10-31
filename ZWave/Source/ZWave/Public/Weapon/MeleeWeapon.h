@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Weapon/WeaponBase.h"
 #include "Weapon/MeleeWeaponDefinition.h"
+#include "Mode/ModingInstance.h"
 #include "MeleeWeapon.generated.h"
 
 /**
@@ -27,6 +28,14 @@ public:
 
 	virtual void Unequip() override;
 
+	virtual bool EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInstance) override;
+
+	virtual void UnEquipModing(EModingSlot ModingSlot) override;
+
+protected:
+	virtual void ApplyCurrentModing() override;
+
+public:
 	UFUNCTION(BlueprintCallable)
 	void StartAttack();
 
@@ -39,11 +48,13 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 		bool bFromSweep, const FHitResult& SweepResult);
 
+	void ApplyStat(const FMeleeWeaponStats& ModingStat, EWeaponModifier ModifierType, FMeleeWeaponStats& OutStat);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<class USphereComponent> SphereCollision;
 
+	FMeleeWeaponStats MeleeWeaponStatBase;
 	FMeleeWeaponStats MeleeWeaponStat;
 
 	UPROPERTY()
