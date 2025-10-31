@@ -31,9 +31,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "ShootWeapon Stats")
 	int SpareAmmo;
-
-	UPROPERTY(EditDefaultsOnly, Category = "ShootWeapon Stats")
-	int ModingAllows;
 };
 
 /**
