@@ -20,7 +20,7 @@ void UHealthEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage)
 
 void UHealthEffect::RemoveEffect()
 {
-	MarkAsGarbage();
+	Super::RemoveEffect();
 }
 
 void UHealthEffect::BeginDestroy()

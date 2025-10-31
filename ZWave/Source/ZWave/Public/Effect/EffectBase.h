@@ -19,7 +19,7 @@ class ZWAVE_API UEffectBase : public UObject
 
 public:
 	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) PURE_VIRTUAL(UEffectBase::ApplyEffect, );
-	virtual void RemoveEffect() PURE_VIRTUAL(UEffectBase::RemoveEffect, );
+	virtual void RemoveEffect();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Target")

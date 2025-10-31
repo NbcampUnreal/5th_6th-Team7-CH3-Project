@@ -4,11 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Engine/DamageEvents.h"
 #include "DamageCalculator.generated.h"
 
-/**
- * 
- */
+
+USTRUCT(BlueprintType)
+struct FZWaveDamageEvent : public FDamageEvent
+{
+	GENERATED_BODY()
+
+public:
+	FZWaveDamageEvent() { DamageTypeClass = UDamageType::StaticClass(); }
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EffectArray")
+	TArray<TSubclassOf<class UEffectBase>> EffectArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+	float BaseDamage;
+};
+
 class EffectBase;
 class IDamagable;
 
@@ -25,5 +39,7 @@ public:
 		TScriptInterface<IDamagable> Target,
 		const float& BaseDamage,
 		TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Calculate")
+	static void DamageHelper(UObject* WorldContextObject, AActor* Target, AActor* DamageCauser, FZWaveDamageEvent const& DamageEvent);
 };

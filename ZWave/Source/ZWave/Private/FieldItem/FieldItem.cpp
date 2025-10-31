@@ -47,7 +47,7 @@ void AFieldItem::ActiveEffect(AActor* OtherActor)
 	if (UEffectApplyManager* EffectApplyManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Activated Player"));
-		//EffectApplyManager->ApplyEffect(OtherActor, FieldItemEffectClassArray);
+		EffectApplyManager->ApplyEffect(OtherActor, FieldItemEffectClassArray);
 		this->CauserActor = nullptr;
 	}
 }
