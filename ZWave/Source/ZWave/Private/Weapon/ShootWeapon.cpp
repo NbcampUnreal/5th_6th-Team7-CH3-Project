@@ -150,8 +150,8 @@ bool AShootWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInst
 		return false;
 	}
 
-	EquipModingMap[ModingSlot] = ModeInstance;
-	EquipModingEffectClassMap[ModingSlot] = ModeInstance->GetModeEffectClass();
+	EquipModingMap.Add(ModingSlot, ModeInstance);
+	EquipModingEffectClassMap.Add(ModingSlot,ModeInstance->GetModeEffectClass());
 	ApplyCurrentModing();
 	return true;
 }
