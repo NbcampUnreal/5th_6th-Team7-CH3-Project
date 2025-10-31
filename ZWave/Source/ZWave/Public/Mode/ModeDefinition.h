@@ -30,7 +30,7 @@ public:
 	EWeaponModifier ModeStatApplyType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mode")
-	TSubclassOf<UWeaponDefinition> StatsDef;
+	TObjectPtr<UWeaponDefinition> StatsDef;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mode")
 	TSubclassOf<UEffectBase> EffectClass;

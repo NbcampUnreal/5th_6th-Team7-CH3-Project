@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class ZWAVE_API UModingInstance : public UObject
 {
 	GENERATED_BODY()
