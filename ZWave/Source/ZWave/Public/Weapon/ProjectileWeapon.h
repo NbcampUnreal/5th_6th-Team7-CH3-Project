@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Weapon/WeaponBase.h"
 #include "Weapon/ProjectileWeaponDefinition.h"
+#include "Mode/ModingInstance.h"
 #include "ProjectileWeapon.generated.h"
 
 /**
@@ -23,12 +24,22 @@ public:
 
 	virtual bool Init(const UWeaponDefinition* WeaponDefinition) override;
 
+	virtual bool EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInstance) override;
+
+	virtual void UnEquipModing(EModingSlot ModingSlot) override;
+
+protected:
+	virtual void ApplyCurrentModing() override;
+
+public:
 	void ThrowFromOwner();
 
 protected:
 	FVector ComputeThrowDirection() const;
 
 	void AttachToOwner();
+
+	void ApplyStat(const FProjectileWeaponStats& ModingStat, EWeaponModifier ModifierType, FProjectileWeaponStats& OutStat);
 
 protected:
 	UFUNCTION()
@@ -55,6 +66,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Degree")
 	float UpDegree;
 
+	FProjectileWeaponStats ProjectileWeaponStatBase;
 	FProjectileWeaponStats ProjectileWeaponStat;
 	FName AttachSocketName;
 

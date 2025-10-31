@@ -43,7 +43,7 @@ AProjectileWeapon::AProjectileWeapon()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->UpdatedComponent = SphereCollision;
 	ProjectileMovement->InitialSpeed = 2000.f;
-	ProjectileMovement->MaxSpeed = 2000.f;
+	ProjectileMovement->MaxSpeed = 10000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->ProjectileGravityScale = 1.0f;
 	ProjectileMovement->bShouldBounce = false;
@@ -73,6 +73,7 @@ bool AProjectileWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 		return false;
 	}
 
+	ProjectileWeaponStatBase = ProjDefinition->ProjectileWeaponStat;
 	ProjectileWeaponStat = ProjDefinition->ProjectileWeaponStat;
 	ProjectileMovement->InitialSpeed = ProjectileWeaponStat.InitialSpeed;
 	ProjectileMovement->SetActive(false);
@@ -82,6 +83,78 @@ bool AProjectileWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 	AttachToOwner();
 
     return true;
+}
+
+bool AProjectileWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInstance)
+{
+	if (ModeInstance == nullptr)
+		return false;
+
+	const UProjectileWeaponDefinition* PrjectileDefinition = Cast<UProjectileWeaponDefinition>(ModeInstance->GetModeWeaponDef());
+	if (PrjectileDefinition == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("It's Not ShootWeapon Moding!"));
+		return false;
+	}
+
+	if (EquipModingMap.Contains(ModingSlot))
+	{
+		if (EquipModingMap[ModingSlot] != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Need UnEquip Slot"));
+			return false;
+		}
+	}
+
+	int32 EquipNum = EquipModingMap.Num();
+	if (EquipModingMap.Contains(EModingSlot::EMS_Default))
+		EquipNum--;
+
+	if (EquipNum >= ProjectileWeaponStat.ModingAllows)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Full Moding!"));
+		return false;
+	}
+
+	EquipModingMap.Add(ModingSlot, ModeInstance);
+	EquipModingEffectClassMap.Add(ModingSlot, ModeInstance->GetModeEffectClass());
+	ApplyCurrentModing();
+	return true;
+}
+
+void AProjectileWeapon::UnEquipModing(EModingSlot ModingSlot)
+{
+	if (EquipModingMap.Contains(ModingSlot) == false)
+	{
+		return;
+	}
+
+	EquipModingMap.Remove(ModingSlot);
+	EquipModingEffectClassMap.Remove(ModingSlot);
+	ApplyCurrentModing();
+}
+
+void AProjectileWeapon::ApplyCurrentModing()
+{
+	FProjectileWeaponStats ProjectileStat = ProjectileWeaponStatBase;
+
+	for (const auto& Pair : EquipModingMap)
+	{
+		UModingInstance* ModingIns = Pair.Value;
+		if (ModingIns == nullptr)
+			continue;
+
+		UProjectileWeaponDefinition* ProjectileDef = Cast<UProjectileWeaponDefinition>(ModingIns->GetModeWeaponDef());
+		if (ProjectileDef == nullptr)
+			continue;
+
+		FProjectileWeaponStats& ModingStat = ProjectileDef->ProjectileWeaponStat;
+		EWeaponModifier ModifierType = ModingIns->GetModeApplyType();
+
+		ApplyStat(ModingStat, ModifierType, ProjectileStat);
+	}
+
+	ProjectileWeaponStat = ProjectileStat;
 }
 
 void AProjectileWeapon::ThrowFromOwner()
@@ -166,6 +239,40 @@ void AProjectileWeapon::AttachToOwner()
 	SetActorTickEnabled(false);
 }
 
+void AProjectileWeapon::ApplyStat(const FProjectileWeaponStats& ModingStat, EWeaponModifier ModifierType, FProjectileWeaponStats& OutStat)
+{
+	switch (ModifierType)
+	{
+	case EWeaponModifier::EWM_Add:
+	{
+		OutStat.AttackPower += ModingStat.AttackPower;
+		OutStat.AttackRate += ModingStat.AttackRate;
+		OutStat.Radius += ModingStat.Radius;
+		OutStat.FuseTime += ModingStat.FuseTime;
+		OutStat.InitialSpeed += ModingStat.InitialSpeed;
+	}
+	break;
+	case EWeaponModifier::EWM_Percent:
+	{
+		OutStat.AttackPower *= (1.0f + ModingStat.AttackPower);
+		OutStat.AttackRate *= (1.0f + ModingStat.AttackRate);
+		OutStat.Radius *= (1.0f + ModingStat.Radius);
+		OutStat.FuseTime *= (1.0f + ModingStat.FuseTime);
+		OutStat.InitialSpeed *= (1.0f + ModingStat.InitialSpeed);
+	}
+	break;
+	case EWeaponModifier::EWM_Multiple:
+	{
+		OutStat.AttackPower *= ModingStat.AttackPower;
+		OutStat.AttackRate *= ModingStat.AttackRate;
+		OutStat.Radius *= ModingStat.Radius;
+		OutStat.FuseTime *= ModingStat.FuseTime;
+		OutStat.InitialSpeed *= ModingStat.InitialSpeed;
+	}
+	break;
+	}
+}
+
 void AProjectileWeapon::OnProjectileStop(const FHitResult& ImpactResult)
 {
 	if (ProjectileWeaponStat.FuseTime > 0.f)
@@ -228,12 +335,12 @@ void AProjectileWeapon::DamageBoom()
 	{
 		if (IsDamagableActor(TargetActor) == true)
 		{
-			UDamageCalculator::DamageCalculate(
+			/*UDamageCalculator::DamageCalculate(
 				GetWorld(),
 				OwningCharacter,
 				TargetActor,
 				ProjectileWeaponStat.AttackPower,
-				BaseEffectClasses);
+				BaseEffectClasses);*/
 		}
 	}
 }
