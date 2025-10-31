@@ -21,12 +21,12 @@ void UShopUI::OnChangeTab_Implementation(int32 TargetTabIdx)
 		if (i == TargetTabIdx)
 		{
 			TabList[i]->ActivateWidget();
-			TabList[i]->AddToViewport();
+			TabList[i]->SetVisibility(ESlateVisibility::Visible);
 		}
 		else
 		{
 			TabList[i]->DeactivateWidget();
-			TabList[i]->RemoveFromViewport();
+			TabList[i]->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
 }
