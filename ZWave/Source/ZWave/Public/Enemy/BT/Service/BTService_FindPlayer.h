@@ -30,4 +30,12 @@ private:
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+private:
+	void TickWithIsAggroedCondtion(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds);
+	void TickWithIsNotAggroedCondition(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds);
+
+	bool CheckSightRange(FVector ToTargetVector, float sightRange);
+	bool CheckSightDegree(AActor* StdActor, FVector ToTargetVector, bool bIsSecondaryTargetLocationSet);
+
+	void ClearTarget(class UBlackboardComponent* OwnerBlackboard);
 };

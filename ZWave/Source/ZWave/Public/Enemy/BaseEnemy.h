@@ -6,6 +6,16 @@
 #include "Base/BaseCharacter.h"
 #include "BaseEnemy.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EHitDir : uint8
+{
+	Front,
+	Back,
+	Left,
+	Right
+};
+
 /**
  * 
  */
@@ -17,26 +27,62 @@ class ZWAVE_API ABaseEnemy : public ABaseCharacter
 public:
 	ABaseEnemy();
 
-public:
-	virtual void Attacked(AActor* DamageCauser, float Damage) override;
-	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
+	virtual void BeginPlay() override;
 
-	virtual void Die() override;
-
+/// <summary>
+/// 기본 영역
+/// </summary>
 public:
 	void SetMoveSpeed(float MoveSpeed);
 	float GetMoveSpeed();
 
+/// <summary>
+/// 피격, 사망 관련
+/// </summary>
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	float AttackRange;
-	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	bool bCanEditAttackPriority;
-
-	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
-	class UAnimMontage* AttackMontage;
-	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage")
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* FrontHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* BackHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* RightHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
+	class UAnimMontage* LeftHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
 	class UAnimMontage* DieMontage;
+
+private:
+	UAnimMontage* GetAttackedMontage(EHitDir Direction);
+
+public:
+	virtual void Attacked(AActor* DamageCauser, float Damage) override;
+	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
+
+	virtual void PlayHitAnimMontage(AActor* DamageCauser);
+
+	virtual void Die() override;
+
+/// <summary>
+/// 공격 관련
+/// </summary>
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
+	bool bIsAttackPlayerOnly;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
+	bool bIsDumb;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
+	float SightRange;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
+	float AttackRange;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Attack")
+	class UAnimMontage* AttackMontage;
+	
+	/// <summary>
+	/// Deprecated Variable
+	/// </summary>
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
+	bool bCanEditAttackPriority;
 
 public:
 	bool GetCanEditAttackPriority() const;
