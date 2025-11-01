@@ -59,11 +59,19 @@ protected:
 	float Health;
 
 /// <summary>
-/// 공격 관련
+/// 공격 관련, EquipComp에서 SetSlotData에서 GetPawn()을 실행해서, AWeaponBase와 WeaponDefinition 을 사용할수 없음.. 
 /// </summary>
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float AwarenessRange = 1000;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	float WeaponDamage = 20;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	float WeaponRPM = 600;
+	float FireInterval = 0;
+
+	//class AWeaponBase* Weapon;
 
 	class ABaseEnemy* Target;
 	FTimerHandle AttackTimerHandle;

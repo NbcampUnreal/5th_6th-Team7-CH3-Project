@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 
 #include "Weapon/EquipComponent.h"
+#include "Weapon/WeaponBase.h"
 #include "Enemy/BaseEnemy.h"
 
 // Sets default values
@@ -34,6 +35,9 @@ void ATurret::BeginPlay()
 	Health = MaxHealth;
 
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATurret::OnSphereBeginOverlap);
+
+	this->FireInterval = 60.0f / WeaponRPM;
+	//Weapon = EquipComp->GetCurrentWeapon();
 }
 
 // Called every frame
@@ -48,9 +52,14 @@ void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	if (OtherActor->IsA(ABaseEnemy::StaticClass()))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Target is overlaped: %s"), *OtherActor->GetActorNameOrLabel());
-		Target = static_cast<ABaseEnemy*>(OtherActor);
+		if (Target == nullptr)
+		{
+			Target = static_cast<ABaseEnemy*>(OtherActor);
 
-		GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, 5.0f, true);
+			//Weapon->Attack();
+			Attack();
+			GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+		}
 	}
 }
 
@@ -82,5 +91,8 @@ void ATurret::Attack()
 		return;
 	}
 
+	UE_LOG(LogTemp, Display, TEXT("Attack"));
+
+	//Weapon->Attack();
 	Target->Attacked(this, 20);
 }
