@@ -61,7 +61,7 @@ void UBTService_FindPlayer::TickWithIsAggroedCondtion(UBehaviorTreeComponent& Ow
 		AActor* SecondaryTargetActor = static_cast<AActor*>(OwnerBlackboard->GetValueAsObject(FName(TEXT("SecondaryTarget"))));
 		FVector Destination = MyController->GetAttackLocation(SecondaryTargetActor->GetActorLocation());
 
-		OwnerBlackboard->SetValueAsVector(FName(TEXT("SecondaryTargetLocation")), SecondaryTargetActor->GetActorLocation());
+		//OwnerBlackboard->SetValueAsVector(FName(TEXT("SecondaryTargetLocation")), SecondaryTargetActor->GetActorLocation());
 		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
 	}
 }

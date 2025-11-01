@@ -49,4 +49,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Stat")
 	float SpeedMultiply;
 
+
+public:
+	float GetHealth() const;
 };

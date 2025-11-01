@@ -76,3 +76,8 @@ void ABaseCharacter::SetHealth(float SetHealAmount)
 	Health = FMath::Clamp(Health + SetHealAmount, 0.0f, MaxHealth);
 }
 
+float ABaseCharacter::GetHealth() const
+{
+	return this->Health;
+}
+
