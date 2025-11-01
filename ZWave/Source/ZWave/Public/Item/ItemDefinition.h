@@ -55,12 +55,6 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Definition")
     int32 SellPrice = 0;
 
-    //(무기전용) 무기 재료
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Crafting")
-    TMap<UItemDefinition*, int32> CraftingMaterials;
-
-    //(무기전용) 무기 모드 수용량
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon Stats")
-    int32 ModSlotLimit;
-
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Definition")
+    TSoftObjectPtr<UPrimaryDataAsset> Definition;
 };
