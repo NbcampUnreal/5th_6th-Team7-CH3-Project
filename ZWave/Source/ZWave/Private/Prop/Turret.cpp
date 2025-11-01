@@ -22,7 +22,7 @@ ATurret::ATurret()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(MeshComp);
 
-	SphereComp->InitSphereRadius(AwarenessRange);
+	SphereComp->InitSphereRadius(AwarenessRange*2);
 
 	EquipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("EquipComp"));
 }
@@ -105,9 +105,38 @@ void ATurret::StopAttack()
 	Target = nullptr;
 
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	SearchEnemy();
 }
 
 void ATurret::SearchEnemy()
 {
+	TArray<FHitResult> HitResults;
+	float SphereRadius = this->AwarenessRange * 2;
 
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		HitResults,
+		GetActorLocation(),
+		GetActorLocation(),
+		FQuat::Identity,
+		ECC_Visibility,                  // 사용할 충돌 채널 설정
+		FCollisionShape::MakeSphere(SphereRadius)
+	);
+
+	if (bHit)
+	{
+		for (const FHitResult& Hit : HitResults)
+		{
+			if (Hit.GetActor()->IsA(ABaseEnemy::StaticClass()))
+			{
+				Target = static_cast<ABaseEnemy*>(Hit.GetActor());
+
+				if (Target->GetHealth() > 0)
+				{
+					Attack();
+					GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+					break;
+				}
+			}
+		}
+	}
 }
