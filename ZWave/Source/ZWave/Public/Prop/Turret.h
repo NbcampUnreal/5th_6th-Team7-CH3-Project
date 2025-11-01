@@ -78,4 +78,6 @@ protected:
 
 protected:
 	virtual void Attack();
+	virtual void StopAttack();
+	virtual void SearchEnemy();
 };

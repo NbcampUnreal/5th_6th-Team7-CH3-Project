@@ -66,3 +66,8 @@ void ABaseCharacter::Die()
 	SetLifeSpan(0.05f);
 }
 
+float ABaseCharacter::GetHealth() const
+{
+	return this->Health;
+}
+

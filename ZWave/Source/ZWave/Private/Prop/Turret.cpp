@@ -51,7 +51,6 @@ void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	if (OtherActor->IsA(ABaseEnemy::StaticClass()))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Target is overlaped: %s"), *OtherActor->GetActorNameOrLabel());
 		if (Target == nullptr)
 		{
 			Target = static_cast<ABaseEnemy*>(OtherActor);
@@ -66,6 +65,8 @@ void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 void ATurret::Attacked(AActor* DamageCauser, float Damage)
 {
 	ApplyDamage(Damage, false);
+
+	UE_LOG(LogTemp, Display, TEXT("DC: %s"), *DamageCauser->GetActorNameOrLabel());
 }
 
 void ATurret::ApplyDamage(float Damage, bool CheckArmor)
@@ -91,8 +92,22 @@ void ATurret::Attack()
 		return;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("Attack"));
-
 	//Weapon->Attack();
-	Target->Attacked(this, 20);
+	Target->Attacked(this, this->WeaponDamage);
+	if (Target->GetHealth() <= 0.f)
+	{
+		StopAttack();
+	}
+}
+
+void ATurret::StopAttack()
+{
+	Target = nullptr;
+
+	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+}
+
+void ATurret::SearchEnemy()
+{
+
 }
