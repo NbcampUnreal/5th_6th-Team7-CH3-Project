@@ -18,7 +18,7 @@ public:
     TObjectPtr<UItemDefinition> ItemDef;
 
     UPROPERTY(BlueprintReadOnly, Category = "Item Instance")
-    int32 MaxStackCount = 1;
+    int32 StackCount = 1;
 
     UFUNCTION(BlueprintCallable, Category = "Item Instance")
     void Initialize(UItemDefinition* Definition, int32 Count = 1);
@@ -34,6 +34,4 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "Item Instance")
     int32 GetMaxStackCount() const;
-
-    int32 GetModeSlotLimit() const;
 };

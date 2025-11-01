@@ -25,8 +25,5 @@ public:
     void DetachMod(UItemModeInstance* ModInstance);
 
     UFUNCTION(BlueprintPure, Category = "Weapon Instance")
-    bool HasEmptyModSlot() const;
-
-    UFUNCTION(BlueprintPure, Category = "Weapon Instance")
     bool IsModAttached(UItemModeInstance* ModInstance) const;
 };

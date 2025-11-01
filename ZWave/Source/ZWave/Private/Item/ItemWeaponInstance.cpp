@@ -12,11 +12,6 @@ bool UItemWeaponInstance::AttachMod(UItemModeInstance* ModInstance)
         return false; // 유효하지 않음
     }
 
-    if (!HasEmptyModSlot())
-    {
-        return false; // 슬롯 부족
-    }
-
     if (IsModAttached(ModInstance))
     {
         return false; // 이미 이 무기에 장착됨
@@ -45,16 +40,6 @@ void UItemWeaponInstance::DetachMod(UItemModeInstance* ModInstance)
 
     ModInstance->OnUnequipped();
 
-}
-
-bool UItemWeaponInstance::HasEmptyModSlot() const
-{
-    if (!ItemDef) return false;
-
-    int32 MaxSlots = GetModeSlotLimit();
-    int32 CurrentSlots = AttachedMods.Num();
-
-    return CurrentSlots < MaxSlots;
 }
 
 bool UItemWeaponInstance::IsModAttached(UItemModeInstance* ModInstance) const
