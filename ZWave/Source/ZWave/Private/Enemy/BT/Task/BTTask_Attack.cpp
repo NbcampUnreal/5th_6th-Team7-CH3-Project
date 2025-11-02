@@ -3,6 +3,7 @@
 
 #include "Enemy/BT/Task/BTTask_Attack.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
 
 #include "Enemy/BaseAIController.h"
 #include "Enemy/BaseEnemy.h"
@@ -20,6 +21,13 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	ABaseEnemy* AICharacter = static_cast<ABaseEnemy*>(AIController->GetCharacter());
 	if (AICharacter == nullptr) return EBTNodeResult::Failed;
 
-	AICharacter->Attack();
+	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
+	if (OwnerBlackboard == nullptr) return;
+
+	if (OwnerBlackboard->GetValueAsBool(FName(TEXT("IsTargetToFake"))) == false)
+	{
+		AICharacter->Attack();
+	}
+
 	return EBTNodeResult::Succeeded;
 }
