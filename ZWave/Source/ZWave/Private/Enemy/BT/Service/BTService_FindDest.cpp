@@ -111,7 +111,7 @@ void UBTService_FindDest::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& 
 	const float MySightRange = MyCharacter->GetSightRange();
 	const bool IsAggroed = FVector::Dist2D(MyCharacter->GetActorLocation(), SecondaryTargetActor->GetActorLocation()) <= MySightRange;
 
-	DrawDebugSphere(GetWorld(), MyCharacter->GetActorLocation(), MySightRange, 12, FColor::Yellow, false, 0.2f);
+	//DrawDebugSphere(GetWorld(), MyCharacter->GetActorLocation(), MySightRange, 12, FColor::Yellow, false, 0.2f);
 
 	if (IsAggroed)
 	{

@@ -16,4 +16,6 @@ class ZWAVE_API ARangedEnemy : public ABaseEnemy
 	
 public:
 	ARangedEnemy();
+
+	virtual void Attack() override;
 };

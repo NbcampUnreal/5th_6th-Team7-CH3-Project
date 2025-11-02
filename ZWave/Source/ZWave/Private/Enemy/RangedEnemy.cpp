@@ -7,3 +7,21 @@
 ARangedEnemy::ARangedEnemy()
 {
 }
+
+void ARangedEnemy::Attack()
+{
+	if (GetMesh() && AttackMontage)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->Montage_Play(
+				AttackMontage,
+				2.f,
+				EMontagePlayReturnType::MontageLength,
+				0.f,
+				true
+			);
+		}
+	}
+}
