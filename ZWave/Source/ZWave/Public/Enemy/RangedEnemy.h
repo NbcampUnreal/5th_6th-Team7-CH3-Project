@@ -15,6 +15,5 @@ class ZWAVE_API ARangedEnemy : public ABaseEnemy
 	GENERATED_BODY()
 	
 public:
-
-	bool CanAttack();
+	ARangedEnemy();
 };

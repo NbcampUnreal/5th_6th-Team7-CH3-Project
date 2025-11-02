@@ -4,47 +4,48 @@
 #include "Enemy/RangedAIController.h"
 #include "NavigationSystem.h"
 
-#include "Enemy/BaseEnemy.h"
+#include "Enemy/RangedEnemy.h"
+#include "Weapon/EquipComponent.h"
 
-FVector ARangedAIController::GetAttackLocation(FVector TargetLocation)
+#include "BehaviorTree/BlackboardComponent.h"
+
+bool ARangedAIController::CheckCondition(AActor* Target)
 {
-    ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(GetCharacter());
-    if (MyCharacter == nullptr)
-        return FVector::ZeroVector;
+    ARangedEnemy* MyCharacter = Cast<ARangedEnemy>(GetCharacter());
+    if (!MyCharacter) return false;
 
-    UWorld* World = GetWorld();
-    if (World == nullptr)
-        return FVector::ZeroVector;
+    UEquipComponent* EquipComponent = MyCharacter->FindComponentByClass<UEquipComponent>();
+    if (!EquipComponent) return false;
 
-    const FVector SelfLocation = MyCharacter->GetActorLocation();
+    AWeaponBase* Weapon = EquipComponent->GetCurrentWeapon();
+    if (!Weapon) return false;
+
+    UBlackboardComponent* OwnerBlackboardComp = GetBlackboardComponent();
+    if (OwnerBlackboardComp == nullptr) return false;
 
     FHitResult Hit;
-    FCollisionQueryParams TraceParams(SCENE_QUERY_STAT(AI_RangedLineOfSight), true, MyCharacter);
-    TraceParams.bReturnPhysicalMaterial = false;
-    TraceParams.AddIgnoredActor(MyCharacter);
+    FCollisionQueryParams Params(SCENE_QUERY_STAT(AI_RangedSight), true, MyCharacter);
+    Params.bReturnPhysicalMaterial = false;
+    Params.AddIgnoredActor(MyCharacter);
 
-    const bool bHit = World->LineTraceSingleByChannel(
+    const bool bHit = GetWorld()->LineTraceSingleByChannel(
         Hit,
-        SelfLocation + FVector(0.f, 0.f, 50.f),
-        TargetLocation + FVector(0.f, 0.f, 50.f),
+        MyCharacter->GetActorLocation() + FVector(0, 0, 50),
+        Target->GetActorLocation() + FVector(0, 0, 50),
         ECollisionChannel::ECC_GameTraceChannel1,
-        TraceParams
+        Params
     );
+    bool bCanAttack = (bHit && Hit.GetActor() == Target);
 
-    if (!bHit)
+    FColor Color = bCanAttack ? FColor::Green : FColor::Red;
+    DrawDebugLine(GetWorld(), MyCharacter->GetActorLocation() + FVector(0, 0, 50), Target->GetActorLocation() + FVector(0, 0, 50), Color, false, 0.2f, 0, 1.5f);
+
+    if (!bHit || Hit.GetActor() != Target)
     {
-        return SelfLocation;
+        OwnerBlackboardComp->ClearValue(FName(TEXT("AttackLocation")));
+        return false;
     }
 
-    UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
-    if (!NavSystem)
-        return TargetLocation;
-
-    FNavLocation ProjectedLocation;
-    if (NavSystem->ProjectPointToNavigation(TargetLocation, ProjectedLocation, FVector(100, 100, 100.0f)))
-    {
-        return ProjectedLocation.Location;
-    }
-
-    return TargetLocation;
+    OwnerBlackboardComp->SetValueAsVector(FName(TEXT("AttackLocation")), MyCharacter->GetActorLocation());
+    return true;
 }

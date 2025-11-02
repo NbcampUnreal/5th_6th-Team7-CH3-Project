@@ -2,8 +2,8 @@
 
 
 #include "Enemy/RangedEnemy.h"
+#include "Enemy/BaseAIController.h"
 
-bool ARangedEnemy::CanAttack()
+ARangedEnemy::ARangedEnemy()
 {
-	return true;
 }

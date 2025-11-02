@@ -7,6 +7,8 @@
 #include "Enemy/BaseEnemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "NavigationSystem.h"
+#include "Level/SpawnPoint.h"
+#include "Base/ZWaveGameState.h"
 
 UBTTask_InitPlayerTargetAI::UBTTask_InitPlayerTargetAI()
 {
@@ -27,37 +29,28 @@ EBTNodeResult::Type UBTTask_InitPlayerTargetAI::ExecuteTask(UBehaviorTreeCompone
 	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(AIController->GetCharacter());
 	if (MyCharacter == nullptr) return EBTNodeResult::Failed;
 
-	if (OwnerBlackboard->IsVectorValueSet(GetSelectedBlackboardKey()) == false)
+	AZWaveGameState* GameState = GetWorld() ? GetWorld()->GetGameState<AZWaveGameState>() : nullptr;
+	if (GameState == nullptr) return EBTNodeResult::Failed;
+
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(MyCharacter, 0);
+	if (Player == nullptr) return EBTNodeResult::Failed;
+
+	const TArray<ASpawnPoint*>& AllSpawnPoints = GameState->GetSpawnPointArray();
+	if (AllSpawnPoints.Num() == 0) return EBTNodeResult::Failed;
+
+	OwnerBlackboard->SetValueAsObject(GetSelectedBlackboardKey(), Player);
+
+	if (AllSpawnPoints.Num() > 1)
 	{
-		ACharacter* PlayerPawn = UGameplayStatics::GetPlayerCharacter(MyCharacter, 0);
-		if (PlayerPawn == nullptr) return EBTNodeResult::Failed;
+		ASpawnPoint* NewSpawn = nullptr;
+		do
+		{
+			NewSpawn = AllSpawnPoints[FMath::RandRange(0, AllSpawnPoints.Num() - 1)];
+		} while (NewSpawn && FVector::Dist2D(NewSpawn->GetActorLocation(), MyCharacter->GetActorLocation()) < 10.f);
 
-		OwnerBlackboard->SetValueAsObject(FName(TEXT("SecondaryTarget")), PlayerPawn);
-		OwnerBlackboard->SetValueAsVector(FName(TEXT("SecondaryTargetLocation")), PlayerPawn->GetActorLocation());
-
-		UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-		if (!NavSystem) return EBTNodeResult::Failed;
-
-		FVector TargetLocation = PlayerPawn->GetActorLocation();
-		FVector ToTarget = (TargetLocation - MyCharacter->GetActorLocation()).GetSafeNormal();
-
-		FNavLocation ProjectedLocation;
-		const float AttackRange = MyCharacter->GetAttackRange();
-
-		bool bFoundNavLocation = NavSystem->ProjectPointToNavigation(
-			TargetLocation - ToTarget * AttackRange,
-			ProjectedLocation,
-			FVector(100, 100, 100.0f)
-		);
-
-		const FVector Destination = bFoundNavLocation
-			? ProjectedLocation.Location
-			: TargetLocation - ToTarget * AttackRange;
-
-		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
+		const FVector NewDest = NewSpawn->GetActorLocation();
+		OwnerBlackboard->SetValueAsVector(FName("MoveDestLocation"), NewDest);
 	}
-
-	OwnerBlackboard->SetValueAsBool(FName(TEXT("IsAggroed")), false);
 
 	return EBTNodeResult::Succeeded;
 }

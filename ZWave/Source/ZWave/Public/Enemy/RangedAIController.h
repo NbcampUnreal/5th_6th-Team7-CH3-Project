@@ -3,18 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enemy/BaseAIController.h"
+#include "Enemy/PlayerTargetBaseAIController.h"
 #include "RangedAIController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZWAVE_API ARangedAIController : public ABaseAIController
+class ZWAVE_API ARangedAIController : public APlayerTargetBaseAIController
 {
 	GENERATED_BODY()
 
 public:
-	virtual FVector GetAttackLocation(FVector TargetLocation) override;
-
+	virtual bool CheckCondition(AActor* Target) override;
 };
