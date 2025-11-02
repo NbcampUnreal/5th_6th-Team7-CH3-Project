@@ -1,6 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "UI/EnforceInfo.h"
+
 #include "CommonUserWidget.h"
 #include "EnforceMenu.generated.h"
 
@@ -15,10 +18,16 @@ protected:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Enforce", meta = (DisplayName = "OnClickPlusButton"))
 	FOnClickPlusButton OnClickPlusButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enforce")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enforce")
 	FName EnforceRowName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enforce")
+	FEnforceInfo EnforceData;
+
 public:
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Enforce")
+	void InitMenu(FEnforceInfo Data);
+
 	UFUNCTION(BlueprintCallable, Category = "Enforce")
 	void BroadcastAll(float NewValue);
 
