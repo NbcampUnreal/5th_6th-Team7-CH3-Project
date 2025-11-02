@@ -5,7 +5,6 @@
 #include "CommonUI/Public/CommonHierarchicalScrollBox.h"
 
 #include "Blueprint/WidgetTree.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
 
 void UShopTabEnforce::NativeOnInitialized()
 {
