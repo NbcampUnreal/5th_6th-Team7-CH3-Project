@@ -48,11 +48,11 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 	if (AIController == nullptr) return;
 	
 	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
-	//FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
+	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
 
 	AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
 	//AIController->SetValueAsVectorToBlackboard(FName(TEXT("SecondaryTargetLocation")), SecondaryTargetLocation);
-	//AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
+	AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
 	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
 }
 

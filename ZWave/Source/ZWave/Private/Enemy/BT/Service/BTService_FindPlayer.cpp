@@ -141,6 +141,6 @@ bool UBTService_FindPlayer::CheckSightDegree(AActor* StdActor, FVector ToTargetV
 
 void UBTService_FindPlayer::ClearTarget(UBlackboardComponent* OwnerBlackboard)
 {
-	//OwnerBlackboard->ClearValue(FName(TEXT("SecondaryTargetLocation")));
+	OwnerBlackboard->ClearValue(FName(TEXT("SecondaryTarget")));
 	OwnerBlackboard->ClearValue(GetSelectedBlackboardKey());
 }
