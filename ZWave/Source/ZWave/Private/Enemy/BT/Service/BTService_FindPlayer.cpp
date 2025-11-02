@@ -105,7 +105,7 @@ void UBTService_FindPlayer::TickWithIsNotAggroedCondition(UBehaviorTreeComponent
 	}
 
 	FVector TargetLocation = TargetCharacter->GetActorLocation();
-	//OwnerBlackboard->SetValueAsVector(FName(TEXT("SecondaryTargetLocation")), TargetLocation);
+	OwnerBlackboard->SetValueAsObject(FName(TEXT("SecondaryTarget")), TargetCharacter);
 	if (ToTargetVector.Size() < MyCharacter->GetAttackRange()) // 공격범위 안에있다면 -> 정지
 	{
 		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), MyCharacter->GetActorLocation());

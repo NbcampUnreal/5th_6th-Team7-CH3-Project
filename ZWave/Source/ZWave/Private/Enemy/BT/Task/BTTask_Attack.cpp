@@ -22,7 +22,7 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	if (AICharacter == nullptr) return EBTNodeResult::Failed;
 
 	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
-	if (OwnerBlackboard == nullptr) return;
+	if (OwnerBlackboard == nullptr) return EBTNodeResult::Failed;
 
 	if (OwnerBlackboard->GetValueAsBool(FName(TEXT("IsTargetToFake"))) == false)
 	{

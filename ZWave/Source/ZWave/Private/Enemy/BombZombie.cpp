@@ -5,10 +5,23 @@
 
 #include "Base/BaseCharacter.h"
 
+void ABombZombie::Die()
+{
+	//Bomb();
+
+	Super::Die();
+}
+
 void ABombZombie::Attack()
 {
 	Super::Attack();
+	UE_LOG(LogTemp, Display, TEXT("Bomb attack"));
 
+	//Attacked(this, this->MaxHealth);
+}
+
+void ABombZombie::Bomb()
+{
 	TArray<FHitResult> HitResults;
 	float SphereRadius = this->AttackRange * 2;
 
@@ -28,14 +41,7 @@ void ABombZombie::Attack()
 			if (Hit.GetActor()->IsA(ABaseCharacter::StaticClass()))
 			{
 				ABaseCharacter* Target = static_cast<ABaseCharacter*>(Hit.GetActor());
-
-				if (Target->GetHealth() > 0)
-				{
-					UE_LOG(LogTemp, Display, TEXT("Target name: %s"), *Target->GetActorNameOrLabel());
-					Attack();
-					GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
-					break;
-				}
+				//Target->Attacked()
 			}
 		}
 	}
