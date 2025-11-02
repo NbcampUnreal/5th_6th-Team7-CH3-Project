@@ -4,6 +4,7 @@
 #include "Components/ArrowComponent.h"
 #include "Engine/World.h"
 #include "Level/EnemySpawnManager.h"
+#include "Base/ZWaveGameState.h"
 
 ASpawnPoint::ASpawnPoint()
 {
@@ -31,6 +32,17 @@ void ASpawnPoint::BeginPlay()
     {
         UE_LOG(LogTemp, Error, TEXT("SpawnPoint: Could not find EnemySpawnManagerSubsystem!"));
     }
+
+    AZWaveGameState* GameState = GetWorld()->GetGameState<AZWaveGameState>();
+    if (GameState)
+    {
+        GameState->RegisterSpawnPoint(this);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("SpawnPoint: Could not find ZWaveGameState!"));
+    }
+
 }
 
 void ASpawnPoint::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -29,13 +29,15 @@ void AMeleeWeapon::Attack()
 	{
 		if (IsDamagableActor(TargetActor) == true)
 		{
+			TArray<TSubclassOf<UEffectBase>> EffectClasses;
+			EquipModingEffectClassMap.GenerateValueArray(EffectClasses);
+
 			UDamageCalculator::DamageCalculate(
 				GetWorld(),
 				OwningCharacter,
 				TargetActor,
 				MeleeWeaponStat.AttackPower,
-				StaggerValue,
-				BaseEffectClasses);
+				EffectClasses);
 		}
 	}
 }
@@ -49,6 +51,7 @@ bool AMeleeWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 		return false;
 	}
 
+	MeleeWeaponStatBase = MeleeDefinition->MeleeWeaponStat;
 	MeleeWeaponStat = MeleeDefinition->MeleeWeaponStat;
 	SphereCollision->InitSphereRadius(MeleeWeaponStat.Radius);
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AMeleeWeapon::OnSphereBeginOverlap);
@@ -64,6 +67,78 @@ void AMeleeWeapon::Equip(ACharacter* NewOwner)
 void AMeleeWeapon::Unequip()
 {
 	Super::Unequip();
+}
+
+bool AMeleeWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInstance)
+{
+	if (ModeInstance == nullptr)
+		return false;
+
+	const UMeleeWeaponDefinition* MeleeDefinition = Cast<UMeleeWeaponDefinition>(ModeInstance->GetModeWeaponDef());
+	if (MeleeDefinition == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("It's Not MeleeWeapon Moding!"));
+		return false;
+	}
+
+	if (EquipModingMap.Contains(ModingSlot))
+	{
+		if (EquipModingMap[ModingSlot] != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Need UnEquip Slot"));
+			return false;
+		}
+	}
+
+	int32 EquipNum = EquipModingMap.Num();
+	if (EquipModingMap.Contains(EModingSlot::EMS_Default))
+		EquipNum--;
+
+	if (EquipNum >= MeleeWeaponStat.ModingAllows)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Full Moding!"));
+		return false;
+	}
+
+	EquipModingMap.Add(ModingSlot, ModeInstance);
+	EquipModingEffectClassMap.Add(ModingSlot, ModeInstance->GetModeEffectClass());
+	ApplyCurrentModing();
+	return true;
+}
+
+void AMeleeWeapon::UnEquipModing(EModingSlot ModingSlot)
+{
+	if (EquipModingMap.Contains(ModingSlot) == false)
+	{
+		return;
+	}
+
+	EquipModingMap.Remove(ModingSlot);
+	EquipModingEffectClassMap.Remove(ModingSlot);
+	ApplyCurrentModing();
+}
+
+void AMeleeWeapon::ApplyCurrentModing()
+{
+	FMeleeWeaponStats MeleeStat = MeleeWeaponStatBase;
+
+	for (const auto& Pair : EquipModingMap)
+	{
+		UModingInstance* ModingIns = Pair.Value;
+		if (ModingIns == nullptr)
+			continue;
+
+		UMeleeWeaponDefinition* MeleeDef = Cast<UMeleeWeaponDefinition>(ModingIns->GetModeWeaponDef());
+		if (MeleeDef == nullptr)
+			continue;
+
+		FMeleeWeaponStats& ModingStat = MeleeDef->MeleeWeaponStat;
+		EWeaponModifier ModifierType = ModingIns->GetModeApplyType();
+
+		ApplyStat(ModingStat, ModifierType, MeleeStat);
+	}
+
+	MeleeWeaponStat = MeleeStat;
 }
 
 void AMeleeWeapon::StartAttack()
@@ -90,5 +165,33 @@ void AMeleeWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AAc
 		OtherActor != OwningCharacter)
 	{
 		OverlappedEnemies.AddUnique(OtherActor);
+	}
+}
+
+void AMeleeWeapon::ApplyStat(const FMeleeWeaponStats& ModingStat, EWeaponModifier ModifierType, FMeleeWeaponStats& OutStat)
+{
+	switch (ModifierType)
+	{
+	case EWeaponModifier::EWM_Add:
+	{
+		OutStat.AttackPower += ModingStat.AttackPower;
+		OutStat.AttackRate += ModingStat.AttackRate;
+		OutStat.Radius += ModingStat.Radius;
+	}
+	break;
+	case EWeaponModifier::EWM_Percent:
+	{
+		OutStat.AttackPower *= (1.0f + ModingStat.AttackPower);
+		OutStat.AttackRate *= (1.0f + ModingStat.AttackRate);
+		OutStat.Radius *= (1.0f + ModingStat.Radius);
+	}
+	break;
+	case EWeaponModifier::EWM_Multiple:
+	{
+		OutStat.AttackPower *= ModingStat.AttackPower;
+		OutStat.AttackRate *= ModingStat.AttackRate;
+		OutStat.Radius *= ModingStat.Radius;
+	}
+	break;
 	}
 }

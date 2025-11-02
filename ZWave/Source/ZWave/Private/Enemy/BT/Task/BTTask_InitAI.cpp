@@ -50,6 +50,8 @@ EBTNodeResult::Type UBTTask_InitAI::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		FVector Destination = bFoundNavLocation ? ProjectedLocation.Location : TargetLocation - ToTarget * MyCharacter->GetAttackRange();
 
 		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
+
+		//return EBTNodeResult::Succeeded;
 	}
 
 	return EBTNodeResult::Succeeded;

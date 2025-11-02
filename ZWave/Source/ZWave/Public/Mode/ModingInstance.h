@@ -1,0 +1,42 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
+#include "ModeDefinition.h"
+#include "ModingInstance.generated.h"
+
+/**
+ * 
+ */
+UCLASS(BlueprintType, Blueprintable)
+class ZWAVE_API UModingInstance : public UObject
+{
+	GENERATED_BODY()
+	
+public:
+	bool Init(const UModeDefinition* ModeDef);
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE FName GetModename() const { return ModeName; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE EWeaponModifier GetModeApplyType() const { return ModeStatApplyType; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE UWeaponDefinition* GetModeWeaponDef() const { return ModeStat; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE TSubclassOf<UEffectBase> GetModeEffectClass() const { return ModeEffectClass; }
+
+protected:
+	FName ModeName;
+
+	EWeaponModifier ModeStatApplyType;
+
+	TObjectPtr<UWeaponDefinition> ModeStat;
+
+	TSubclassOf<UEffectBase> ModeEffectClass;
+};

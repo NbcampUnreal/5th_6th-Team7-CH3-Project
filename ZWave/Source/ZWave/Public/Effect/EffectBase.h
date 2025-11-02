@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Base/BaseCharacter.h"
+#include "Player/TaskPlayer.h"
+#include "Enemy/BaseEnemy.h"
 #include "EffectBase.generated.h"
 
 /**
@@ -15,8 +18,8 @@ class ZWAVE_API UEffectBase : public UObject
 	GENERATED_BODY()
 
 public:
-	virtual float ApplyEffect(AActor* TargetActor, const float& BaseDamage, const float& Value) PURE_VIRTUAL(UEffectBase::ApplyEffect, return BaseDamage;);
-	virtual void RemoveEffect() PURE_VIRTUAL(UEffectBase::RemoveEffect, );
+	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) PURE_VIRTUAL(UEffectBase::ApplyEffect, );
+	virtual void RemoveEffect();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Target")

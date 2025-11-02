@@ -7,13 +7,21 @@ UEffectApplyManager::UEffectApplyManager()
 {
 }
 
-float UEffectApplyManager::ApplyEffect(
+/// <summary>
+/// 피격 효과 적용 함수
+/// </summary>
+/// <param name="Target">적용할 대상</param>
+/// <param name="BaseDamage">데미지</param>
+/// <param name="EffectClassArray">효과를 담은 배열</param>
+void UEffectApplyManager::ApplyEffect(
 	TScriptInterface<IDamagable> Target,
 	const float& BaseDamage, 
-	float EffectValue, 
 	const TArray<TSubclassOf<UEffectBase>>& EffectClassArray)
 {
-	float ApplyEffectDmg = BaseDamage;
+	if (!Target || EffectClassArray.Num() <= 0)
+	{
+		return;
+	}
 
 	for (const auto& EffectClass : EffectClassArray)
 	{
@@ -23,15 +31,29 @@ float UEffectApplyManager::ApplyEffect(
 			{
 				if (UEffectBase* NewEffect = CreateEffect(EffectClass))
 				{
-					ApplyEffectDmg += NewEffect->ApplyEffect(TargetActor, BaseDamage, EffectValue);
+					NewEffect->ApplyEffect(TargetActor, BaseDamage);
 				}
 			}
 		}
 	}
-	return ApplyEffectDmg;
 }
 
+/// <summary>
+/// 아이템 효과 적용 함수
+/// </summary>
+/// <param name="Causer">호출자</param>
+/// <param name="EffectClass">적용 효과 클래스</param>
+void UEffectApplyManager::ApplyEffect(AActor* Causer, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray)
+{
+	for (const auto& EffectClass : EffectClassArray)
+	{
+		if (UEffectBase* NewEffect = CreateEffect(EffectClass))
+		{
+			NewEffect->ApplyEffect(Causer);
+		}
 
+	}
+}
 
 UEffectBase* UEffectApplyManager::CreateEffect(TSubclassOf<UEffectBase> EffectClass)
 {

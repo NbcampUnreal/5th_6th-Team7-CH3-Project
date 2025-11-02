@@ -9,7 +9,6 @@
 class UModeDefinition;
 class UEffectBase;
 class IDamagable;
-
 UCLASS()
 class ZWAVE_API UEffectApplyManager : public UWorldSubsystem
 {
@@ -18,7 +17,8 @@ class ZWAVE_API UEffectApplyManager : public UWorldSubsystem
 public:
 	UEffectApplyManager();
 
-	float ApplyEffect(TScriptInterface<IDamagable> Target, const float& BaseDamage, float EffectValue, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
+	void ApplyEffect(TScriptInterface<IDamagable> Target, const float& BaseDamage, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
+	void ApplyEffect(AActor* Causer, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
 private:
 	UEffectBase* CreateEffect(TSubclassOf<UEffectBase> EffectClass);
 	
