@@ -15,6 +15,7 @@ public class ZWave : ModuleRules
             "InputCore",
             "EnhancedInput",
             "Slate",
+            "SlateCore",
             "UMG",
             "CommonUI" ,
             "PhysicsCore",
