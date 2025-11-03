@@ -153,6 +153,11 @@ float ABaseEnemy::GetAttackRange() const
 	return this->AttackRange;
 }
 
+float ABaseEnemy::GetSightRange() const
+{
+	return this->SightRange;
+}
+
 void ABaseEnemy::Attack()
 {
 	//USkeletalMeshComponent* Mesh = GetMesh();
