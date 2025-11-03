@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ItemInstance.h"
 #include "ItemDefinition.h"
+#include "Weapon/EquipComponent.h"
 #include "InventoryComponent.generated.h"
 
 USTRUCT(BlueprintType)
@@ -45,12 +46,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 CountItem(const UItemDefinition* ItemDef) const;
 
+	// 직접적인 장착 X
+	// EquipComponent에서 해당 슬롯에 장착 가능하도록 세팅
+	UFUNCTION(BlueprintCallable)
+	bool EquipWeaponItem(const UItemDefinition* ItemDef, EEquipSlot EquipSlot);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int32 GetBioCoreCount() const { return BioCoreCount; };
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Inventory")
 	FOnInventoryUpdated OnInventoryUpdated;
+
+protected:
+	// EquipSlot의 WeaponActor를 찾아 WeaponItem에 장착된 모드를 장착시켜줌
+	void EquipModingOnWeaponActor(class UItemWeaponInstance* WeaponItem,EEquipSlot EquipSlot);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")

@@ -2,6 +2,11 @@
 
 
 #include "Item/InventoryComponent.h"
+#include "Item/ItemWeaponInstance.h"
+#include "Item/ItemModeInstance.h"
+#include "Mode/ModeDefinition.h"
+#include "Mode/ModingInstance.h"
+#include "Weapon/WeaponBase.h"
 
 void UInventoryComponent::BeginPlay()
 {
@@ -137,4 +142,83 @@ int32 UInventoryComponent::CountItem(const UItemDefinition* ItemDef) const
 		}
 	}
 	return Total;
+}
+
+bool UInventoryComponent::EquipWeaponItem(const UItemDefinition* ItemDef, EEquipSlot EquipSlot)
+{
+	if (GetOwner() == nullptr)
+		return false;
+
+	int32 InvenSlot = FindItem(ItemDef);
+	if (InvenSlot == INDEX_NONE)
+		return false;
+
+	UItemInstance* TargetItem = Entries[InvenSlot].ItemInstance;
+	if (TargetItem == nullptr)
+		return false;
+
+	UItemWeaponInstance* WeaponItem = Cast<UItemWeaponInstance>(TargetItem);
+	if (WeaponItem == nullptr)
+		return false;
+
+	UEquipComponent* EquipComp = GetOwner()->FindComponentByClass<UEquipComponent>();
+	if (EquipComp == nullptr)
+		return false;
+
+	if (WeaponItem->ItemDef == nullptr ||
+		WeaponItem->ItemDef->Definition == nullptr)
+		return false;
+
+	UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(WeaponItem->ItemDef->Definition);
+	if (WeaponDef == nullptr)
+		return false;
+
+	EquipComp->SetSlotData(EquipSlot, WeaponDef);
+
+	// 모딩장착한 것이 있다면 WeaponActor에도 전달
+	if(WeaponItem->AttachedMods.Num() > 0)
+		EquipModingOnWeaponActor(WeaponItem, EquipSlot);
+
+	return true;
+}
+
+void UInventoryComponent::EquipModingOnWeaponActor(UItemWeaponInstance* WeaponItem, EEquipSlot EquipSlot)
+{
+	if (WeaponItem == nullptr)
+		return;
+
+	if (GetOwner() == nullptr)
+		return;
+
+	UEquipComponent* EquipComp = GetOwner()->FindComponentByClass<UEquipComponent>();
+	if (EquipComp == nullptr)
+		return;
+
+	AWeaponBase* WeaponActor = EquipComp->GetTargetWeapon(EquipSlot);
+	if (WeaponActor == nullptr)
+		return;
+
+	for (int32 i = 0; i < WeaponItem->AttachedMods.Num(); ++i)
+	{
+		UItemModeInstance* AttachedMod = WeaponItem->AttachedMods[i];
+
+		if (AttachedMod == nullptr ||
+			AttachedMod->ItemDef == nullptr)
+			continue;
+
+		UModeDefinition* ModeDef = Cast<UModeDefinition>(AttachedMod->ItemDef);
+		if (ModeDef == nullptr)
+			continue;
+
+		EModingSlot ModingSlot = static_cast<EModingSlot>(i);
+		UModingInstance* ModingInstance = NewObject<UModingInstance>(WeaponActor);
+		if (ModingInstance == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Mode Instance Create Failed!?"));
+			continue;
+		}
+
+		ModingInstance->Init(ModeDef);
+		WeaponActor->EquipModing(ModingSlot, ModingInstance);
+	}
 }

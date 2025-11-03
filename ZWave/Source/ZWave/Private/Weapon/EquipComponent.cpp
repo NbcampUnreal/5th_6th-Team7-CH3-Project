@@ -151,6 +151,13 @@ void UEquipComponent::AmmoSupply(int32 AmmoAmount)
 {
 }
 
+AWeaponBase* UEquipComponent::GetTargetWeapon(EEquipSlot Slot)
+{
+	if (SlotMaps.Contains(Slot) == false)
+		return nullptr;
+
+	return SlotMaps[Slot];
+}
 
 void UEquipComponent::AttachWeaponToOwner(AWeaponBase* Weapon, const UWeaponDefinition* WeaponDef)
 {
