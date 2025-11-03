@@ -4,26 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "Effect/EffectBase.h"
-#include "SpeedEffect.generated.h"
+#include "SpeedDebuffEffect.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZWAVE_API USpeedEffect : public UEffectBase
+class ZWAVE_API USpeedDebuffEffect : public UEffectBase
 {
 	GENERATED_BODY()
-	
 public:
-	USpeedEffect();
+	USpeedDebuffEffect();
 
-	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) override;
+	virtual void ApplyEffect(AActor* TargetActor, const float& Duration) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
+
+	UFUNCTION(BlueprintCallable, Category = "BuffTimer")
+	void SetBuffTimer(const float& Duration);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect|Value")
 	float SpeedMultiplier;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect|Type")
-	bool bIsDebuff;
-}; 
+
+private:
+	FTimerHandle BuffTimer;
+};

@@ -6,6 +6,7 @@
 #include "DamageCalculator/DamageCalculator.h"
 #include "Effect/EffectApplyManager.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -95,7 +96,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageE
 	{
 		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
 		{
-			EffectManager->ApplyEffect(this, CustomDamageEvent->BaseDamage, CustomDamageEvent->EffectArray);
+			EffectManager->ApplyEffect(this, CustomDamageEvent->EffectArray, CustomDamageEvent->BaseDamage);
 		}
 
 
@@ -103,5 +104,25 @@ float ABaseCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageE
 	}
 
 	return DamageAmount;
+}
+
+void ABaseCharacter::SetMoveSpeed(float MoveSpeed)
+{
+	if (MoveSpeed < 0) return;
+
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+	}
+}
+
+float ABaseCharacter::GetMoveSpeed() const
+{
+	if (GetCharacterMovement())
+	{
+		return GetCharacterMovement()->MaxWalkSpeed;
+	}
+
+	return 0.0f;
 }
 

@@ -16,7 +16,7 @@ class ZWAVE_API UReloadEffect : public UEffectBase
 
 public:
 	UReloadEffect();
-	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) override;
+	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
 

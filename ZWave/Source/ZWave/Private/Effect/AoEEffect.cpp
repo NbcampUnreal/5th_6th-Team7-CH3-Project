@@ -8,7 +8,7 @@ UAoEEffect::UAoEEffect()
 
 }
 
-void UAoEEffect::ApplyEffect(AActor* AoECauser, const float& BaseDamage)
+void UAoEEffect::ApplyEffect(AActor* AoECauser, const float& Duration)
 {
 	if (UObject* Outer = GetOuter())
 	{

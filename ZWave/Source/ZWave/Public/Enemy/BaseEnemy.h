@@ -29,12 +29,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-/// <summary>
-/// 기본 영역
-/// </summary>
-public:
-	void SetMoveSpeed(float MoveSpeed);
-	float GetMoveSpeed();
 
 /// <summary>
 /// 피격, 사망 관련

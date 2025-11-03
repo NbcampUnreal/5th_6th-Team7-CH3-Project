@@ -17,7 +17,7 @@ class ZWAVE_API UStaggerEffect : public UEffectBase
 public:
 	UStaggerEffect();
 
-	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) override;
+	virtual void ApplyEffect(AActor* TargetActor, const float& Duration) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
 

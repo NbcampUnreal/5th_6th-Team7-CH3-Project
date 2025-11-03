@@ -18,7 +18,7 @@ class ZWAVE_API UEffectBase : public UObject
 	GENERATED_BODY()
 
 public:
-	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) PURE_VIRTUAL(UEffectBase::ApplyEffect, );
+	virtual void ApplyEffect(AActor* TargetActor, const float& Duration) PURE_VIRTUAL(UEffectBase::ApplyEffect, );
 	virtual void RemoveEffect();
 
 protected:

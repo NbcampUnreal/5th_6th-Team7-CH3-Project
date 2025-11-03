@@ -29,12 +29,15 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
+
 	
 	// 데미지 및 아이템 쪽에서 사용하기 위해 추가되었습니다.
 	virtual float GetMaxHealth() const;
 	virtual void SetHealth(float SetHealAmount);
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void SetMoveSpeed(float MoveSpeed);
+	virtual float GetMoveSpeed() const;
 	//
 
 	virtual void Die() override;

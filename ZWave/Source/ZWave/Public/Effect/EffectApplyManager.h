@@ -17,8 +17,8 @@ class ZWAVE_API UEffectApplyManager : public UWorldSubsystem
 public:
 	UEffectApplyManager();
 
-	void ApplyEffect(TScriptInterface<IDamagable> Target, const float& BaseDamage, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
-	void ApplyEffect(AActor* Causer, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
+	void ApplyEffect(TScriptInterface<IDamagable> Target, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray, const float& Duration = 0);
+	void ApplyEffect(AActor* Causer, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray, const float& Duration = 0);
 private:
 	UEffectBase* CreateEffect(TSubclassOf<UEffectBase> EffectClass);
 	

@@ -4,23 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "Effect/EffectBase.h"
-#include "HealthEffect.generated.h"
+#include "SpeedBuffEffect.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZWAVE_API UHealthEffect : public UEffectBase
+class ZWAVE_API USpeedBuffEffect : public UEffectBase
 {
 	GENERATED_BODY()
 
 public:
-	UHealthEffect();
+	USpeedBuffEffect();
+
 	virtual void ApplyEffect(AActor* TargetActor, const float& Duration) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
 
+	UFUNCTION(BlueprintCallable, Category = "BuffTimer")
+	void SetBuffTimer(const float& Duration);
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect|Value")
-	float HealAmount;
+	float SpeedMultiplier;
+	
+private:
+	FTimerHandle BuffTimer;
 };

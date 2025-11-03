@@ -10,7 +10,7 @@ UStaggerEffect::UStaggerEffect()
 	StaggerSpeedMultiplier = 2;
 }
 
-void UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage)
+void UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{

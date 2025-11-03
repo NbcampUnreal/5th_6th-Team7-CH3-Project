@@ -6,7 +6,12 @@ UGainItemEffect::UGainItemEffect()
 
 }
 
-void UGainItemEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage)
+void UGainItemEffect::Init()
+{
+
+}
+
+void UGainItemEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
 	if (ATaskPlayer* Player = Cast<ATaskPlayer>(TargetActor))
 	{
@@ -25,3 +30,5 @@ void UGainItemEffect::BeginDestroy()
 	Super::BeginDestroy();
 	UE_LOG(LogTemp, Warning, TEXT("UGainItemEffect has been successfully collected by GC."));
 }
+
+

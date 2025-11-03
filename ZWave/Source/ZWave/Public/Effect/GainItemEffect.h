@@ -16,7 +16,10 @@ class ZWAVE_API UGainItemEffect : public UEffectBase
 
 public:
 	UGainItemEffect();
-	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage = 0) override;
+	virtual void ApplyEffect(AActor* TargetActor, const float& Duration) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy();
+
+	UFUNCTION(BlueprintCallable, Category = "Init")
+	void Init();
 };

@@ -122,25 +122,6 @@ void ABaseEnemy::Die()
 	}
 }
 
-void ABaseEnemy::SetMoveSpeed(float MoveSpeed)
-{
-	if (MoveSpeed < 0) return;
-
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
-	}
-}
-
-float ABaseEnemy::GetMoveSpeed()
-{
-	if (GetCharacterMovement())
-	{
-		return GetCharacterMovement()->MaxWalkSpeed;
-	}
-
-	return 0;
-}
 
 bool ABaseEnemy::GetCanEditAttackPriority() const
 {

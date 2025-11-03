@@ -6,7 +6,7 @@ UHealthEffect::UHealthEffect()
 	HealAmount = 0.3f;
 }
 
-void UHealthEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage)
+void UHealthEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
 	if (ABaseCharacter* Player = Cast<ABaseCharacter>(TargetActor))
 	{
