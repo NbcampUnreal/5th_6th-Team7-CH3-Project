@@ -10,25 +10,28 @@ void UHoveredDescWidgetBase::NativeOnInitialized()
 	SetVisibility(ESlateVisibility::HitTestInvisible);
 }
 
-void UHoveredDescWidgetBase::OnActivated_Implementation(const FItemUIInfo& Info)
+void UHoveredDescWidgetBase::OnActivated_Implementation(const FItemSlotInfo& Info)
 {
 	bIsActivated = true;
 
 	if (IsValid(TitleText))
 		TitleText->SetText(FText::FromString(Info.ItemName.ToString()));
 	if (IsValid(DescText))
-		DescText->SetText(Info.Desc);
+		DescText->SetText(Info.ItemDesc);
 	if (IsValid(IconImage))
 	{
-		if (Info.Icon.IsPending())
+		UTexture* Texture = Info.Icon.Get();
+		if (IsValid(Texture))
 		{
-			Info.Icon.LoadSynchronous();
-		}
+			if (!IsValid(IconMID))
+			{
+				IconMID = IconImage->GetDynamicMaterial();
+			}
 
-		UMaterialInterface* MI = Info.Icon.Get();
-		if (IsValid(MI))
-		{
-			IconImage->SetBrushFromMaterial(MI);
+			if (IsValid(IconMID))
+			{
+				IconMID->SetTextureParameterValue(IconMIDValue, Texture);
+			}
 		}
 	}
 }

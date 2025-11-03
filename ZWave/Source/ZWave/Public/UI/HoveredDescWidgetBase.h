@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "UI/ItemUIInfo.h"
+#include "UI/ItemSlotInfo.h"
 
 #include "CommonUserWidget.h"
 #include "HoveredDescWidgetBase.generated.h"
@@ -22,6 +22,9 @@ protected:
 	TObjectPtr<UTextBlock> DescText;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> IconImage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Desc")
+	FName IconMIDValue = "IconTexture";
+	TObjectPtr<UMaterialInstanceDynamic> IconMID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsActivated = false;
@@ -30,8 +33,8 @@ public:
 	void NativeOnInitialized() override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void OnActivated(const FItemUIInfo& Info);
-	void OnActivated_Implementation(const FItemUIInfo& Info);
+	void OnActivated(const FItemSlotInfo& Info);
+	void OnActivated_Implementation(const FItemSlotInfo& Info);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnDeactivated();
