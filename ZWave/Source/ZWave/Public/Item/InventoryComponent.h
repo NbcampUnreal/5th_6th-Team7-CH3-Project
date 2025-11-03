@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 CountItem(const UItemDefinition* ItemDef) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE int32 GetBioCoreCount() const { return BioCoreCount; };
+
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Inventory")
 	FOnInventoryUpdated OnInventoryUpdated;
@@ -55,4 +58,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 	int32 MaxEntryCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	int32 BioCoreCount;
 };
