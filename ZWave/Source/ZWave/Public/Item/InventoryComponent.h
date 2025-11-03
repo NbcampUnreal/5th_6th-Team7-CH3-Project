@@ -57,6 +57,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool EquipModingToWeapon(int32 TargetWeaponSlotIdx, int32 TargetModingSlotIdx);
 
+	UFUNCTION(BlueprintCallable)
+	bool UnequipModingToWeapon(int32 TargetWeaponSlotIdx, int32 TargetModingSlotIdx);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int32 GetBioCoreCount() const { return BioCoreCount; };
 
