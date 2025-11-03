@@ -18,9 +18,6 @@ protected:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Enforce", meta = (DisplayName = "OnClickPlusButton"))
 	FOnClickPlusButton OnClickPlusButton;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enforce")
-	FName EnforceRowName;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enforce")
 	FEnforceInfo EnforceData;
 
@@ -32,5 +29,4 @@ public:
 	void BroadcastAll(float NewValue);
 
 	FORCEINLINE FOnClickPlusButton& GetDelegate() { return OnClickPlusButton; }
-	FORCEINLINE const FName& GetEnforceRowName() { return EnforceRowName; }
 };
