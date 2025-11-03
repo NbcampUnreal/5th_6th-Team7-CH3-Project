@@ -13,6 +13,21 @@ void ABombZombie::BeginPlay()
 	UE_LOG(LogTemp, Display, TEXT("Bomb begin play"));
 }
 
+void ABombZombie::Attacked(AActor* DamageCauser, float Damage)
+{
+	Super::Attacked(DamageCauser, Damage);
+}
+
+void ABombZombie::ApplyDamage(float Damage, bool CheckArmor)
+{
+	Super::ApplyDamage(Damage, CheckArmor);
+}
+
+void ABombZombie::PlayHitAnimMontage(AActor* DamageCauser)
+{
+	Super::PlayHitAnimMontage(DamageCauser);
+}
+
 void ABombZombie::Die()
 {
 	//Bomb();
@@ -23,9 +38,6 @@ void ABombZombie::Die()
 void ABombZombie::Attack()
 {
 	Super::Attack();
-	UE_LOG(LogTemp, Display, TEXT("Bomb attack"));
-
-	//Attacked(this, this->MaxHealth);
 }
 
 void ABombZombie::Bomb()
