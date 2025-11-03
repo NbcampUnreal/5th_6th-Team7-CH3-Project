@@ -174,6 +174,7 @@ bool UInventoryComponent::EquipWeaponItem(const UItemDefinition* ItemDef, EEquip
 		return false;
 
 	EquipComp->SetSlotData(EquipSlot, WeaponDef);
+	WeaponItem->EquipSlot = EquipSlot;
 
 	// 모딩장착한 것이 있다면 WeaponActor에도 전달
 	if(WeaponItem->AttachedMods.Num() > 0)
