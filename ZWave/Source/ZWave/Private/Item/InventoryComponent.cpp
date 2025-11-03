@@ -183,6 +183,45 @@ bool UInventoryComponent::EquipWeaponItem(const UItemDefinition* ItemDef, EEquip
 	return true;
 }
 
+bool UInventoryComponent::UnequipWeaponItem(const UItemDefinition* ItemDef, EEquipSlot EquipSlot)
+{
+	if (GetOwner() == nullptr)
+		return false;
+
+	int32 InvenSlot = FindItem(ItemDef);
+	if (InvenSlot == INDEX_NONE)
+		return false;
+
+	UItemInstance* TargetItem = Entries[InvenSlot].ItemInstance;
+	if (TargetItem == nullptr)
+		return false;
+
+	UItemWeaponInstance* WeaponItem = Cast<UItemWeaponInstance>(TargetItem);
+	if (WeaponItem == nullptr)
+		return false;
+
+	if (WeaponItem->EquipSlot == EEquipSlot::None)
+		return false;
+
+	UEquipComponent* EquipComp = GetOwner()->FindComponentByClass<UEquipComponent>();
+	if (EquipComp == nullptr)
+		return false;
+
+	if (WeaponItem->ItemDef == nullptr ||
+		WeaponItem->ItemDef->Definition == nullptr)
+		return false;
+
+	UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(WeaponItem->ItemDef->Definition);
+	if (WeaponDef == nullptr)
+		return false;
+
+	EquipComp->UnEquip(WeaponItem->EquipSlot);
+	EquipComp->ClearSlotData(WeaponItem->EquipSlot);
+	WeaponItem->EquipSlot = EEquipSlot::None;
+
+	return true;
+}
+
 TArray<int32> UInventoryComponent::GetWeaponItemSlotIdxs() const
 {
 	TArray<int32> SlotIdx;
