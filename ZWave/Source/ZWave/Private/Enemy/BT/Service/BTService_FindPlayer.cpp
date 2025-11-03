@@ -27,7 +27,7 @@ void UBTService_FindPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	if (MyController == nullptr) return;
 
 	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(MyController->GetCharacter());
-	if (MyCharacter == nullptr || MyCharacter->GetCanEditAttackPriority() == false) return;
+	if (MyCharacter == nullptr || MyCharacter->GetMaxPriorityLv() < 2) return;
 
 	bool bIsAggroed = OwnerBlackboard->GetValueAsBool(FName(TEXT("IsAggroed")));
 	if (bIsAggroed)

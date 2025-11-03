@@ -56,10 +56,11 @@ private:
 
 public:
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
-	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 
 	virtual void PlayHitAnimMontage(AActor* DamageCauser);
+	virtual void CheckPriorityLv(AActor* DamageCauser);
 
+	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;
 
 /// <summary>
@@ -84,8 +85,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability|Attack")
 	bool bCanEditAttackPriority;
 
+	/// <summary>
+	/// 정화장치: 0, 터렛: 1, 플레이어: 2
+	/// 
+	/// if MaxAggroLv == 2 then 플레이어에게는 어그로 가 끌리지않음
+	/// </summary>
+	UPROPERTY(EditDefaultsOnly, Category = "Ability|AggroLv")
+	int32 MaxPriorityLv;
+	//int32 CurPriorityLv = 0;
+
 public:
-	bool GetCanEditAttackPriority() const;
+	int32 GetMaxPriorityLv() const;
 	float GetAttackRange() const;
 	float GetSightRange() const;
 
