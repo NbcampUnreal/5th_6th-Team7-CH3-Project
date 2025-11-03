@@ -53,6 +53,7 @@ void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		if (Target == nullptr)
 		{
+			UE_LOG(LogTemp, Display, TEXT("Target name: %s"), *OtherActor->GetActorNameOrLabel());
 			Target = static_cast<ABaseEnemy*>(OtherActor);
 
 			//Weapon->Attack();
@@ -132,6 +133,7 @@ void ATurret::SearchEnemy()
 
 				if (Target->GetHealth() > 0)
 				{
+					UE_LOG(LogTemp, Display, TEXT("Target name: %s"), *Target->GetActorNameOrLabel());
 					Attack();
 					GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 					break;

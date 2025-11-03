@@ -53,7 +53,7 @@ bool AMeleeWeapon::Init(const UWeaponDefinition* WeaponDefinition)
 
 	MeleeWeaponStatBase = MeleeDefinition->MeleeWeaponStat;
 	MeleeWeaponStat = MeleeDefinition->MeleeWeaponStat;
-	SphereCollision->InitSphereRadius(MeleeWeaponStat.Radius);
+	SphereCollision->SetSphereRadius(MeleeWeaponStat.Radius);
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AMeleeWeapon::OnSphereBeginOverlap);
 
 	return true;
@@ -144,10 +144,12 @@ void AMeleeWeapon::ApplyCurrentModing()
 void AMeleeWeapon::StartAttack()
 {
 	SphereCollision->SetGenerateOverlapEvents(true);
+	//bCanAttack = true;
 }
 
 void AMeleeWeapon::EndAttack()
 {
+	bCanAttack = false;
 	SphereCollision->SetGenerateOverlapEvents(false);
 	Attack();
 	OverlappedEnemies.Empty();
@@ -160,11 +162,28 @@ void AMeleeWeapon::EndAttack()
 
 void AMeleeWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Display, TEXT("overlap %s"), *OverlappedComp->GetName());
+	if (bCanAttack == false) return;
+
+	UE_LOG(LogTemp, Display, TEXT("overlap can attack: %s"), *OtherActor->GetActorNameOrLabel());
 	if (OtherActor &&
 		OtherActor != GetOwner() &&
 		OtherActor != OwningCharacter)
 	{
-		OverlappedEnemies.AddUnique(OtherActor);
+		/*UE_LOG(LogTemp, Display, TEXT("OtherActor name : %s"), *OtherActor->GetActorNameOrLabel());
+		OverlappedEnemies.AddUnique(OtherActor);*/
+		ABaseCharacter* OtherCharacter = static_cast<ABaseCharacter*>(OtherActor);
+
+		//OtherCharacter->Attacked(OwningCharacter, 50);
+		TArray<TSubclassOf<UEffectBase>> EffectClasses;
+		EquipModingEffectClassMap.GenerateValueArray(EffectClasses);
+
+		UDamageCalculator::DamageCalculate(
+			GetWorld(),
+			OwningCharacter,
+			OtherActor,
+			MeleeWeaponStat.AttackPower,
+			EffectClasses);
 	}
 }
 
