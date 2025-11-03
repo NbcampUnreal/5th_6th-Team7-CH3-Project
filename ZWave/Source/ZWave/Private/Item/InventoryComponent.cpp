@@ -183,6 +183,31 @@ bool UInventoryComponent::EquipWeaponItem(const UItemDefinition* ItemDef, EEquip
 	return true;
 }
 
+TArray<int32> UInventoryComponent::GetWeaponItemSlotIdxs() const
+{
+	TArray<int32> SlotIdx;
+
+	int32 NowInvenSize = Entries.Num();
+
+	for (int32 i = 0; i < NowInvenSize; ++i)
+	{
+		if (Entries[i].IsEmpty())
+			continue;
+
+		UItemInstance* TargetItem = Entries[i].ItemInstance;
+		if (TargetItem == nullptr)
+			continue;
+
+		UItemWeaponInstance* WeaponItem = Cast<UItemWeaponInstance>(TargetItem);
+		if (WeaponItem == nullptr)
+			continue;
+
+		SlotIdx.Add(i);
+	}
+
+	return SlotIdx;
+}
+
 void UInventoryComponent::EquipModingOnWeaponActor(UItemWeaponInstance* WeaponItem, EEquipSlot EquipSlot)
 {
 	if (WeaponItem == nullptr)

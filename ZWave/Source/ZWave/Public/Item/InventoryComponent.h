@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool EquipWeaponItem(const UItemDefinition* ItemDef, EEquipSlot EquipSlot);
 
+	UFUNCTION(BlueprintCallable,BlueprintPure)
+	TArray<int32> GetWeaponItemSlotIdxs() const;
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int32 GetBioCoreCount() const { return BioCoreCount; };
 
