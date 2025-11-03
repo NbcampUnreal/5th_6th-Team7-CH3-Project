@@ -26,9 +26,6 @@ AAoEActor::AAoEActor()
 void AAoEActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//ActiveAoE(20.0f);
-	
 }
 
 void AAoEActor::ActiveAoE(float ActiveTime, float DamagePerSec, UNiagaraSystem* NiagaraParticle)
@@ -80,7 +77,7 @@ void AAoEActor::ApplyOverlapActorDOT()
 
 		for (AActor* OverlapActor : OverlapActors)
 		{
-			if (!OverlapActor)
+			if (!OverlapActor && OverlapActor == GetOwner())
 			{
 				continue;
 			}

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "NiagaraSystem.h"
+#include "GenericTeamAgentInterface.h"
 #include "AoEActor.generated.h"
 
 UCLASS()
@@ -23,7 +24,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 	class UBoxComponent* BoxCollision;
-
 	class UNiagaraComponent* NiagaraParticleInstance;
 
 public:

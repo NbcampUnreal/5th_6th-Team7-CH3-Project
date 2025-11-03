@@ -29,18 +29,24 @@ void UAoESpawningManager::Initialize(FSubsystemCollectionBase& Collection)
 	}
 }
 
-bool UAoESpawningManager::SpawnAoEActor(int32 index, FVector SpawnPoint)
+bool UAoESpawningManager::SpawnAoEActor(AActor* Causer, int32 index, FVector SpawnPoint)
 {
 	if (AoEDataArray.IsValidIndex(index))
 	{
-		AAoEActor* Actor = GetWorld()->SpawnActor<AAoEActor>(
+		FActorSpawnParameters SpawnParam;
+		SpawnParam.Owner = Causer;
+		SpawnParam.Instigator = Cast<APawn>(Causer);
+
+
+		AAoEActor* AoE = GetWorld()->SpawnActor<AAoEActor>(
 			SpawnActorClass,
-			SpawnPoint + FVector(0,0, 10.0f),
-			FRotator::ZeroRotator
+			SpawnPoint + FVector(0,0, 10.0f), // 임시 포지션
+			FRotator::ZeroRotator,
+			SpawnParam
 		);
 
-		Actor->ActiveAoE(AoEDataArray[index]->ActiveTime, AoEDataArray[index]->DamagePerSec, AoEDataArray[index]->NiagaraParicle);
 
+		AoE->ActiveAoE(AoEDataArray[index]->ActiveTime, AoEDataArray[index]->DamagePerSec, AoEDataArray[index]->NiagaraParicle);
 		return true;
 	}
 

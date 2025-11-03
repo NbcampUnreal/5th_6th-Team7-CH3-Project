@@ -8,7 +8,7 @@ UAoEEffect::UAoEEffect()
 
 }
 
-void UAoEEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage)
+void UAoEEffect::ApplyEffect(AActor* AoECauser, const float& BaseDamage)
 {
 	if (UObject* Outer = GetOuter())
 	{
@@ -16,7 +16,7 @@ void UAoEEffect::ApplyEffect(AActor* TargetActor, const float& BaseDamage)
 		{
 			if (UAoESpawningManager* AoESpawingManager = World->GetSubsystem<UAoESpawningManager>())
 			{
-				if (AoESpawingManager->SpawnAoEActor(0, FVector::ZeroVector))
+				if (AoESpawingManager->SpawnAoEActor(AoECauser, 0, FVector::ZeroVector))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Success Spawn AoE Actor"));
 				}

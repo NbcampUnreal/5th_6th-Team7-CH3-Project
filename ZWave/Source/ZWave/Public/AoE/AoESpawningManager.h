@@ -26,7 +26,7 @@ public:
 	TSubclassOf<class AAoEActor> SpawnActorClass;
 
 	UFUNCTION(BlueprintCallable, Category = "GetAoEData")
-	bool SpawnAoEActor(int32 index, FVector SpawnPoint);
+	bool SpawnAoEActor(AActor* Causer, int32 index, FVector SpawnPoint);
 
 	UFUNCTION(BlueprintCallable, Category = "AddAoEData")
 	void AddAoEData();

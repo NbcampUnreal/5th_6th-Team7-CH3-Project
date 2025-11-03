@@ -3,6 +3,7 @@
 #include "Effect/EffectBase.h"
 #include "Base/BaseCharacter.h"
 #include "Base/Damagable.h"
+#include "GenericTeamAgentInterface.h"
 #include "Engine/World.h"
 
 void UDamageCalculator::DamageCalculate(
@@ -27,21 +28,39 @@ void UDamageCalculator::DamageCalculate(
 	Target->Attacked(Causer, FinalDamage);
 }
 
-void UDamageCalculator::DamageHelper(UObject* WorldContextObject, AActor* Target, AActor* DamageCauser, FZWaveDamageEvent const& DamageEvent)
+void UDamageCalculator::DamageHelper(UObject* WorldContextObject, TScriptInterface<IDamagable> Target, AActor* DamageCauser, FZWaveDamageEvent const& DamageEvent)
 {
-	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
+	IGenericTeamAgentInterface* DamageCauserTeam = nullptr;
+	if (DamageCauser->GetInstigator())
 	{
-		if (UEffectApplyManager* EffectApplyManager = World->GetSubsystem<UEffectApplyManager>())
-		{
-			EffectApplyManager->ApplyEffect(Target, DamageEvent.BaseDamage, DamageEvent.EffectArray);
-		}
+		DamageCauserTeam = Cast<IGenericTeamAgentInterface>(DamageCauser->GetInstigator());
+	}
+	else
+	{
+		DamageCauserTeam = Cast<IGenericTeamAgentInterface>(DamageCauser->GetOwner());
 	}
 
-	// 이 부분에서 같은 팀이면 TakeDamage 호출 되지 않게 수정
-	//Target->TakeDamage(DamageEvent.BaseDamage, DamageEvent, Target->GetInstigatorController(), DamageCauser);
+	IGenericTeamAgentInterface* TargetTeam = Cast<IGenericTeamAgentInterface>(Target.GetObject());
 
-	if (ABaseCharacter* Player = Cast<ABaseCharacter>(Target))
+	if (!TargetTeam || !DamageCauserTeam)
 	{
-		Player->Attacked(Player, DamageEvent.BaseDamage);
+		return;
+	}
+
+	const FGenericTeamId CauserTeamID = DamageCauserTeam->GetGenericTeamId();
+	const FGenericTeamId TargetTeamID = TargetTeam->GetGenericTeamId();
+
+	if (CauserTeamID != TargetTeamID)
+	{
+		AActor* TargetActor = Cast<AActor>(Target.GetObject());
+		if (TargetActor)
+		{
+			TargetActor->TakeDamage(
+				DamageEvent.BaseDamage,
+				DamageEvent,
+				nullptr,
+				DamageCauser
+			);
+		}
 	}
 }

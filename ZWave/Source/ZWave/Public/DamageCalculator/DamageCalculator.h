@@ -41,5 +41,5 @@ public:
 		TArray<TSubclassOf<UEffectBase>>& EffectClassArray);
 
 	UFUNCTION(BlueprintCallable, Category = "Calculate")
-	static void DamageHelper(UObject* WorldContextObject, AActor* Target, AActor* DamageCauser, FZWaveDamageEvent const& DamageEvent);
+	static void DamageHelper(UObject* WorldContextObject, TScriptInterface<IDamagable> Target, AActor* DamageCauser, FZWaveDamageEvent const& DamageEvent);
 };

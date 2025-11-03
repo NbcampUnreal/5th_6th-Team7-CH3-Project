@@ -3,6 +3,8 @@
 
 #include "Base/BaseCharacter.h"
 #include "Weapon/EquipComponent.h"
+#include "DamageCalculator/DamageCalculator.h"
+#include "Effect/EffectApplyManager.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -14,6 +16,7 @@ ABaseCharacter::ABaseCharacter()
 	Health = MaxHealth;
 	SpeedMultiply = 1.f;
 	Armor = 0.f;
+	TeamID = 0;
 
 	EquipComponent = CreateDefaultSubobject<UEquipComponent>(TEXT("EquipComponent"));
 
@@ -66,7 +69,7 @@ void ABaseCharacter::Die()
 	SetLifeSpan(0.05f);
 }
 
-float ABaseCharacter::GetMaxHealth()
+float ABaseCharacter::GetMaxHealth() const
 {
 	return MaxHealth;
 }
@@ -76,8 +79,32 @@ void ABaseCharacter::SetHealth(float SetHealAmount)
 	Health = FMath::Clamp(Health + SetHealAmount, 0.0f, MaxHealth);
 }
 
+FGenericTeamId ABaseCharacter::GetGenericTeamId() const
+{
+	return this->TeamID;
+}
+
 float ABaseCharacter::GetHealth() const
 {
 	return this->Health;
+}
+
+float ABaseCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (const FZWaveDamageEvent* CustomDamageEvent = static_cast<const FZWaveDamageEvent*>(&DamageEvent))
+	{
+		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
+		{
+			EffectManager->ApplyEffect(this, CustomDamageEvent->BaseDamage, CustomDamageEvent->EffectArray);
+		}
+
+
+		UE_LOG(LogTemp, Warning, TEXT("Target Health : %f"), Health);
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), DamageAmount);
+		Attacked(DamageCauser, DamageAmount);
+		UE_LOG(LogTemp, Warning, TEXT("Current Health : %f"), Health);
+	}
+
+	return DamageAmount;
 }
 

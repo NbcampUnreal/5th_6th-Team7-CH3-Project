@@ -11,7 +11,7 @@
 
 ABaseEnemy::ABaseEnemy()
 {
-	
+	TeamID = 2;
 }
 
 void ABaseEnemy::BeginPlay()

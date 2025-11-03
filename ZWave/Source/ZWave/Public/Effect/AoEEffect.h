@@ -17,7 +17,7 @@ class ZWAVE_API UAoEEffect : public UEffectBase
 public:
 	UAoEEffect();
 
-	virtual void ApplyEffect(AActor* TargetActor, const float& BaseDamage) override;
+	virtual void ApplyEffect(AActor* AoECauser, const float& BaseDamage) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
 };

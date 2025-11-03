@@ -32,6 +32,8 @@ ATaskPlayer::ATaskPlayer()
 	ActionComp = CreateDefaultSubobject<UCharacterActionComponent>(TEXT("ActionComp"));
 
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+
+	TeamID = 1;
 }
 
 void ATaskPlayer::AttachWeaponTo(const FName SocketName)
