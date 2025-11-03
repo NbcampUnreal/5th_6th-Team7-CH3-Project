@@ -44,6 +44,8 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 	
 	PlayHitAnimMontage(DamageCauser);
 
+	if (bCanEditAttackPriority == false) return;
+
 	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
 	if (AIController == nullptr) return;
 	

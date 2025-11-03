@@ -31,8 +31,8 @@ protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 private:
-	void TickWithIsAggroedCondtion(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds);
-	void TickWithIsNotAggroedCondition(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds);
+	void TickWithIsAggroedCondtion(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds, class ABaseAIController* MyController, class ABaseEnemy* MyCharacter);
+	void TickWithIsNotAggroedCondition(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds, class ABaseAIController* MyController, class ABaseEnemy* MyCharacter);
 
 	bool CheckSightRange(FVector ToTargetVector, float sightRange);
 	bool CheckSightDegree(AActor* StdActor, FVector ToTargetVector, bool bIsSecondaryTargetLocationSet);

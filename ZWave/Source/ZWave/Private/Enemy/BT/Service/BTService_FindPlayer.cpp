@@ -23,27 +23,27 @@ void UBTService_FindPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
 	if (OwnerBlackboard == nullptr) return;
 
-	bool bIsAggroed = OwnerBlackboard->GetValueAsBool(FName(TEXT("IsAggroed")));
-	if (bIsAggroed)
-	{
-		TickWithIsAggroedCondtion(OwnerComp, NodeMemory, DeltaSeconds);
-	}
-	else
-	{
-		TickWithIsNotAggroedCondition(OwnerComp, NodeMemory, DeltaSeconds);
-	}
-}
-
-void UBTService_FindPlayer::TickWithIsAggroedCondtion(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-{
-	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
-	if (OwnerBlackboard == nullptr) return;
-
 	ABaseAIController* MyController = static_cast<ABaseAIController*>(OwnerComp.GetAIOwner());
 	if (MyController == nullptr) return;
 
 	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(MyController->GetCharacter());
 	if (MyCharacter == nullptr || MyCharacter->GetCanEditAttackPriority() == false) return;
+
+	bool bIsAggroed = OwnerBlackboard->GetValueAsBool(FName(TEXT("IsAggroed")));
+	if (bIsAggroed)
+	{
+		TickWithIsAggroedCondtion(OwnerComp, NodeMemory, DeltaSeconds, MyController, MyCharacter);
+	}
+	else
+	{
+		TickWithIsNotAggroedCondition(OwnerComp, NodeMemory, DeltaSeconds, MyController, MyCharacter);
+	}
+}
+
+void UBTService_FindPlayer::TickWithIsAggroedCondtion(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds, ABaseAIController* MyController, ABaseEnemy* MyCharacter)
+{
+	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
+	if (OwnerBlackboard == nullptr) return;
 
 	ABaseCharacter* TargetCharacter = Cast<ABaseCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (TargetCharacter == nullptr) return;
@@ -66,14 +66,8 @@ void UBTService_FindPlayer::TickWithIsAggroedCondtion(UBehaviorTreeComponent& Ow
 	}
 }
 
-void UBTService_FindPlayer::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+void UBTService_FindPlayer::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds, ABaseAIController* MyController, ABaseEnemy* MyCharacter)
 {
-	ABaseAIController* MyController = static_cast<ABaseAIController*>(OwnerComp.GetAIOwner());
-	if (MyController == nullptr) return;
-
-	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(MyController->GetCharacter());
-	if (MyCharacter == nullptr || MyCharacter->GetCanEditAttackPriority() == false) return;
-
 	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
 	if (OwnerBlackboard == nullptr) return;
 
