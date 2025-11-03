@@ -39,8 +39,8 @@ bool ARangedAIController::CheckCondition(AActor* Target)
     );
     bool bCanAttack = (bHit && Hit.GetActor() == Target);
 
-    //FColor Color = bCanAttack ? FColor::Green : FColor::Red;
-    //DrawDebugLine(GetWorld(), MyCharacter->GetActorLocation() + FVector(0, 0, 50), Target->GetActorLocation() + FVector(0, 0, 50), Color, false, 0.2f, 0, 1.5f);
+    FColor Color = bCanAttack ? FColor::Green : FColor::Red;
+    DrawDebugLine(GetWorld(), MyCharacter->GetActorLocation() + FVector(0, 0, 50), Target->GetActorLocation() + FVector(0, 0, 50), Color, false, 0.2f, 0, 1.5f);
 
     if (!bHit || Hit.GetActor() != Target)
     {
