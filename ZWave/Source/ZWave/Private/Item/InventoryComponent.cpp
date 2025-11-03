@@ -208,6 +208,50 @@ TArray<int32> UInventoryComponent::GetWeaponItemSlotIdxs() const
 	return SlotIdx;
 }
 
+bool UInventoryComponent::EquipModingToWeapon(int32 TargetWeaponSlotIdx, int32 TargetModingSlotIdx)
+{
+	if (GetOwner() == nullptr)
+		return false;
+
+	if (TargetWeaponSlotIdx < 0 ||
+		TargetWeaponSlotIdx >= MaxEntryCount ||
+		TargetModingSlotIdx < 0 || 
+		TargetModingSlotIdx >= MaxEntryCount)
+		return false;
+
+	UItemInstance* TargetWeaponItem = Entries[TargetWeaponSlotIdx].ItemInstance;
+	if (TargetWeaponItem == nullptr)
+		return false;
+
+	UItemWeaponInstance* WeaponItem = Cast<UItemWeaponInstance>(TargetWeaponItem);
+	if (WeaponItem == nullptr)
+		return false;
+
+	UItemInstance* TargetModingItem = Entries[TargetModingSlotIdx].ItemInstance;
+	if (TargetModingItem == nullptr)
+		return false;
+
+	UItemModeInstance* ModingItem = Cast<UItemModeInstance>(TargetModingItem);
+	if (ModingItem == nullptr)
+		return false;
+
+	if (ModingItem->IsEquipped() == true ||
+		WeaponItem->IsModAttached(ModingItem))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Moding Already Attached!"));
+		return false;
+	}
+
+	WeaponItem->AttachMod(ModingItem);
+
+	if (WeaponItem->EquipSlot != EEquipSlot::None)
+	{
+		EquipModingOnWeaponActor(WeaponItem, WeaponItem->EquipSlot);
+	}
+
+	return true;
+}
+
 void UInventoryComponent::EquipModingOnWeaponActor(UItemWeaponInstance* WeaponItem, EEquipSlot EquipSlot)
 {
 	if (WeaponItem == nullptr)
