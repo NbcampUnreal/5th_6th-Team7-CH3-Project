@@ -20,7 +20,7 @@ void UHoveringDescButtonBase::OnHoveringIn_Implementation()
 {
 	if (!IsValid(Inventory)) return;
 
-	Inventory->OnDescActivated(TargetID);
+	Inventory->OnDescActivated(TargetItemName);
 }
 
 void UHoveringDescButtonBase::OnHoveringOut_Implementation()

@@ -1,5 +1,7 @@
 #include "UI/InventoryUI.h"
 
+#include "UI/ItemCategoryInfo.h"
+
 #include "UI/HoveredDescWidgetBase.h"
 
 void UInventoryUI::NativeOnInitialized()
@@ -9,11 +11,11 @@ void UInventoryUI::NativeOnInitialized()
 	GetDataTable();
 }
 
-void UInventoryUI::OnDescActivated_Implementation(int32 ID)
+void UInventoryUI::OnDescActivated_Implementation(FName ItemName)
 {
 	if (!IsValid(Desc)) return;
 
-	FItemUIInfo* Info = FindItemInfo(ID);
+	FItemSlotInfo* Info = FindItemInfo(ItemName);
 	if (Info)
 	{
 		Desc->OnActivated(*Info);
@@ -27,14 +29,14 @@ void UInventoryUI::OnDescDeactivated_Implementation()
 	Desc->OnDeactivated();
 }
 
-FItemUIInfo* UInventoryUI::FindItemInfo(int32 ID)
+FItemSlotInfo* UInventoryUI::FindItemInfo(FName ItemName)
 {
-	if (!IsValid(ItemUIInfoDataTable)) return nullptr;
+	if (!IsValid(ItemCategoryInfoDataTable)) return nullptr;
 	if (InfoList.Num() <= 0) return nullptr;
 
 	for (const auto& Info : InfoList)
 	{
-		if (Info->ItemID == ID)
+		if (Info->ItemName == ItemName)
 			return Info;
 	}
 
@@ -43,10 +45,19 @@ FItemUIInfo* UInventoryUI::FindItemInfo(int32 ID)
 
 void UInventoryUI::GetDataTable()
 {
-	if (!IsValid(ItemUIInfoDataTable)) return;
+	if (!IsValid(ItemCategoryInfoDataTable)) return;
 	if (InfoList.Num() > 0) InfoList.Empty();
 
 	static const FString ContextString(TEXT("ItemUIInfoContext"));
 
-	ItemUIInfoDataTable->GetAllRows(ContextString, InfoList);
+	TArray<FItemCategoryInfo*> Categories;
+	ItemCategoryInfoDataTable->GetAllRows(ContextString, Categories);
+
+	for (auto& c : Categories)
+	{
+		for (auto& i : c->ItemSlotInfoList)
+		{
+			InfoList.Add(&i);
+		}
+	}
 }

@@ -15,8 +15,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
 	TObjectPtr<UInventoryUI> Inventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	int32 TargetID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	FName TargetItemName;
 
 public:
 	void NativeOnInitialized() override;
