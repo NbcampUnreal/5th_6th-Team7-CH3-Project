@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -45,7 +45,7 @@ public:
 
     //아이템 아이콘
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Definition")
-    TSoftObjectPtr<UTexture2D> ItemIcon;
+    TObjectPtr<UTexture2D> ItemIcon;
 
     // 상점 구매 가격 (0이면 구매 불가)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Definition")
@@ -56,5 +56,5 @@ public:
     int32 SellPrice = 0;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Definition")
-    TSoftObjectPtr<UPrimaryDataAsset> Definition;
+    TObjectPtr<UPrimaryDataAsset> Definition;
 };
