@@ -59,6 +59,7 @@ public:
 
 	virtual void PlayHitAnimMontage(AActor* DamageCauser);
 	virtual void CheckPriorityLv(AActor* DamageCauser);
+	virtual void SetNewTarget(AActor* DamageCauser);
 
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;

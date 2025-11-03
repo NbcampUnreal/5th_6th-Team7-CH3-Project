@@ -98,11 +98,19 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && MaxPriorityLv >= 2)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 2);
+		SetNewTarget(DamageCauser);
 	}
 	else if (DamageCauser->IsA(ATurret::StaticClass()) && CurPriorityLv < 2 && MaxPriorityLv >= 1)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
+		SetNewTarget(DamageCauser);
 	}
+}
+
+void ABaseEnemy::SetNewTarget(AActor* DamageCauser)
+{
+	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
+	if (AIController == nullptr) return;
 
 	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
 	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
