@@ -5,6 +5,14 @@
 
 #include "Base/BaseCharacter.h"
 
+
+void ABombZombie::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Display, TEXT("Bomb begin play"));
+}
+
 void ABombZombie::Die()
 {
 	//Bomb();

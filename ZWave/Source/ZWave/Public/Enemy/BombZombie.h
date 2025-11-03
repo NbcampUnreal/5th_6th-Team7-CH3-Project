@@ -15,6 +15,10 @@ class ZWAVE_API ABombZombie : public ABaseEnemy
 	GENERATED_BODY()
 
 public:
+
+	virtual void BeginPlay() override;
+
+public:
 	virtual void Die() override;
 
 	virtual void Attack() override;
