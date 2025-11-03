@@ -99,10 +99,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageE
 		}
 
 
-		UE_LOG(LogTemp, Warning, TEXT("Target Health : %f"), Health);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), DamageAmount);
-		Attacked(DamageCauser, DamageAmount);
-		UE_LOG(LogTemp, Warning, TEXT("Current Health : %f"), Health);
+		Attacked(DamageCauser, DamageAmount); //데미지 계산 후 넘겨줄 수도 있고 아니면 그냥 이렇게 쓸 수도 있을 듯
 	}
 
 	return DamageAmount;
