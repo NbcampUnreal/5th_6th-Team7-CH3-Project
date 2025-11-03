@@ -33,4 +33,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Mode")
 	void OnDeselectedMode();
+
+	FORCEINLINE FModeSlotButtonInfo* GetModeData() { return &ModeData; }
 };

@@ -1,6 +1,7 @@
 #include "UI/PanelModeSlot.h"
 
 #include "UI/ModeSlotButton.h"
+#include "UI/PanelModeDesc.h"
 
 #include "Components/UniformGridPanel.h"
 
@@ -9,6 +10,9 @@
 void UPanelModeSlot::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
+	if (!IsValid(ModeDescPanel))
+		FindPanel();
 
 	if (!IsValid(ModeSlotClass) || !IsValid(ModeSlotInfoDataTable)) return;
 	if (!IsValid(ModeSlotGrid)) return;
@@ -42,13 +46,32 @@ void UPanelModeSlot::NativeOnInitialized()
 	}
 }
 
+void UPanelModeSlot::FindPanel()
+{
+	UPanelWidget* Parent = Cast<UPanelWidget>(GetParent()->GetParent()); // 일단 구조상 이러하니 이렇게
+	if (IsValid(Parent))
+	{
+		TArray<UWidget*> Children = Parent->GetAllChildren();
+		for (auto* c : Children)
+		{
+			UPanelModeDesc* Desc = Cast<UPanelModeDesc>(c);
+			if (IsValid(Desc))
+			{
+				ModeDescPanel = Desc;
+				return;
+			}
+		}
+	}
+}
+
 void UPanelModeSlot::OnSelectedButtonChanged_Implementation(UModeSlotButton* NewSelected)
 {
-	for (auto& m : ModeSlotList)
+	for (UModeSlotButton* m : ModeSlotList)
 	{
 		if (m == NewSelected)
 		{
 			m->OnSelectedMode(m);
+			ModeDescPanel->OnSelectedButtonChanged(m);
 		}
 		else
 		{

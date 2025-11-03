@@ -6,6 +6,7 @@
 
 class UModeSlotButton;
 class UUniformGridPanel;
+class UPanelModeDesc;
 
 UCLASS()
 class ZWAVE_API UPanelModeSlot : public UCommonUserWidget
@@ -27,8 +28,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mode", meta = (BindWidget))
 	TObjectPtr<UUniformGridPanel> ModeSlotGrid;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mode")
+	TObjectPtr<UPanelModeDesc> ModeDescPanel;
+
 public:
 	void NativeOnInitialized() override;
+	void FindPanel();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mode")
 	void OnSelectedButtonChanged(UModeSlotButton* NewSelected);
