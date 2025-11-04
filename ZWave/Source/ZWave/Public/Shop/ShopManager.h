@@ -20,7 +20,7 @@ public:
 	bool TryPurchaseItem(APlayerController* Player, FShopItemData& ItemData);
 
 	UFUNCTION(BlueprintCallable)
-	bool TrySellItem(APlayerController* Player, int32 InvenSlotData);
+	bool TrySellItem(APlayerController* Player, int32 InvenSlotIdx);
 
 	UFUNCTION(BlueprintCallable)
 	bool TryUpgradeStat(APlayerController* Player, const FShopItemData& ItemData);

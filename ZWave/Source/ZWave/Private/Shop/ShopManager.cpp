@@ -54,7 +54,7 @@ bool UShopManager::TryPurchaseItem(APlayerController* Player, FShopItemData& Ite
 	return true;
 }
 
-bool UShopManager::TrySellItem(APlayerController* Player, int32 InvenSlotData)
+bool UShopManager::TrySellItem(APlayerController* Player, int32 InvenSlotIdx)
 {
 	if (Player == nullptr)
 	{
@@ -69,9 +69,23 @@ bool UShopManager::TrySellItem(APlayerController* Player, int32 InvenSlotData)
 		return false;
 	}
 
+	const UItemInstance* ItemIns = InvComp->FindItemBySlot(InvenSlotIdx);
+	if (ItemIns == nullptr ||
+		ItemIns->ItemDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TrySellItem: SlotIdx not valid"));
+		return false;
+	}
 
+	int32 SellPrice = ItemIns->ItemDef->SellPrice;
 
-	return true;
+	if (InvComp->RemoveItemByDef(ItemIns->ItemDef, 1))
+	{
+		InvComp->AddBioCoreCount(SellPrice);
+		return true;
+	}
+
+	return false;
 }
 
 
