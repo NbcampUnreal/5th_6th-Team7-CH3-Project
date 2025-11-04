@@ -15,6 +15,7 @@
 #include "Engine/OverlapResult.h"
 #include "DamageCalculator/DamageCalculator.h"
 #include "DrawDebugHelpers.h"
+#include "AoE/AoESpawningManager.h"
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -275,6 +276,8 @@ void AProjectileWeapon::ApplyStat(const FProjectileWeaponStats& ModingStat, EWea
 
 void AProjectileWeapon::OnProjectileStop(const FHitResult& ImpactResult)
 {
+	HitLocation = ImpactResult.ImpactPoint;
+
 	if (ProjectileWeaponStat.FuseTime > 0.f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
@@ -358,6 +361,11 @@ void AProjectileWeapon::Explode()
 	//	this,
 	//	GetInstigatorController(),
 	//	true);
+
+	if (UAoESpawningManager* AoeManager = GetWorld()->GetSubsystem<UAoESpawningManager>())
+	{
+		AoeManager->SpawnAoEActor(GetOwner(), ProjectileWeaponStat.ProjectileIdx, HitLocation);
+	}
 
 	bCanAttack = false;
 
