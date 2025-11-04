@@ -66,6 +66,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE int32 GetBioCoreCount() const { return BioCoreCount; };
 
+	UFUNCTION(BlueprintCallable)
+	void AddBioCoreCount(int32 Amount);
+
+	UFUNCTION(BlueprintCallable)
+	bool UseBioCoreCount(int32 Amount);
+
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Inventory")
 	FOnInventoryUpdated OnInventoryUpdated;

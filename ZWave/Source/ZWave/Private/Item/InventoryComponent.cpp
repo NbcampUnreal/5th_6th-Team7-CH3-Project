@@ -335,6 +335,23 @@ bool UInventoryComponent::UnequipModingToWeapon(int32 TargetWeaponSlotIdx, int32
 	return true;
 }
 
+void UInventoryComponent::AddBioCoreCount(int32 Amount)
+{
+	if (Amount <= 0)
+		return;
+
+	BioCoreCount += Amount;
+}
+
+bool UInventoryComponent::UseBioCoreCount(int32 Amount)
+{
+	if (Amount > BioCoreCount)
+		return false;
+
+	BioCoreCount -= Amount;
+	return true;
+}
+
 void UInventoryComponent::EquipModingOnWeaponActor(UItemWeaponInstance* WeaponItem, EEquipSlot EquipSlot)
 {
 	if (WeaponItem == nullptr)
