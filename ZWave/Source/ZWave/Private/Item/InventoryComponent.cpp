@@ -7,11 +7,25 @@
 #include "Mode/ModeDefinition.h"
 #include "Mode/ModingInstance.h"
 #include "Weapon/WeaponBase.h"
+#include "Shop/ShopManager.h"
 
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Entries.SetNum(MaxEntryCount);
+
+	UShopManager* ShopMgr = GetWorld()->GetSubsystem<UShopManager>();
+	if (ShopMgr)
+	{
+		// 기본적으로 EquipComponent에서 기본 장착을 하는 상태
+		// - 여기서 Equip을 시켜줄 순 있지만 Enemy는 Inv Compo가 없음
+		// - 차후, 적에게도 Inventory가 생긴다면 고려해볼만한 내용
+		UItemDefinition* BaseWeapon = ShopMgr->FindItemByDisplayName(DefaultWeaponName);
+		if (BaseWeapon)
+		{
+			AddItem(BaseWeapon, 1);
+		}
+	}
 }
 
 void UInventoryComponent::AddItem(UItemDefinition* ItemDef, int32 Quantity)

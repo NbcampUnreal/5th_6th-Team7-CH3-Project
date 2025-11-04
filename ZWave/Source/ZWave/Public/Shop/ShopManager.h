@@ -35,15 +35,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TryEquipWeapon(APlayerController* Player, const FString& Name, int32 Slot);
 
+	UItemDefinition* FindItemByDisplayName(const FString& Name) const;
+
 protected:
 	bool HasEnoughCore(APlayerController* Player, int32 Price);
 	void DeductCore(APlayerController* Player, int32 Price);
 	void GiveItemToInventory(APlayerController* Player, UItemDefinition* ItemDef);
 
 	void NameMapSetting();
-
-	UItemDefinition* FindItemByDisplayName(const FString& Name) const;
-
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Shop Data")
 	TObjectPtr<UDataTable> ShopTable = nullptr;
