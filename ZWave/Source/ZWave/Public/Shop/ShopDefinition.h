@@ -23,7 +23,6 @@ struct FShopItemData
 	UPROPERTY(EditDefaultsOnly, Category = "Shop")
 	TObjectPtr<UItemDefinition> ItemDef;
 
-	// 상점 내의 재고
 	UPROPERTY(EditDefaultsOnly, Category = "Shop")
 	int32 Stock;
 

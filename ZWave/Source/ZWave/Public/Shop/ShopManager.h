@@ -17,10 +17,10 @@ class ZWAVE_API UShopManager : public UWorldSubsystem
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
-	void OpenShop(UShopDefinition* ShopDef, APlayerController* Player);
+	bool TryPurchaseItem(APlayerController* Player, FShopItemData& ItemData);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryPurchaseItem(APlayerController* Player, const FShopItemData& ItemData);
+	bool TrySellItem(APlayerController* Player, int32 InvenSlotData);
 
 	UFUNCTION(BlueprintCallable)
 	bool TryUpgradeStat(APlayerController* Player, const FShopItemData& ItemData);
@@ -32,7 +32,8 @@ public:
 	bool TryEquipWeapon(APlayerController* Player, const FShopItemData& ItemData, EEquipSlot TargetSlot);
 
 protected:
-	bool HasEnoughMoney(APlayerController* Player, int32 Price);
-	void DeductMoney(APlayerController* Player, int32 Price);
+	bool HasEnoughCore(APlayerController* Player, int32 Price);
+	void DeductCore(APlayerController* Player, int32 Price);
 	void GiveItemToInventory(APlayerController* Player, UItemDefinition* ItemDef);
+
 };
