@@ -6,7 +6,7 @@
 
 USpeedBuffEffect::USpeedBuffEffect()
 {
-	SpeedMultiplier = 1.2f;
+	SpeedMultiplier = 1.5f;
 }
 
 void USpeedBuffEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
@@ -43,8 +43,8 @@ void USpeedBuffEffect::RemoveEffect()
 		else
 		{
 			const float CharacterSpeed = Character->GetMoveSpeed();
-			SpeedMultiplier -= 1.0f;
-			Character->SetMoveSpeed(CharacterSpeed - (CharacterSpeed * SpeedMultiplier));
+			const float RemoveSpeedMultiplier = SpeedMultiplier - 1.0f;
+			Character->SetMoveSpeed(CharacterSpeed - (CharacterSpeed * RemoveSpeedMultiplier));
 		}
 	}
 	
