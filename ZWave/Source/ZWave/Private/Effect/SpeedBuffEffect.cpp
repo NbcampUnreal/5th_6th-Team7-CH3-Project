@@ -13,10 +13,6 @@ void USpeedBuffEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
 	if (ABaseCharacter* Character = Cast<ABaseCharacter>(TargetActor))
 	{
-		if (!FMath::IsNearlyZero(Duration))
-		{
-			SetBuffTimer(Duration);
-		}
 		Target = Character;
 
 		if (UCharacterActionComponent* ActionComp = Character->FindComponentByClass<UCharacterActionComponent>())
@@ -27,6 +23,15 @@ void USpeedBuffEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 		{
 			const float CharacterSpeed = Character->GetMoveSpeed();
 			Character->SetMoveSpeed(CharacterSpeed * SpeedMultiplier);
+		}
+
+		if (!FMath::IsNearlyZero(Duration))
+		{
+			SetBuffTimer(Duration);
+		}
+		else
+		{
+			RemoveEffect();
 		}
 	}
 }
