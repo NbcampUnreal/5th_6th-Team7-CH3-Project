@@ -6,6 +6,7 @@
 #include "Level/SpawnPoint.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "TimerManager.h"
 
 
 void UEnemySpawnManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -17,6 +18,10 @@ void UEnemySpawnManager::Initialize(FSubsystemCollectionBase& Collection)
 
 void UEnemySpawnManager::Deinitialize()
 {
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+    }
     SpawnPoints.Empty();
     ActiveEnemies.Empty();
     Super::Deinitialize();
@@ -41,36 +46,24 @@ void UEnemySpawnManager::UnregisterSpawnPoint(ASpawnPoint* Point)
 
 void UEnemySpawnManager::RequestSpawn(TSubclassOf<ABaseCharacter> MonsterClass, int32 Count)
 {
-    if (!MonsterClass || SpawnPoints.Num() == 0)
+    if (!MonsterClass || Count <= 0)
     {
-        UE_LOG(LogTemp, Error, TEXT("Spawn Request Failed. No Spawn Points or Invalid Class."));
+        UE_LOG(LogTemp, Warning, TEXT("Spawn Request REJECTED: Invalid MonsterClass or Count <= 0."));
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("Spawning %d of %s"), Count, *MonsterClass->GetName());
+    UE_LOG(LogTemp, Log, TEXT("Adding %d of %s to spawn queue."), Count, *GetNameSafe(MonsterClass.Get()));
 
-    for (int32 Index = 0; Index < Count; ++Index)
+    SpawnQueue.Add(FSpawnRequest(MonsterClass, Count));
+
+    if (GetWorld() && !GetWorld()->GetTimerManager().IsTimerActive(SpawnTimerHandle))
     {
-        ASpawnPoint* SpawnPoint = GetRandomSpawnPoint();
-        if (SpawnPoint)
-        {
-            FActorSpawnParameters SpawnParams;
-            SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-            ABaseCharacter* NewMonster = GetWorld()->SpawnActor<ABaseCharacter>(
-                MonsterClass,
-                SpawnPoint->GetActorLocation(),
-                SpawnPoint->GetActorRotation(),
-                SpawnParams
-            );
-
-            if (NewMonster)
-            {
-                ActiveEnemies.Add(NewMonster);
-                NewMonster->SpawnDefaultController();
-                NewMonster->OnDestroyed.AddDynamic(this, &UEnemySpawnManager::HandleEnemyDied);
-            }
-        }
+        GetWorld()->GetTimerManager().SetTimer(
+            SpawnTimerHandle,
+            this,
+            &UEnemySpawnManager::OnSpawnTimerTick,
+            SpawnInterval,
+            true);
     }
 }
 
@@ -92,4 +85,68 @@ ASpawnPoint* UEnemySpawnManager::GetRandomSpawnPoint()
     if (SpawnPoints.Num() == 0) return nullptr;
     int32 Index = FMath::RandRange(0, SpawnPoints.Num() - 1);
     return SpawnPoints[Index];
+}
+
+void UEnemySpawnManager::OnSpawnTimerTick()
+{
+    if (SpawnQueue.Num() == 0)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+        return;
+    }
+
+    int32 CurrentActiveCount = ActiveEnemies.Num();
+    if (CurrentActiveCount >= MaxActiveEnemies)
+    {
+
+        return;
+    }
+
+    FSpawnRequest& CurrentRequest = SpawnQueue[0];
+
+    if (SpawnPoints.Num() == 0)
+    {
+        UE_LOG(LogTemp, Error, TEXT("OnSpawnTimerTick: No Spawn Points available. Stopping timer."));
+        GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+        return;
+    }
+
+    int32 SpawnCapacity = MaxActiveEnemies - CurrentActiveCount;
+
+    int32 NumToSpawn = FMath::Min(SpawnsPerTick, CurrentRequest.Count);
+
+    int32 NumToSpawnThisTick = FMath::Min(NumToSpawn, SpawnCapacity);
+
+    for (int32 i = 0; i < NumToSpawnThisTick; ++i)
+    {
+        ASpawnPoint* SpawnPoint = GetRandomSpawnPoint();
+        if (SpawnPoint)
+        {
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+            ABaseCharacter* NewMonster = GetWorld()->SpawnActor<ABaseCharacter>(
+                CurrentRequest.MonsterClass,
+                SpawnPoint->GetActorLocation(),
+                SpawnPoint->GetActorRotation(),
+                SpawnParams
+            );
+
+            if (NewMonster)
+            {
+                NewMonster->SpawnDefaultController();
+                ActiveEnemies.Add(NewMonster);
+                NewMonster->OnDestroyed.AddDynamic(this, &UEnemySpawnManager::HandleEnemyDied);
+            }
+        }
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("SpawnTick: Spawned %d. Active: %d."), NumToSpawnThisTick, ActiveEnemies.Num());
+
+    CurrentRequest.Count -= NumToSpawnThisTick;
+
+    if (CurrentRequest.Count <= 0)
+    {
+        SpawnQueue.RemoveAt(0);
+    }
 }

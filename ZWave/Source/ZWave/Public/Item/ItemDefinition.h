@@ -16,7 +16,7 @@ enum class EItemType : uint8
     EIT_Material    UMETA(DisplayName = "Material")
 };
 
-UCLASS(Abstract, BlueprintType)
+UCLASS(BlueprintType)
 class ZWAVE_API UItemDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -54,6 +54,10 @@ public:
     // 상점 판매 가격 (0이면 판매 불가)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Definition")
     int32 SellPrice = 0;
+
+    //(무기전용) 무기 재료
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Crafting")
+    TMap<UItemDefinition*, int32> CraftingMaterials;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Definition")
     TObjectPtr<UPrimaryDataAsset> Definition;

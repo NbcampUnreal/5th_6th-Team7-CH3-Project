@@ -4,12 +4,34 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "Level/ZWaveTypes.h"
+#include "GameFramework/Character.h"
 #include "EnemySpawnManager.generated.h"
 
 class ABaseCharacter;
 class ASpawnPoint;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnemyDiedSignature, ABaseCharacter*);
+
+USTRUCT()
+struct FSpawnRequest
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    TSubclassOf<ABaseCharacter> MonsterClass;
+
+    UPROPERTY()
+    int32 Count;
+
+    FSpawnRequest()
+        : MonsterClass(nullptr), Count(0) {
+    }
+
+    FSpawnRequest(TSubclassOf<ABaseCharacter> InClass, int32 InCount)
+        : MonsterClass(InClass), Count(InCount) {
+    }
+};
 
 UCLASS()
 class ZWAVE_API UEnemySpawnManager : public UWorldSubsystem
@@ -32,10 +54,27 @@ protected:
     TArray<ASpawnPoint*> SpawnPoints;
 
     UPROPERTY()
-
     TArray<ABaseCharacter*> ActiveEnemies;
+
+	UPROPERTY()
+	TArray<FSpawnRequest> SpawnQueue;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+    int32 SpawnsPerTick = 5;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+    float SpawnInterval = 1.0f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+    int32 MaxActiveEnemies = 30;
+
+	FTimerHandle SpawnTimerHandle;
+
     UFUNCTION()
     void HandleEnemyDied(AActor* DiedActor);
+
+	UFUNCTION()
+	void OnSpawnTimerTick();
 
     ASpawnPoint* GetRandomSpawnPoint();
 };

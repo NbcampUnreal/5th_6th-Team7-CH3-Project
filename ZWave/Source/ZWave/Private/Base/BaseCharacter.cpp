@@ -96,7 +96,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageE
 	{
 		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
 		{
-			EffectManager->ApplyEffect(this, CustomDamageEvent->EffectArray, CustomDamageEvent->BaseDamage);
+			EffectManager->ApplyEffect(this, CustomDamageEvent->EffectArray, CustomDamageEvent->Duration);
 		}
 
 

@@ -25,6 +25,8 @@ void UShopTabItem::NativeOnInitialized()
 	TArray<FName> RowNameList = CategoryInfoDataTable->GetRowNames();
 	for (auto& RowName : RowNameList)
 	{
+		if (IsIgnoreRow(RowName)) continue;
+
 		FString Name = RowName.ToString() + "Category";
 		UUserWidget* Widget = WidgetTree->ConstructWidget<UUserWidget>(CategoryClass, FName(Name));
 		if (IsValid(Widget))
@@ -78,4 +80,15 @@ void UShopTabItem::OnSelectedButtonChange_Implementation(UItemSlotButton* NewSel
 void UShopTabItem::AddButtons(TArray<UItemSlotButton*> NewButtons)
 {
 	Buttons.Append(NewButtons);
+}
+
+bool UShopTabItem::IsIgnoreRow(FName RowName)
+{
+	for (auto& n : IgnoreCategories)
+	{
+		if (n == RowName)
+			return true;
+	}
+
+	return false;
 }

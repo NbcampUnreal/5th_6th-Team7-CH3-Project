@@ -36,4 +36,7 @@ public:
 	void SetValueAsVectorToBlackboard(FName BlackboardKeyName, FVector Value);
 	void SetValueAsBoolToBlackboard(FName BlackboardKeyName, bool Value);
 	void SetValueAsObjectToBlackboard(FName BlackboardKeyName, UObject* Object);
+	
+	void SetValueAsIntToBlackboard(FName BlackboardKeyName, int32 Value);
+	int32 GetValueAsIntFromBlackboard(FName BlackboardKeyName);
 };
