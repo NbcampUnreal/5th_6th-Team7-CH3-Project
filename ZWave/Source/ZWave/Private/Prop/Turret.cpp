@@ -44,18 +44,27 @@ void ATurret::BeginPlay()
 	//Weapon = EquipComp->GetCurrentWeapon();
 }
 
+void ATurret::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bShouldRot)
+	{
+		RotateToTarget(DeltaTime);
+	}
+}
+
 void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->IsA(ABaseEnemy::StaticClass()))
 	{
 		if (Target == nullptr)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Target name: %s"), *OtherActor->GetActorNameOrLabel());
 			Target = static_cast<ABaseEnemy*>(OtherActor);
-
-			//Weapon->Attack();
-			Attack();
-			GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+			bShouldRot = true;
+			
+			//Attack();
+			//GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 		}
 	}
 }
@@ -99,21 +108,30 @@ void ATurret::Attack()
 		}
 	}
 
-	RotateToTarget();
 	Target->Attacked(this, this->WeaponDamage);
-	
 	if (Target->GetHealth() <= 0.f)
 	{
 		StopAttack();
 	}
 }
 
-void ATurret::RotateToTarget()
+void ATurret::RotateToTarget(float DeltaTime)
 {
-	FVector ToTarget = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-	FRotator NewRot = FRotator(0, ToTarget.Rotation().Yaw, 0);
-	
+	if (Target == nullptr) return;
+
+	FVector TargetDirection = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	FRotator TargetRot = FRotator(0, TargetDirection.Rotation().Yaw, 0);
+
+	FRotator CurrentRot = GetActorRotation();
+	FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, RotationSpeed);
 	SetActorRotation(NewRot);
+
+	if (FMath::Abs(TargetRot.Yaw - CurrentRot.Yaw) < 1) {
+		bShouldRot = false;
+
+		Attack();
+		GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+	}
 }
 
 void ATurret::StopAttack()
@@ -127,7 +145,6 @@ void ATurret::StopAttack()
 void ATurret::SearchEnemy()
 {
 	TArray<FHitResult> HitResults;
-	float SphereRadius = this->AwarenessRange * 2;
 
 	bool bHit = GetWorld()->SweepMultiByChannel(
 		HitResults,
@@ -135,7 +152,7 @@ void ATurret::SearchEnemy()
 		GetActorLocation(),
 		FQuat::Identity,
 		ECC_Visibility,                  // 사용할 충돌 채널 설정
-		FCollisionShape::MakeSphere(SphereRadius)
+		FCollisionShape::MakeSphere(this->AwarenessRange)
 	);
 
 	if (bHit)
@@ -148,9 +165,7 @@ void ATurret::SearchEnemy()
 
 				if (Target->GetHealth() > 0)
 				{
-					UE_LOG(LogTemp, Display, TEXT("Target name: %s"), *Target->GetActorNameOrLabel());
-					Attack();
-					GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+					bShouldRot = true;
 					break;
 				}
 			}

@@ -51,6 +51,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
 	class UAnimMontage* DieMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	class USoundBase* HitSound;
+
 private:
 	UAnimMontage* GetAttackedMontage(EHitDir Direction);
 

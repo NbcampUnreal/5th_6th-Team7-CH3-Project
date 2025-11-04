@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
@@ -43,7 +44,6 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 
 	if (Health <= 0.f) return;
 	
-	PlayHitAnimMontage(DamageCauser);
 	CheckPriorityLv(DamageCauser);
 }
 
@@ -99,11 +99,15 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 2);
 		SetNewTarget(DamageCauser);
+
+		PlayHitAnimMontage(DamageCauser);
 	}
 	else if (DamageCauser->IsA(ATurret::StaticClass()) && CurPriorityLv < 2 && MaxPriorityLv >= 1)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
 		SetNewTarget(DamageCauser);
+
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 	}
 }
 
