@@ -66,7 +66,7 @@ void UInventoryComponent::AddItem(UItemDefinition* ItemDef, int32 Quantity)
 	}
 }
 
-bool UInventoryComponent::RemoveItem(const UItemDefinition* ItemDef, int32 Quantity)
+bool UInventoryComponent::RemoveItemByDef(const UItemDefinition* ItemDef, int32 Quantity)
 {
 	if (ItemDef == nullptr
 		|| Quantity <= 0)
@@ -105,8 +105,26 @@ bool UInventoryComponent::RemoveItem(const UItemDefinition* ItemDef, int32 Quant
 	return true;
 }
 
+bool UInventoryComponent::RemoveItemBySlot(int32 SlotIdx, int32 Quantity)
+{
+	if (SlotIdx < 0 ||
+		SlotIdx >= MaxEntryCount ||
+		Quantity <= 0)
+		return false;
 
-int32 UInventoryComponent::FindItem(const UItemDefinition* ItemDef) const
+	if (Entries[SlotIdx].IsEmpty() == true)
+		return false;
+
+	const UItemDefinition* ItemDef = Entries[SlotIdx].ItemInstance->ItemDef;
+	if (ItemDef == nullptr)
+	{
+		return false;
+	}
+
+	return RemoveItemByDef(ItemDef,Quantity);
+}
+
+int32 UInventoryComponent::FindItemByDef(const UItemDefinition* ItemDef) const
 {
 	if (ItemDef == nullptr)
 	{
@@ -123,6 +141,18 @@ int32 UInventoryComponent::FindItem(const UItemDefinition* ItemDef) const
 		}
 	}
 	return INDEX_NONE;
+}
+
+const UItemInstance* UInventoryComponent::FindItemBySlot(int32 SlotIdx) const
+{
+	if (SlotIdx < 0 ||
+		SlotIdx >= MaxEntryCount)
+		return nullptr;
+
+	if (Entries[SlotIdx].IsEmpty() == true)
+		return nullptr;
+
+	return Entries[SlotIdx].ItemInstance;
 }
 
 int32 UInventoryComponent::CountItem(const UItemDefinition* ItemDef) const
@@ -149,7 +179,7 @@ bool UInventoryComponent::EquipWeaponItem(const UItemDefinition* ItemDef, EEquip
 	if (GetOwner() == nullptr)
 		return false;
 
-	int32 InvenSlot = FindItem(ItemDef);
+	int32 InvenSlot = FindItemByDef(ItemDef);
 	if (InvenSlot == INDEX_NONE)
 		return false;
 
@@ -188,7 +218,7 @@ bool UInventoryComponent::UnequipWeaponItem(const UItemDefinition* ItemDef, EEqu
 	if (GetOwner() == nullptr)
 		return false;
 
-	int32 InvenSlot = FindItem(ItemDef);
+	int32 InvenSlot = FindItemByDef(ItemDef);
 	if (InvenSlot == INDEX_NONE)
 		return false;
 

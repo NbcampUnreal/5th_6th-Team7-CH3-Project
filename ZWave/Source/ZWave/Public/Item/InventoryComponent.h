@@ -37,11 +37,17 @@ public:
 	void AddItem(UItemDefinition* ItemDef, int32 Quantity);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory | Component")
-	bool RemoveItem(const UItemDefinition* ItemDef, int32 Quantity);
+	bool RemoveItemByDef(const UItemDefinition* ItemDef, int32 Quantity);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory | Component")
+	bool RemoveItemBySlot(int32 SlotIdx, int32 Quantity);
 
 	// Slot Idx 반환
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int32 FindItem(const UItemDefinition* ItemDef) const;
+	int32 FindItemByDef(const UItemDefinition* ItemDef) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	const class UItemInstance* FindItemBySlot(int32 SlotIdx) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 CountItem(const UItemDefinition* ItemDef) const;

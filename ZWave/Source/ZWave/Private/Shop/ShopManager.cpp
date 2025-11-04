@@ -156,7 +156,7 @@ bool UShopManager::TryCombineWeapon(APlayerController* Player, const FShopItemDa
 		const UItemDefinition* NeedItemDef = p.Key;
 		int32 Amount = p.Value;
 
-		InvComp->RemoveItem(NeedItemDef, Amount);
+		InvComp->RemoveItemByDef(NeedItemDef, Amount);
 	}
 
 	GiveItemToInventory(Player, ItemData.ItemDef);
@@ -187,7 +187,7 @@ bool UShopManager::TryEquipWeapon(APlayerController* Player, const FShopItemData
 		return false;
 	}
 
-	if (InvComp->FindItem(ItemData.ItemDef) == INDEX_NONE)
+	if (InvComp->FindItemByDef(ItemData.ItemDef) == INDEX_NONE)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipWeapon: Item was not found"));
 		return false;
