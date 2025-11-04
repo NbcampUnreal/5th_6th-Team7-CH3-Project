@@ -4,6 +4,7 @@
 #include "Player/TaskPlayerController.h"
 #include "EnhancedInputSubSystems.h"
 #include "Components/TextBlock.h"
+#include "UI/ShopUI.h"
 
 ATaskPlayerController::ATaskPlayerController()
 	:InputMappingContext(nullptr),
@@ -17,7 +18,11 @@ ATaskPlayerController::ATaskPlayerController()
 	EquipSlotFirstAction(nullptr),
 	EquipSlotSecondAction(nullptr),
 	EquipSlotThirdAction(nullptr),
-	GrenadeAction(nullptr)
+	GrenadeAction(nullptr),
+	IngameHUDClass(nullptr),
+	ShopHUDClass(nullptr),
+	IngameHUD(nullptr),
+	ShopHUD(nullptr)
 {
 }
 
@@ -69,6 +74,30 @@ void ATaskPlayerController::ShowMainMenu()
 			SetInputMode(FInputModeUIOnly());
 		}
 	}
+}
+
+void ATaskPlayerController::ShowShopUI()
+{
+	if (ShopHUD)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RemovePreShopUI"));
+		ShopHUD->RemoveFromParent();
+		ShopHUD = nullptr;
+	}
+
+	if (ShopHUDClass)
+	{
+		ShopHUD = CreateWidget<UShopUI>(this, ShopHUDClass);
+		if (ShopHUD)
+		{
+			ShopHUD->ActivateWidget();
+			SetPause(true);
+			ShopHUD->AddToViewport();
+			bShowMouseCursor = true;
+			SetInputMode(FInputModeUIOnly());
+		}
+	}
+
 }
 
 void ATaskPlayerController::ShowGameHUD()
