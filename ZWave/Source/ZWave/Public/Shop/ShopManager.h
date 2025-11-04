@@ -24,7 +24,7 @@ public:
 	bool TryPurchaseItem(APlayerController* Player, const FString& Name);
 
 	UFUNCTION(BlueprintCallable)
-	bool TrySellItem(APlayerController* Player, int32 InvenSlotIdx);
+	bool TrySellItem(APlayerController* Player, const FString& Name);
 
 	UFUNCTION(BlueprintCallable)
 	bool TryUpgradeStat(APlayerController* Player, const FString& Name);

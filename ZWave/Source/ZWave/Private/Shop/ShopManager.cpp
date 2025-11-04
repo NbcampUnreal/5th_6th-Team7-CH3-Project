@@ -69,9 +69,12 @@ bool UShopManager::TryPurchaseItem(APlayerController* Player, const FString& Nam
 	return true;
 }
 
-bool UShopManager::TrySellItem(APlayerController* Player, int32 InvenSlotIdx)
+bool UShopManager::TrySellItem(APlayerController* Player, const FString& Name)
 {
-	if (Player == nullptr)
+	UItemDefinition* ItemDef = FindItemByDisplayName(Name);
+
+	if (Player == nullptr ||
+		ItemDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TrySellItem: Player is null"));
 		return false;
@@ -84,17 +87,16 @@ bool UShopManager::TrySellItem(APlayerController* Player, int32 InvenSlotIdx)
 		return false;
 	}
 
-	const UItemInstance* ItemIns = InvComp->FindItemBySlot(InvenSlotIdx);
-	if (ItemIns == nullptr ||
-		ItemIns->ItemDef == nullptr)
+	int32 SlotIdx = InvComp->FindItemByDef(ItemDef);
+	if (SlotIdx == INDEX_NONE)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TrySellItem: SlotIdx not valid"));
+		UE_LOG(LogTemp, Warning, TEXT("TrySellItem: Item Not Valid"));
 		return false;
 	}
 
-	int32 SellPrice = ItemIns->ItemDef->SellPrice;
+	int32 SellPrice = ItemDef->SellPrice;
 
-	if (InvComp->RemoveItemByDef(ItemIns->ItemDef, 1))
+	if (InvComp->RemoveItemBySlot(SlotIdx, 1))
 	{
 		InvComp->AddBioCoreCount(SellPrice);
 		return true;
