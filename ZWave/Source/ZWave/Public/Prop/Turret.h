@@ -19,7 +19,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
@@ -33,14 +33,17 @@ public:
 	);
 
 public:
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> MeshComp;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<class UCapsuleComponent> CapsuleComp;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Category = "Components", VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USkeletalMeshComponent> Mesh;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
 	TObjectPtr<class USphereComponent> SphereComp;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<class UEquipComponent> EquipComp;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class UAnimMontage> AttackMontage;
 
 
 /// <summary>
@@ -64,6 +67,8 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float AwarenessRange = 1000;
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	float RotationSpeed = 500;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float WeaponDamage = 20;
@@ -76,8 +81,11 @@ protected:
 	class ABaseEnemy* Target;
 	FTimerHandle AttackTimerHandle;
 
+	bool bShouldRot = false;
+
 protected:
 	virtual void Attack();
+	virtual void RotateToTarget(float DeltaTime);
 	virtual void StopAttack();
 	virtual void SearchEnemy();
 };

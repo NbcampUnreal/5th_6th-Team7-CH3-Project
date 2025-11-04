@@ -12,6 +12,8 @@ struct FMeleeWeaponStats : public FCommonWeaponStats
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "MeleeWeapon Stats")
+	bool bCanOverlapSelf;
+	UPROPERTY(EditDefaultsOnly, Category = "MeleeWeapon Stats")
 	float Radius;
 };
 

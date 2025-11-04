@@ -6,8 +6,10 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Enemy/BaseAIController.h"
+#include "Prop/Turret.h"
 
 ABaseEnemy::ABaseEnemy()
 {
@@ -42,24 +44,7 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 
 	if (Health <= 0.f) return;
 	
-	PlayHitAnimMontage(DamageCauser);
-
-	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
-	if (AIController == nullptr) return;
-	
-	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
-	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
-
-	AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
-	AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
-	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
-}
-
-void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
-{
-	if (Health <= 0.f) return;
-
-	Super::ApplyDamage(Damage, CheckArmor);
+	CheckPriorityLv(DamageCauser);
 }
 
 void ABaseEnemy::PlayHitAnimMontage(AActor* DamageCauser)
@@ -103,6 +88,49 @@ void ABaseEnemy::PlayHitAnimMontage(AActor* DamageCauser)
 	}
 }
 
+void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
+{
+	//if (bCanEditAttackPriority == false) return;
+	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
+	if (AIController == nullptr) return;
+
+	int32 CurPriorityLv = AIController->GetValueAsIntFromBlackboard(FName(TEXT("CurPriorityLv")));
+	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && MaxPriorityLv >= 2)
+	{
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 2);
+		SetNewTarget(DamageCauser);
+
+		PlayHitAnimMontage(DamageCauser);
+	}
+	else if (DamageCauser->IsA(ATurret::StaticClass()) && CurPriorityLv < 2 && MaxPriorityLv >= 1)
+	{
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
+		SetNewTarget(DamageCauser);
+
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
+}
+
+void ABaseEnemy::SetNewTarget(AActor* DamageCauser)
+{
+	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
+	if (AIController == nullptr) return;
+
+	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
+	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
+
+	AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
+	AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
+	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+}
+
+void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
+{
+	if (Health <= 0.f) return;
+
+	Super::ApplyDamage(Damage, CheckArmor);
+}
+
 void ABaseEnemy::Die()
 {
 	//Super::Die();
@@ -123,9 +151,9 @@ void ABaseEnemy::Die()
 }
 
 
-bool ABaseEnemy::GetCanEditAttackPriority() const
+int32 ABaseEnemy::GetMaxPriorityLv() const
 {
-	return this->bCanEditAttackPriority;
+	return this->MaxPriorityLv;
 }
 
 float ABaseEnemy::GetAttackRange() const
