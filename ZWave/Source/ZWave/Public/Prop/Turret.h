@@ -19,8 +19,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-public:	
-	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void OnSphereBeginOverlap(
@@ -33,14 +31,17 @@ public:
 	);
 
 public:
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> MeshComp;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<class UCapsuleComponent> CapsuleComp;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Category = "Components", VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USkeletalMeshComponent> Mesh;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
 	TObjectPtr<class USphereComponent> SphereComp;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<class UEquipComponent> EquipComp;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class UAnimMontage> AttackMontage;
 
 
 /// <summary>
@@ -78,6 +79,7 @@ protected:
 
 protected:
 	virtual void Attack();
+	virtual void RotateToTarget();
 	virtual void StopAttack();
 	virtual void SearchEnemy();
 };

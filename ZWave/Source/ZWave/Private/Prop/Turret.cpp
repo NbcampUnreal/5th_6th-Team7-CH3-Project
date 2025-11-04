@@ -3,6 +3,8 @@
 
 #include "Prop/Turret.h"
 
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
 
@@ -16,15 +18,17 @@ ATurret::ATurret()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	RootComponent = MeshComp;
+	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
+	RootComponent = CapsuleComp;
+
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(RootComponent);
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(MeshComp);
+	SphereComp->SetupAttachment(RootComponent);
 
-	SphereComp->InitSphereRadius(AwarenessRange*2);
+	SphereComp->SetSphereRadius(AwarenessRange*2);
 
-	EquipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("EquipComp"));
 }
 
 // Called when the game starts or when spawned
@@ -38,13 +42,6 @@ void ATurret::BeginPlay()
 
 	this->FireInterval = 60.0f / WeaponRPM;
 	//Weapon = EquipComp->GetCurrentWeapon();
-}
-
-// Called every frame
-void ATurret::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -94,11 +91,29 @@ void ATurret::Attack()
 	}
 
 	//Weapon->Attack();
+	if (Mesh != nullptr) {
+		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+		
+		if (AnimInstance != nullptr) {
+			AnimInstance->Montage_Play(AttackMontage);
+		}
+	}
+
+	RotateToTarget();
 	Target->Attacked(this, this->WeaponDamage);
+	
 	if (Target->GetHealth() <= 0.f)
 	{
 		StopAttack();
 	}
+}
+
+void ATurret::RotateToTarget()
+{
+	FVector ToTarget = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	FRotator NewRot = FRotator(0, ToTarget.Rotation().Yaw, 0);
+	
+	SetActorRotation(NewRot);
 }
 
 void ATurret::StopAttack()
