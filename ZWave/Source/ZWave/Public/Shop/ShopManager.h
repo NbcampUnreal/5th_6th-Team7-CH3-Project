@@ -8,17 +8,6 @@
 #include "Weapon/EquipComponent.h"
 #include "ShopManager.generated.h"
 
-UENUM(BlueprintType)
-enum class EShopFunctionResult : uint8
-{
-	ESFR_Success,			// 성공
-	ESFR_TargetNull,		// 대상이 없음 (Player Or Component)
-	ESFR_BioCoreLack,		// 바이오코어 부족
-	ESFR_ResourceLack,		// 조합 자원 부족
-	ESFR_StockLack,			// 재고 부족
-	ESFR_CompletedUpgrade,	// 이미 완료된 업그레이드
-};
-
 /**
  * 
  */
