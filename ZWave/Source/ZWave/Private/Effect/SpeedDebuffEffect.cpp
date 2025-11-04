@@ -12,14 +12,18 @@ void USpeedDebuffEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
 	if (ABaseCharacter* Character = Cast<ABaseCharacter>(TargetActor))
 	{
+		Target = Character;
+		const float CharacterSpeed = Character->GetMoveSpeed();
+		Character->SetMoveSpeed(CharacterSpeed - (CharacterSpeed * SpeedMultiplier));
+
 		if (!FMath::IsNearlyZero(Duration))
 		{
 			SetBuffTimer(Duration);
 		}
-
-		Target = Character;
-		const float CharacterSpeed = Character->GetMoveSpeed();
-		Character->SetMoveSpeed(CharacterSpeed - (CharacterSpeed * SpeedMultiplier));
+		else
+		{
+			RemoveEffect();
+		}
 	}
 }
 
