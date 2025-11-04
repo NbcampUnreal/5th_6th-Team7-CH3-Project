@@ -31,8 +31,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item", meta = (BindWidget))
 	TObjectPtr<UHorizontalBox> MainHB;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mode")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	TObjectPtr<UPanelItemDesc> ItemDescPanel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	TArray<FName> IgnoreCategories;
 
 public:
 	void NativeOnInitialized() override;
@@ -43,4 +46,6 @@ public:
 	void OnSelectedButtonChange_Implementation(UItemSlotButton* NewSelected);
 
 	void AddButtons(TArray<UItemSlotButton*> NewButtons);
+
+	bool IsIgnoreRow(FName RowName);
 };
