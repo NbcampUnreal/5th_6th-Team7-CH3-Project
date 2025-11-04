@@ -75,3 +75,19 @@ void ABaseAIController::SetValueAsObjectToBlackboard(FName BlackboardKeyName, UO
 	OwnerBlackboardComp->SetValueAsObject(BlackboardKeyName, Object);
 }
 
+void ABaseAIController::SetValueAsIntToBlackboard(FName BlackboardKeyName, int32 Value)
+{
+	UBlackboardComponent* OwnerBlackboardComp = GetBlackboardComponent();
+	if (OwnerBlackboardComp == nullptr) return;
+
+	OwnerBlackboardComp->SetValueAsInt(BlackboardKeyName, Value);
+}
+
+int32 ABaseAIController::GetValueAsIntFromBlackboard(FName BlackboardKeyName)
+{
+	UBlackboardComponent* OwnerBlackboardComp = GetBlackboardComponent();
+	if (OwnerBlackboardComp == nullptr) return -1;
+	
+	return OwnerBlackboardComp->GetValueAsInt(BlackboardKeyName);
+}
+

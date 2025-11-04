@@ -50,7 +50,7 @@ void UBTService_FindDest::TickWithIsAggroedCondtion(UBehaviorTreeComponent& Owne
 	if (MyController == nullptr) return;
 
 	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(MyController->GetCharacter());
-	if (MyCharacter == nullptr || MyCharacter->GetCanEditAttackPriority() == false) return;
+	if (MyCharacter == nullptr || MyCharacter->GetMaxPriorityLv() < 2) return;
 
 	AActor* SecondaryTargetActor = static_cast<AActor*>(OwnerBlackboard->GetValueAsObject(FName(TEXT("SecondaryTarget"))));
 	if (SecondaryTargetActor == nullptr) return;
@@ -94,7 +94,7 @@ void UBTService_FindDest::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& 
 	if (MyController == nullptr) return;
 
 	ABaseEnemy* MyCharacter = Cast<ABaseEnemy>(MyController->GetCharacter());
-	if (MyCharacter == nullptr || MyCharacter->GetCanEditAttackPriority() == false) return;
+	if (MyCharacter == nullptr || MyCharacter->GetMaxPriorityLv() < 2) return;
 
 	UBlackboardComponent* OwnerBlackboard = OwnerComp.GetBlackboardComponent();
 	if (OwnerBlackboard == nullptr) return;

@@ -3,6 +3,8 @@
 
 #include "Prop/Turret.h"
 
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
 
@@ -16,15 +18,17 @@ ATurret::ATurret()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	RootComponent = MeshComp;
+	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
+	RootComponent = CapsuleComp;
+
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(RootComponent);
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(MeshComp);
+	SphereComp->SetupAttachment(RootComponent);
 
-	SphereComp->InitSphereRadius(AwarenessRange*2);
+	SphereComp->SetSphereRadius(AwarenessRange*2);
 
-	EquipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("EquipComp"));
 }
 
 // Called when the game starts or when spawned
@@ -40,11 +44,14 @@ void ATurret::BeginPlay()
 	//Weapon = EquipComp->GetCurrentWeapon();
 }
 
-// Called every frame
 void ATurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bShouldRot)
+	{
+		RotateToTarget(DeltaTime);
+	}
 }
 
 void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -53,12 +60,11 @@ void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		if (Target == nullptr)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Target name: %s"), *OtherActor->GetActorNameOrLabel());
 			Target = static_cast<ABaseEnemy*>(OtherActor);
-
-			//Weapon->Attack();
-			Attack();
-			GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+			bShouldRot = true;
+			
+			//Attack();
+			//GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 		}
 	}
 }
@@ -94,10 +100,37 @@ void ATurret::Attack()
 	}
 
 	//Weapon->Attack();
+	if (Mesh != nullptr) {
+		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+		
+		if (AnimInstance != nullptr) {
+			AnimInstance->Montage_Play(AttackMontage);
+		}
+	}
+
 	Target->Attacked(this, this->WeaponDamage);
 	if (Target->GetHealth() <= 0.f)
 	{
 		StopAttack();
+	}
+}
+
+void ATurret::RotateToTarget(float DeltaTime)
+{
+	if (Target == nullptr) return;
+
+	FVector TargetDirection = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	FRotator TargetRot = FRotator(0, TargetDirection.Rotation().Yaw, 0);
+
+	FRotator CurrentRot = GetActorRotation();
+	FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, RotationSpeed);
+	SetActorRotation(NewRot);
+
+	if (FMath::Abs(TargetRot.Yaw - CurrentRot.Yaw) < 1) {
+		bShouldRot = false;
+
+		Attack();
+		GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 	}
 }
 
@@ -112,7 +145,6 @@ void ATurret::StopAttack()
 void ATurret::SearchEnemy()
 {
 	TArray<FHitResult> HitResults;
-	float SphereRadius = this->AwarenessRange * 2;
 
 	bool bHit = GetWorld()->SweepMultiByChannel(
 		HitResults,
@@ -120,7 +152,7 @@ void ATurret::SearchEnemy()
 		GetActorLocation(),
 		FQuat::Identity,
 		ECC_Visibility,                  // 사용할 충돌 채널 설정
-		FCollisionShape::MakeSphere(SphereRadius)
+		FCollisionShape::MakeSphere(this->AwarenessRange)
 	);
 
 	if (bHit)
@@ -133,9 +165,7 @@ void ATurret::SearchEnemy()
 
 				if (Target->GetHealth() > 0)
 				{
-					UE_LOG(LogTemp, Display, TEXT("Target name: %s"), *Target->GetActorNameOrLabel());
-					Attack();
-					GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+					bShouldRot = true;
 					break;
 				}
 			}
