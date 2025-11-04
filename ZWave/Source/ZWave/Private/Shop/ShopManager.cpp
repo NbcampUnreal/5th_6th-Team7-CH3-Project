@@ -30,26 +30,23 @@ static UInventoryComponent* GetInventoryFromPlayer(APlayerController* PC)
 // UShopManager 구현
 // ──────────────────────────────────────────────────────────────
 
-bool UShopManager::TryPurchaseItem(APlayerController* Player, FShopItemData& ItemData)
+bool UShopManager::TryPurchaseItem(APlayerController* Player, UItemDefinition* ItemDef)
 {
 	if (Player == nullptr
-		|| ItemData.ItemDef == nullptr)
+		|| ItemDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryPurchaseItem: invalid args"));
 		return false;
 	}
 
-	if (HasEnoughCore(Player, ItemData.ItemDef->BuyPrice) == false)
+	if (HasEnoughCore(Player, ItemDef->BuyPrice) == false)
 	{
-		UE_LOG(LogTemp, Log, TEXT("TryPurchaseItem: not enough money. Need %d"), ItemData.ItemDef->BuyPrice);
+		UE_LOG(LogTemp, Log, TEXT("TryPurchaseItem: not enough money. Need %d"), ItemDef->BuyPrice);
 		return false;
 	}
 
-	DeductCore(Player, ItemData.ItemDef->BuyPrice);
-	GiveItemToInventory(Player, ItemData.ItemDef);
-
-	if (ItemData.Stock > 0)
-		ItemData.Stock--;
+	DeductCore(Player, ItemDef->BuyPrice);
+	GiveItemToInventory(Player, ItemDef);
 
 	return true;
 }
@@ -89,10 +86,10 @@ bool UShopManager::TrySellItem(APlayerController* Player, int32 InvenSlotIdx)
 }
 
 
-bool UShopManager::TryUpgradeStat(APlayerController* Player, const FShopItemData& ItemData)
+bool UShopManager::TryUpgradeStat(APlayerController* Player, const UItemDefinition* ItemDef)
 {
 	if (Player == nullptr
-		|| ItemData.ItemDef == nullptr)
+		|| ItemDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryUpgradeStat: invalid args"));
 		return false;
@@ -105,9 +102,9 @@ bool UShopManager::TryUpgradeStat(APlayerController* Player, const FShopItemData
 		return false;
 	}
 
-	if (HasEnoughCore(Player, ItemData.ItemDef->BuyPrice) == false)
+	if (HasEnoughCore(Player, ItemDef->BuyPrice) == false)
 	{
-		UE_LOG(LogTemp, Log, TEXT("TryUpgradeStat: not enough money. Need %d"), ItemData.ItemDef->BuyPrice);
+		UE_LOG(LogTemp, Log, TEXT("TryUpgradeStat: not enough money. Need %d"), ItemDef->BuyPrice);
 		return false;
 	}
 
@@ -120,14 +117,14 @@ bool UShopManager::TryUpgradeStat(APlayerController* Player, const FShopItemData
 		return false;
 	}
 
-	DeductCore(Player, ItemData.ItemDef->BuyPrice);
+	DeductCore(Player, ItemDef->BuyPrice);
 	return true;
 }
 
-bool UShopManager::TryCombineWeapon(APlayerController* Player, const FShopItemData& ItemData)
+bool UShopManager::TryCombineWeapon(APlayerController* Player, UItemDefinition* ItemDef)
 {
 	if (Player == nullptr
-		|| ItemData.ItemDef == nullptr)
+		|| ItemDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryCombineWeapon: invalid args"));
 		return false;
@@ -140,13 +137,13 @@ bool UShopManager::TryCombineWeapon(APlayerController* Player, const FShopItemDa
 		return false;
 	}
 
-	if (ItemData.ItemDef->CraftingMaterials.Num() == 0)
+	if (ItemDef->CraftingMaterials.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryCombineWeapon: Not Crafting Materials"));
 		return false;
 	}
 
-	for (auto& p : ItemData.ItemDef->CraftingMaterials)
+	for (auto& p : ItemDef->CraftingMaterials)
 	{
 		const UItemDefinition* NeedItemDef = p.Key;
 		int32 Amount = p.Value;
@@ -165,7 +162,7 @@ bool UShopManager::TryCombineWeapon(APlayerController* Player, const FShopItemDa
 		}
 	}
 
-	for (auto& p : ItemData.ItemDef->CraftingMaterials)
+	for (auto& p : ItemDef->CraftingMaterials)
 	{
 		const UItemDefinition* NeedItemDef = p.Key;
 		int32 Amount = p.Value;
@@ -173,15 +170,15 @@ bool UShopManager::TryCombineWeapon(APlayerController* Player, const FShopItemDa
 		InvComp->RemoveItemByDef(NeedItemDef, Amount);
 	}
 
-	GiveItemToInventory(Player, ItemData.ItemDef);
+	GiveItemToInventory(Player, ItemDef);
 
 	return true;
 }
 
-bool UShopManager::TryEquipWeapon(APlayerController* Player, const FShopItemData& ItemData, EEquipSlot TargetSlot)
+bool UShopManager::TryEquipWeapon(APlayerController* Player, const UItemDefinition* ItemDef, EEquipSlot TargetSlot)
 {
 	if (Player == nullptr
-		|| ItemData.ItemDef == nullptr)
+		|| ItemDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipWeapon: invalid args"));
 		return false;
@@ -194,20 +191,20 @@ bool UShopManager::TryEquipWeapon(APlayerController* Player, const FShopItemData
 		return false;
 	}
 
-	UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(ItemData.ItemDef);
+	const UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(ItemDef);
 	if (WeaponDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipWeapon: Item is not weapon"));
 		return false;
 	}
 
-	if (InvComp->FindItemByDef(ItemData.ItemDef) == INDEX_NONE)
+	if (InvComp->FindItemByDef(ItemDef) == INDEX_NONE)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipWeapon: Item was not found"));
 		return false;
 	}
 
-	bool bResult = InvComp->EquipWeaponItem(ItemData.ItemDef, TargetSlot);
+	bool bResult = InvComp->EquipWeaponItem(ItemDef, TargetSlot);
 
 	if (bResult == false)
 	{

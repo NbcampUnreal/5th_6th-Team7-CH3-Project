@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "ShopDefinition.h"
 #include "Weapon/EquipComponent.h"
 #include "ShopManager.generated.h"
 
@@ -17,19 +16,19 @@ class ZWAVE_API UShopManager : public UWorldSubsystem
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
-	bool TryPurchaseItem(APlayerController* Player, FShopItemData& ItemData);
+	bool TryPurchaseItem(APlayerController* Player, UItemDefinition* ItemDef);
 
 	UFUNCTION(BlueprintCallable)
 	bool TrySellItem(APlayerController* Player, int32 InvenSlotIdx);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryUpgradeStat(APlayerController* Player, const FShopItemData& ItemData);
+	bool TryUpgradeStat(APlayerController* Player, const UItemDefinition* ItemDef);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryCombineWeapon(APlayerController* Player, const FShopItemData& ItemData);
+	bool TryCombineWeapon(APlayerController* Player, UItemDefinition* ItemDef);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryEquipWeapon(APlayerController* Player, const FShopItemData& ItemData, EEquipSlot TargetSlot);
+	bool TryEquipWeapon(APlayerController* Player, const UItemDefinition* ItemDef, EEquipSlot TargetSlot);
 
 protected:
 	bool HasEnoughCore(APlayerController* Player, int32 Price);
