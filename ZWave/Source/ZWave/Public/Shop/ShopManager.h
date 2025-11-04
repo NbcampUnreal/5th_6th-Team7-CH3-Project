@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "ShopDefinition.h"
+#include "Engine/DataTable.h"
 #include "Weapon/EquipComponent.h"
 #include "ShopManager.generated.h"
+
+class UItemDefinition;
 
 /**
  * 
@@ -16,23 +18,35 @@ class ZWAVE_API UShopManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable)
-	void OpenShop(UShopDefinition* ShopDef, APlayerController* Player);
+	UShopManager();
 
 	UFUNCTION(BlueprintCallable)
-	bool TryPurchaseItem(APlayerController* Player, const FShopItemData& ItemData);
+	bool TryPurchaseItem(APlayerController* Player, const FString& Name);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryUpgradeStat(APlayerController* Player, const FShopItemData& ItemData);
+	bool TrySellItem(APlayerController* Player, const FString& Name);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryCombineWeapon(APlayerController* Player, const FShopItemData& ItemData);
+	bool TryUpgradeStat(APlayerController* Player, const FString& Name);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryEquipWeapon(APlayerController* Player, const FShopItemData& ItemData, EEquipSlot TargetSlot);
+	bool TryCombineWeapon(APlayerController* Player, const FString& Name);
+
+	UFUNCTION(BlueprintCallable)
+	bool TryEquipWeapon(APlayerController* Player, const FString& Name, int32 Slot);
+
+	UItemDefinition* FindItemByDisplayName(const FString& Name) const;
 
 protected:
-	bool HasEnoughMoney(APlayerController* Player, int32 Price);
-	void DeductMoney(APlayerController* Player, int32 Price);
+	bool HasEnoughCore(APlayerController* Player, int32 Price);
+	void DeductCore(APlayerController* Player, int32 Price);
 	void GiveItemToInventory(APlayerController* Player, UItemDefinition* ItemDef);
+
+	void NameMapSetting();
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Shop Data")
+	TObjectPtr<UDataTable> ShopTable = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<FString, TObjectPtr<UItemDefinition>> DisplayNameToItemMap;
 };
