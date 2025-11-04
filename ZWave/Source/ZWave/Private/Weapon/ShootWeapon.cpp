@@ -281,15 +281,14 @@ void AShootWeapon::ShootOneBullet(bool IsFPSSight, float SpreadDeg)
 
 		if (IsDamagableActor(TargetActor) == true)
 		{
+			FZWaveDamageEvent DamageEvent;
+			DamageEvent.BaseDamage = ShootWeaponStat.AttackPower;
+			DamageEvent.Duration = 0.0f;
+
 			TArray<TSubclassOf<UEffectBase>> EffectClasses;
 			EquipModingEffectClassMap.GenerateValueArray(EffectClasses);
-
-			UDamageCalculator::DamageCalculate(
-				GetWorld(),
-				OwningCharacter,
-				TargetActor,
-				ShootWeaponStat.AttackPower,
-				EffectClasses);
+			DamageEvent.EffectArray = EffectClasses;
+			UDamageCalculator::DamageHelper(GetWorld(), TargetActor, OwningCharacter, DamageEvent);
 
 			if (UIngameHUD* nowHud = GetIngameHud())
 			{
