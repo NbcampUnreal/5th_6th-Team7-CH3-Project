@@ -143,7 +143,15 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 					this,
 					&ATaskPlayer::EquipThirdSlot
 				);
-			}				
+			}
+			if (PlayerController->ShopUIAction)
+			{
+				EnhancedInput->BindAction(PlayerController->ShopUIAction,
+					ETriggerEvent::Triggered,
+					PlayerController,
+					&ATaskPlayerController::ShowShopUI
+				);
+			}
 
 			if (ActionComp)
 			{

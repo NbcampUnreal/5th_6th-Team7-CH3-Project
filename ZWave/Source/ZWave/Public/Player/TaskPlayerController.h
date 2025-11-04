@@ -24,7 +24,13 @@ protected:
 	TSubclassOf<class UIngameHUD> IngameHUDClass;  
 
 	UPROPERTY()
-	UIngameHUD* IngameHUD = nullptr;
+	UIngameHUD* IngameHUD;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UShopUI> ShopHUDClass;
+
+	UPROPERTY()
+	UShopUI* ShopHUD;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
@@ -61,9 +67,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* EquipSlotThirdAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
+	UInputAction* ShopUIAction;
+
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
 
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainMenu();
+
+	UFUNCTION(BlueprintCallable, Category = "Shop")
+	void ShowShopUI();
 };
