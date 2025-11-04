@@ -25,3 +25,8 @@ void ARangedEnemy::Attack()
 		}
 	}
 }
+
+void ARangedEnemy::Die()
+{
+	Super::Die();
+}

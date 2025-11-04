@@ -27,7 +27,8 @@ void UBTService_FindDest::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	AActor* SecondaryTargetActor = static_cast<AActor*>(OwnerBlackboard->GetValueAsObject(FName(TEXT("SecondaryTarget"))));
 	if (SecondaryTargetActor == nullptr) return;
 
-	MyController->CheckCondition(SecondaryTargetActor);
+	if (MyController->CheckCondition(SecondaryTargetActor))
+		return;
 
 	bool bIsAggroed = OwnerBlackboard->GetValueAsBool(FName(TEXT("IsAggroed")));
 	if (bIsAggroed)
@@ -55,36 +56,18 @@ void UBTService_FindDest::TickWithIsAggroedCondtion(UBehaviorTreeComponent& Owne
 	AActor* SecondaryTargetActor = static_cast<AActor*>(OwnerBlackboard->GetValueAsObject(FName(TEXT("SecondaryTarget"))));
 	if (SecondaryTargetActor == nullptr) return;
 
-	AZWaveGameState* GameState = GetWorld() ? GetWorld()->GetGameState<AZWaveGameState>() : nullptr;
-	if (GameState == nullptr) return;
+	FVector NowDestLocation = OwnerBlackboard->GetValueAsVector(FName(TEXT("MoveDestTargetLocation")));
 
-	const float MySightRange = MyCharacter->GetSightRange();
-	const bool CheckAggroed = FVector::Dist2D(MyCharacter->GetActorLocation(), SecondaryTargetActor->GetActorLocation()) <= MySightRange;
+	DrawDebugSphere(GetWorld(), MyCharacter->GetActorLocation(), SightRange, 12, FColor::Yellow, false, 0.2f);
 
-	if (!CheckAggroed)
+	if (FVector::Dist2D(MyCharacter->GetActorLocation(), SecondaryTargetActor->GetActorLocation()) > SightRange)
 	{
 		OwnerBlackboard->SetValueAsBool(FName("IsAggroed"), false);
-
-		const TArray<ASpawnPoint*>& AllSpawnPoints = GameState->GetSpawnPointArray();
-		if (AllSpawnPoints.Num() == 0) return;
-
-		if (AllSpawnPoints.Num() > 1)
-		{
-			ASpawnPoint* NewSpawn = nullptr;
-			do
-			{
-				NewSpawn = AllSpawnPoints[FMath::RandRange(0, AllSpawnPoints.Num() - 1)];
-			} while (NewSpawn && FVector::Dist2D(NewSpawn->GetActorLocation(), MyCharacter->GetActorLocation()) < 10.f);
-
-			const FVector NewDest = NewSpawn->GetActorLocation();
-			OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), NewDest);
-			return;
-		}
 	}
 	else
 	{
 		FVector Destination = MyController->GetAttackLocation(SecondaryTargetActor->GetActorLocation());
-		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
+		OwnerBlackboard->SetValueAsVector(FName(TEXT("AttackLocation")), Destination);
 	}
 }
 
@@ -108,22 +91,15 @@ void UBTService_FindDest::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& 
 	const TArray<ASpawnPoint*>& AllSpawnPoints = GameState->GetSpawnPointArray();
 	if (AllSpawnPoints.Num() == 0) return;
 
-	const float MySightRange = MyCharacter->GetSightRange();
-	const bool IsAggroed = FVector::Dist2D(MyCharacter->GetActorLocation(), SecondaryTargetActor->GetActorLocation()) <= MySightRange;
-
-	DrawDebugSphere(GetWorld(), MyCharacter->GetActorLocation(), MySightRange, 12, FColor::Yellow, false, 0.2f);
-
-	if (IsAggroed)
+	if (FVector::Dist2D(MyCharacter->GetActorLocation(), SecondaryTargetActor->GetActorLocation()) < SightRange)
 	{
 		OwnerBlackboard->SetValueAsBool(FName("IsAggroed"), true);
 		return;
 	}
 
-	const FVector SelfLoc = MyCharacter->GetActorLocation();
-	const FVector DestLoc = OwnerBlackboard->GetValueAsVector(GetSelectedBlackboardKey());
+	const FVector DestLoc = OwnerBlackboard->GetValueAsVector(FName(TEXT("MoveDestTargetLocation")));
 
-	const bool bReachedDest = FVector::Dist2D(SelfLoc, DestLoc) <= ReachRadius;
-	if (bReachedDest)
+	if (FVector::Dist2D(MyCharacter->GetActorLocation(), DestLoc) <= ReachRadius)
 	{
 		if (AllSpawnPoints.Num() > 1)
 		{
@@ -133,10 +109,19 @@ void UBTService_FindDest::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& 
 				NewSpawn = AllSpawnPoints[FMath::RandRange(0, AllSpawnPoints.Num() - 1)];
 			} while (NewSpawn && FVector::Dist2D(NewSpawn->GetActorLocation(), DestLoc) < 10.f);
 
-			const FVector NewDest = NewSpawn->GetActorLocation();
-			OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), NewDest);
+			if (NewSpawn != nullptr)
+			{
+				OwnerBlackboard->SetValueAsVector(FName(TEXT("MoveDestTargetLocation")), NewSpawn->GetActorLocation());
+				FVector Destination = MyController->GetAttackLocation(NewSpawn->GetActorLocation());
+				OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
+			}
 			return;
 		}
+	}
+	else
+	{
+		FVector Destination = MyController->GetAttackLocation(DestLoc);
+		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
 	}
 
 }
