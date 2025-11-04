@@ -30,7 +30,7 @@ void AFieldItem::BeginPlay()
 
 void AFieldItem::OnFieldItemBeingOverlap(UPrimitiveComponent* OtherlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (ATaskPlayer* Player = Cast<ATaskPlayer>(OtherActor))
+	if (ABaseCharacter* Player = Cast<ABaseCharacter>(OtherActor))
 	{
 		CauserActor = Player;
 		ActiveEffect(Player);

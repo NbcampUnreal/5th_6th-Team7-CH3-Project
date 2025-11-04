@@ -29,6 +29,10 @@ public:
 
 	virtual void BeginPlay() override;
 
+public:
+	UPROPERTY(EditAnywhere, Category = "Components")
+	class UStateComponent* StateComp;
+
 
 /// <summary>
 /// 피격, 사망 관련

@@ -3,6 +3,7 @@
 
 #include "Effect/StunEffect.h"
 #include "State/StateComponent.h"
+#include "Enemy/BaseAIController.h"
 
 UStunEffect::UStunEffect()
 {
@@ -13,6 +14,7 @@ void UStunEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{
 		Target = Enemy;
+		static_cast<ABaseAIController*>(Enemy->GetController())->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), true);
 		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
 		{
 			StateComp->SetState(EStateType::EST_Stun);
@@ -21,14 +23,17 @@ void UStunEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 		}
 	}
 
-	if (!FMath::IsNearlyZero(Duration))
+	SetStunTimer(5);
+	return;
+
+	/*if (!FMath::IsNearlyZero(Duration))
 	{
 		SetStunTimer(Duration);
 	}
 	else
 	{
 		RemoveEffect();
-	}
+	}*/
 }
 
 void UStunEffect::RemoveEffect()
@@ -45,6 +50,7 @@ void UStunEffect::RemoveEffect()
 	{
 		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
 		{
+			static_cast<ABaseAIController*>(Enemy->GetController())->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), false);
 			StateComp->SetState(EStateType::EST_None);
 		}
 	}

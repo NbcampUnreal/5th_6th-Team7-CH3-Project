@@ -34,6 +34,7 @@ protected:
 
 
 private:
+	UPROPERTY(VisibleAnywhere, Category = "State")
 	EStateType CurrentState;
 		
 };

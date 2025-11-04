@@ -10,10 +10,13 @@
 
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
+#include "State/StateComponent.h"
 
 ABaseEnemy::ABaseEnemy()
 {
 	TeamID = 2;
+
+	StateComp = CreateDefaultSubobject<UStateComponent>(TEXT("StateComopnent"));
 }
 
 void ABaseEnemy::BeginPlay()
