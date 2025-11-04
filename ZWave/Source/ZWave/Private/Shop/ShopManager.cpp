@@ -5,6 +5,7 @@
 #include "Item/InventoryComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
+#include "Shop/ShopTableData.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogShop, Log, All);
 
@@ -30,8 +31,25 @@ static UInventoryComponent* GetInventoryFromPlayer(APlayerController* PC)
 // UShopManager 구현
 // ──────────────────────────────────────────────────────────────
 
-bool UShopManager::TryPurchaseItem(APlayerController* Player, UItemDefinition* ItemDef)
+UShopManager::UShopManager()
 {
+	static ConstructorHelpers::FObjectFinder<UDataTable> ShopConfigFinder(TEXT("DataTable'/Game/HyunJaeHoon/DataTable/DT_ShopDataTable.DT_ShopDataTable'"));
+
+	if (ShopConfigFinder.Succeeded())
+	{
+		ShopTable = ShopConfigFinder.Object;
+		NameMapSetting();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to find DT_WaveConfig!"));
+	}
+}
+
+bool UShopManager::TryPurchaseItem(APlayerController* Player, const FString& Name)
+{
+	UItemDefinition* ItemDef = FindItemByDisplayName(Name);
+
 	if (Player == nullptr
 		|| ItemDef == nullptr)
 	{
@@ -86,8 +104,10 @@ bool UShopManager::TrySellItem(APlayerController* Player, int32 InvenSlotIdx)
 }
 
 
-bool UShopManager::TryUpgradeStat(APlayerController* Player, const UItemDefinition* ItemDef)
+bool UShopManager::TryUpgradeStat(APlayerController* Player, const FString& Name)
 {
+	UItemDefinition* ItemDef = FindItemByDisplayName(Name);
+
 	if (Player == nullptr
 		|| ItemDef == nullptr)
 	{
@@ -121,8 +141,10 @@ bool UShopManager::TryUpgradeStat(APlayerController* Player, const UItemDefiniti
 	return true;
 }
 
-bool UShopManager::TryCombineWeapon(APlayerController* Player, UItemDefinition* ItemDef)
+bool UShopManager::TryCombineWeapon(APlayerController* Player, const FString& Name)
 {
+	UItemDefinition* ItemDef = FindItemByDisplayName(Name);
+
 	if (Player == nullptr
 		|| ItemDef == nullptr)
 	{
@@ -175,10 +197,14 @@ bool UShopManager::TryCombineWeapon(APlayerController* Player, UItemDefinition* 
 	return true;
 }
 
-bool UShopManager::TryEquipWeapon(APlayerController* Player, const UItemDefinition* ItemDef, EEquipSlot TargetSlot)
+bool UShopManager::TryEquipWeapon(APlayerController* Player, const FString& Name, int32 Slot)
 {
+	UItemDefinition* ItemDef = FindItemByDisplayName(Name);
+	
 	if (Player == nullptr
-		|| ItemDef == nullptr)
+		|| ItemDef == nullptr
+		|| Slot < 0
+		|| Slot >= static_cast<int32>(EEquipSlot::Third))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipWeapon: invalid args"));
 		return false;
@@ -204,6 +230,7 @@ bool UShopManager::TryEquipWeapon(APlayerController* Player, const UItemDefiniti
 		return false;
 	}
 
+	EEquipSlot TargetSlot = static_cast<EEquipSlot>(Slot);
 	bool bResult = InvComp->EquipWeaponItem(ItemDef, TargetSlot);
 
 	if (bResult == false)
@@ -253,4 +280,34 @@ void UShopManager::GiveItemToInventory(APlayerController* Player, UItemDefinitio
 	{
 		Inv->AddItem(ItemDef, 1);
 	}
+}
+
+void UShopManager::NameMapSetting()
+{
+	if (ShopTable == nullptr)
+		return;
+
+	DisplayNameToItemMap.Reset();
+
+	for (const auto& Pair : ShopTable->GetRowMap())
+	{
+		const FShopTableData* Row = reinterpret_cast<const FShopTableData*>(Pair.Value);
+		if (Row == nullptr
+			|| Row->ItemDef == nullptr)
+			continue;
+
+		if (Row->DisplayName.IsEmpty() == false)
+		{
+			DisplayNameToItemMap.Add(Row->DisplayName, Row->ItemDef);
+		}
+	}
+}
+
+UItemDefinition* UShopManager::FindItemByDisplayName(const FString& Name) const
+{
+	if (const TObjectPtr<UItemDefinition>* Found = DisplayNameToItemMap.Find(Name))
+	{
+		return Found->Get();
+	}
+	return nullptr;
 }
