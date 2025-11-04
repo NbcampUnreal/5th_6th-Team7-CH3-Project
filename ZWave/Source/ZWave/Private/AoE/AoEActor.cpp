@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
+#include "AoE/AoEData.h"
 #include "DamageCalculator/DamageCalculator.h"
 
 AAoEActor::AAoEActor()
@@ -21,6 +22,7 @@ AAoEActor::AAoEActor()
 	DamagePerSecond = 0;
 	TotalActiveTime = 0;
 	CurrentActiveTime = 0;
+	AoEEffectClass = nullptr;
 }
 
 void AAoEActor::BeginPlay()
@@ -28,16 +30,17 @@ void AAoEActor::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AAoEActor::ActiveAoE(float ActiveTime, float DamagePerSec, UNiagaraSystem* NiagaraParticle)
+void AAoEActor::ActiveAoE(UNiagaraSystem* NiagaraParticle, FAoEParam DamageParam)
 {
-	this->DamagePerSecond = DamagePerSec;
-	this->TotalActiveTime = ActiveTime;
-
+	this->DamagePerSecond = DamageParam.DamagePerSec;
+	this->TotalActiveTime = DamageParam.ActiveTime;
+	this->AoEEffectClass = DamageParam.AoEEffectClass;
 	if (!NiagaraParticle)
 	{
 		return;
 	}
 
+	BoxCollision->SetBoxExtent(DamageParam.AoERange);
 
 	NiagaraParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 		GetWorld(),
@@ -52,13 +55,20 @@ void AAoEActor::ActiveAoE(float ActiveTime, float DamagePerSec, UNiagaraSystem* 
 		NiagaraParticleInstance->OnSystemFinished.AddDynamic(this, &AAoEActor::DestroyAoEActor);
 	}
 
-	GetWorldTimerManager().SetTimer(
-		DOTHandle,
-		this,
-		&AAoEActor::ApplyOverlapActorDOT,
-		1.0f,
-		true
-	);
+	if (!DamageParam.bIsTick)
+	{
+		ApplyOverlapActorDamage();
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(
+			DOTHandle,
+			this,
+			&AAoEActor::ApplyOverlapActorDOT,
+			1.0f,
+			true
+		);
+	}
 }
 
 void AAoEActor::ApplyOverlapActorDOT()
@@ -84,11 +94,35 @@ void AAoEActor::ApplyOverlapActorDOT()
 
 			FZWaveDamageEvent DamageEvent;
 			DamageEvent.BaseDamage = DamagePerSecond;
-
+			DamageEvent.Duration = TotalActiveTime;
+			if (AoEEffectClass)
+			{
+				DamageEvent.EffectArray.Add(AoEEffectClass);
+			}
 			UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
 		}
 	}
 }
+
+void AAoEActor::ApplyOverlapActorDamage()
+{
+	TArray<AActor*> OverlapActors;
+	BoxCollision->GetOverlappingActors(OverlapActors, ABaseCharacter::StaticClass());
+
+	for (AActor* OverlapActor : OverlapActors)
+	{
+		if (!OverlapActor && OverlapActor == GetOwner())
+		{
+			continue;
+		}
+
+		FZWaveDamageEvent DamageEvent;
+		DamageEvent.BaseDamage = DamagePerSecond;
+
+		UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+	}
+}
+
 
 void AAoEActor::DestroyAoEActor(UNiagaraComponent* NiagaraSys)
 {

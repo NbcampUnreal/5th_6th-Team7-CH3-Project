@@ -28,10 +28,13 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "AoE")
-	void ActiveAoE(float ActiveTime, float DamagePerSec, UNiagaraSystem* NiagaraParticle);
+	void ActiveAoE(UNiagaraSystem* NiagaraParticle, struct FAoEParam DamageParam);
+
+	UFUNCTION(BlueprintCallable, Category = "AoEDoT")
+	void ApplyOverlapActorDOT();
 
 	UFUNCTION(BlueprintCallable, Category = "AoE")
-	void ApplyOverlapActorDOT();
+	void ApplyOverlapActorDamage();
 
 	UFUNCTION(BlueprintCallable, Category = "AoE")
 	void DestroyAoEActor(UNiagaraComponent* NiagaraSys);
@@ -41,4 +44,6 @@ private:
 	float DamagePerSecond;
 	float TotalActiveTime;
 	float CurrentActiveTime;
+
+	TSubclassOf<class UEffectBase> AoEEffectClass;
 };

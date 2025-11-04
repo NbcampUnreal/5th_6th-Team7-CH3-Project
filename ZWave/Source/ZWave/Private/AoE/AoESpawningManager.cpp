@@ -46,7 +46,10 @@ bool UAoESpawningManager::SpawnAoEActor(AActor* Causer, int32 index, FVector Spa
 		);
 
 
-		AoE->ActiveAoE(AoEDataArray[index]->ActiveTime, AoEDataArray[index]->DamagePerSec, AoEDataArray[index]->NiagaraParicle);
+		AoE->ActiveAoE(
+			AoEDataArray[index]->NiagaraParicle,
+			AoEDataArray[index]->DamageParam
+		);
 		return true;
 	}
 
