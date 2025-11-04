@@ -16,7 +16,7 @@ enum class EItemType : uint8
     EIT_Material    UMETA(DisplayName = "Material")
 };
 
-UCLASS(Abstract, BlueprintType)
+UCLASS(BlueprintType)
 class ZWAVE_API UItemDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
