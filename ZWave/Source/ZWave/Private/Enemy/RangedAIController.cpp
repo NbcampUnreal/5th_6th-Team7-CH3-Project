@@ -42,13 +42,13 @@ bool ARangedAIController::CheckCondition(AActor* Target)
     //FColor Color = bCanAttack ? FColor::Green : FColor::Red;
     //DrawDebugLine(GetWorld(), MyCharacter->GetActorLocation() + FVector(0, 0, 50), Target->GetActorLocation() + FVector(0, 0, 50), Color, false, 0.2f, 0, 1.5f);
 
-    if (!bHit || Hit.GetActor() != Target)
+    if (!bCanAttack)
     {
         OwnerBlackboardComp->ClearValue(FName(TEXT("AttackLocation")));
         return false;
     }
     TargetVector = Target->GetActorLocation();
-
+    OwnerBlackboardComp->SetValueAsVector(FName(TEXT("MainTargetLocation")), Target->GetActorLocation());
     OwnerBlackboardComp->SetValueAsVector(FName(TEXT("AttackLocation")), MyCharacter->GetActorLocation());
     return true;
 }

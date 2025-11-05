@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Enemy/BT/Service/BTService_FindPlayer.h"
@@ -59,10 +59,12 @@ void UBTService_FindPlayer::TickWithIsAggroedCondtion(UBehaviorTreeComponent& Ow
 	else
 	{
 		AActor* SecondaryTargetActor = static_cast<AActor*>(OwnerBlackboard->GetValueAsObject(FName(TEXT("SecondaryTarget"))));
-		FVector Destination = MyController->GetAttackLocation(SecondaryTargetActor->GetActorLocation());
-
-		//OwnerBlackboard->SetValueAsVector(FName(TEXT("SecondaryTargetLocation")), SecondaryTargetActor->GetActorLocation());
-		OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
+		if (SecondaryTargetActor != nullptr)
+		{
+			FVector Destination = MyController->GetAttackLocation(SecondaryTargetActor->GetActorLocation());
+			//OwnerBlackboard->SetValueAsVector(FName(TEXT("SecondaryTargetLocation")), SecondaryTargetActor->GetActorLocation());
+			OwnerBlackboard->SetValueAsVector(GetSelectedBlackboardKey(), Destination);
+		}
 	}
 }
 
