@@ -94,12 +94,6 @@ bool AMeleeWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInst
 	if (EquipModingMap.Contains(EModingSlot::EMS_Default))
 		EquipNum--;
 
-	if (EquipNum >= MeleeWeaponStat.ModingAllows)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Full Moding!"));
-		return false;
-	}
-
 	EquipModingMap.Add(ModingSlot, ModeInstance);
 	EquipModingEffectClassMap.Add(ModingSlot, ModeInstance->GetModeEffectClass());
 	ApplyCurrentModing();

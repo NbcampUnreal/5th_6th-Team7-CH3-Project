@@ -59,6 +59,11 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Crafting")
     TMap<UItemDefinition*, int32> CraftingMaterials;
 
+    // (무기전용) 무기 모딩 허용 수
+    // 기본 모딩 장착시 +1 고려
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+    int ModingAllows;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Definition")
     TObjectPtr<UPrimaryDataAsset> Definition;
 };

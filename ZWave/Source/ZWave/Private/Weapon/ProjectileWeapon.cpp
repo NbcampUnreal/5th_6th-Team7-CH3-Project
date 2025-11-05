@@ -110,12 +110,6 @@ bool AProjectileWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* Mod
 	if (EquipModingMap.Contains(EModingSlot::EMS_Default))
 		EquipNum--;
 
-	if (EquipNum >= ProjectileWeaponStat.ModingAllows)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Full Moding!"));
-		return false;
-	}
-
 	EquipModingMap.Add(ModingSlot, ModeInstance);
 	EquipModingEffectClassMap.Add(ModingSlot, ModeInstance->GetModeEffectClass());
 	ApplyCurrentModing();
