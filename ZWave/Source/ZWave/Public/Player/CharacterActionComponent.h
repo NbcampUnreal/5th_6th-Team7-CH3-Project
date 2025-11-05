@@ -40,7 +40,7 @@ public:
 	UCharacterActionComponent();
 
 public:
-	void InitRefs(UCharacterMovementComponent* InMoveComp, USpringArmComponent* InSpringArm, UCameraComponent* InCamera);
+	void InitRefs(ATaskPlayer* InPlayerCharacter ,UCharacterMovementComponent* InMoveComp, USpringArmComponent* InSpringArm, UCameraComponent* InCamera);
 
 	void Move(const FInputActionValue& Value);
 	void StopMove();
@@ -51,16 +51,16 @@ public:
 	void StopSprint();
 	void StartShoulder();
 	void StopShoulder();
-	void Shooting(ATaskPlayer* OwnerChar, EShootType ShootType);
+	void Shooting(EShootType ShootType, float ShootSpeedMultiply);
 	void StopShooting();
 	void TickAction(float DeltaTime);
-	void Reload(ATaskPlayer* OwnerChar, EShootType ShootType);
-	void EquipChange(ATaskPlayer* OwnerChar, EShootType ShootType);
-	void DryShot(ATaskPlayer* OwnerChar, EShootType ShootType);
-	void Grenade(ATaskPlayer* OwnerChar);
-
-	void Attacked(ATaskPlayer* OwnerChar, AActor* DamageCauser);
-	void Die(ATaskPlayer* OwnerChar);
+	void Reload(EShootType ShootType, float ReloadSpeedMultiply);
+	void EquipChange(EShootType ShootType);
+	void DryShot( EShootType ShootType);
+	void Grenade();
+	
+	void Attacked(AActor* DamageCauser);
+	void Die();
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -142,14 +142,15 @@ public:
 	bool bNotifyBound = false;
 
 	void EnsureBindMontageNotifies(UAnimInstance* Anim);
-	void UnbindMontageNotifies(ATaskPlayer* Player);
+	void UnbindMontageNotifies();
 
 	UFUNCTION(BlueprintCallable)
 	void OnMontageNotifyBegin(FName NotifyName);
 private:
 	TWeakObjectPtr<UCharacterMovementComponent> MoveComp;
-	TWeakObjectPtr<USpringArmComponent>        SpringArm;
-	TWeakObjectPtr<UCameraComponent>           Camera;
+	TWeakObjectPtr<USpringArmComponent>			SpringArm;
+	TWeakObjectPtr<UCameraComponent>			Camera;
+	TWeakObjectPtr <ATaskPlayer>				OwnerCharacter;
 
 	float MaxSprintSpeed = 600.f;
 	float NormalWalkSpeed = 300.f;
@@ -194,4 +195,7 @@ private:
 	float ConvertAngle(float InDeg);
 	UAnimMontage* GetAttackedMontage(EHitDirection Direction);
 
+	float GetSpeedValue(float Speed);
+
+	AActor* ActivateObject;
 };

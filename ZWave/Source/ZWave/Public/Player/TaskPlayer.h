@@ -7,6 +7,16 @@
 #include "InputActionValue.h"
 #include "TaskPlayer.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EPlayerShopStat : uint8
+{
+	MaxHealth,
+	MoveSpeedMultiply,
+	ReloadSpeedMultiply,
+	ShotSpeedMultiplay,
+};
+
 class UCharacterActionComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -27,6 +37,8 @@ public:
 	const bool IsDead() { return Health <= 0.f; };
 
 	void AttachWeaponTo(const FName SocketName);
+
+	FORCEINLINE float GetSpeedMultiply() const { return SpeedMultiply; }
 
 protected:
 
@@ -52,6 +64,10 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EShootType GetShootType() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	void AddPlayerStat(EPlayerShopStat statType, float value);
+
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComp;
@@ -70,4 +86,9 @@ private:
 
 	UIngameHUD* GetIngameHud();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|ShopStat", meta = (AllowPrivateAccess = "true"))
+	float MoveSpeedMultiply;
+
+	float ReloadSpeedMultiply;
+	float ShotSpeedMultiplay;
 };

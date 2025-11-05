@@ -34,6 +34,10 @@ ATaskPlayer::ATaskPlayer()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 
 	TeamID = 1;
+
+	MoveSpeedMultiply = 1.f;
+	ReloadSpeedMultiply = 1.f;
+	ShotSpeedMultiplay = 1.f;
 }
 
 void ATaskPlayer::AttachWeaponTo(const FName SocketName)
@@ -58,7 +62,7 @@ void ATaskPlayer::BeginPlay()
 
 	if (ActionComp && EquipComponent)
 	{
-		ActionComp->InitRefs(GetCharacterMovement(), SpringArmComp, CameraComp);
+		ActionComp->InitRefs(this, GetCharacterMovement(), SpringArmComp, CameraComp);
 
 		if (EquipComponent->Equip(EEquipSlot::First))
 		{
@@ -80,7 +84,7 @@ void ATaskPlayer::BeginPlay()
 				{
 					NowShootWeapon = NewShootWeapon;
 					NowShootWeapon->OnFireSuccess.AddUniqueDynamic(this, &ATaskPlayer::ShootingAction);
-					ActionComp->UnbindMontageNotifies(this);
+					ActionComp->UnbindMontageNotifies();
 				}
 			}
 		}
@@ -263,14 +267,14 @@ void ATaskPlayer::Attacked(AActor* DamageCauser, float Damage)
 	if (IsDead())
 		return;
 
-	ActionComp->Attacked(this, DamageCauser);
+	ActionComp->Attacked(DamageCauser);
 }
 
 
 
 void ATaskPlayer::Die()
 {
-	ActionComp->Die(this);
+	ActionComp->Die();
 	//사망 시 UI출력?
 }
 
@@ -341,7 +345,7 @@ void ATaskPlayer::EquipChange()
 
 		if (ActionComp)
 		{
-			ActionComp->EquipChange(this, NowShootWeapon->GetShootType());
+			ActionComp->EquipChange(NowShootWeapon->GetShootType());
 
 			if (UIngameHUD* nowHud = GetIngameHud())
 			{
@@ -362,7 +366,7 @@ void ATaskPlayer::CheckShooting()
 	{
 		if (NowShootWeapon->IsNeedReload())
 		{
-			ActionComp->DryShot(this, NowShootWeapon->GetShootType());
+			ActionComp->DryShot(NowShootWeapon->GetShootType());
 		}
 		else
 		{
@@ -375,7 +379,7 @@ void ATaskPlayer::ShootingAction()
 {
 	if (NowShootWeapon && ActionComp)
 	{
-		ActionComp->Shooting(this, NowShootWeapon->GetShootType());
+		ActionComp->Shooting(NowShootWeapon->GetShootType(), ShotSpeedMultiplay);
 ;	}
 }
 
@@ -386,14 +390,14 @@ void ATaskPlayer::Reload()
 		NowShootWeapon->Reload();
 		if (ActionComp)
 		{
-			ActionComp->Reload(this, NowShootWeapon->GetShootType());
+			ActionComp->Reload(NowShootWeapon->GetShootType(), ReloadSpeedMultiply);
 		}
 	}
 }
 
 void ATaskPlayer::Grenade()
 {
-	ActionComp->Grenade(this);
+	ActionComp->Grenade();
 }
 
 EShootType ATaskPlayer::GetShootType() const
@@ -402,6 +406,28 @@ EShootType ATaskPlayer::GetShootType() const
 		return EShootType::ST_Rifle;
 
 	return NowShootWeapon->GetShootType();
+}
+
+void ATaskPlayer::AddPlayerStat(EPlayerShopStat statType, float value)
+{
+	switch (statType)
+	{
+	case EPlayerShopStat::MaxHealth: 
+		MaxHealth += value;
+		Health += value;
+		break;
+	case EPlayerShopStat::MoveSpeedMultiply:
+		MoveSpeedMultiply += value;
+		break;
+	case EPlayerShopStat::ReloadSpeedMultiply:
+		ReloadSpeedMultiply += value;
+		break;
+	case EPlayerShopStat::ShotSpeedMultiplay:
+		ShotSpeedMultiplay += value;
+		break;
+	default:
+		break;
+	}
 }
 
 UIngameHUD* ATaskPlayer::GetIngameHud()
