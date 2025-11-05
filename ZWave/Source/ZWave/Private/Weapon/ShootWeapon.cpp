@@ -172,6 +172,16 @@ void AShootWeapon::UnEquipModing(EModingSlot ModingSlot)
 	ApplyCurrentModing();
 }
 
+void AShootWeapon::AddRemainSpareAmmo(float AddingPercent)
+{
+	if (AddingPercent <= 0)
+		return;
+
+	RemainSpareAmmo += (ShootWeaponStat.SpareAmmo * AddingPercent);
+
+	ReloadUIBroadCast();
+}
+
 void AShootWeapon::ApplyCurrentModing()
 {
 	FShootWeaponStats ShootStat = ShootWeaponStatBase;

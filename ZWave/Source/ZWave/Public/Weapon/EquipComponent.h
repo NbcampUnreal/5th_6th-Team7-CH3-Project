@@ -40,7 +40,7 @@ public:
 
 	void SetSlotData(EEquipSlot Slot, const UWeaponDefinition* WeaponDef);
 	void ClearSlotData(EEquipSlot Slot);
-	void AmmoSupply(int32 AmmoAmount);
+	void AmmoSupply(float AddingPercent);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE AWeaponBase* GetCurrentWeapon() { return SlotMaps[CurrentSlot]; }

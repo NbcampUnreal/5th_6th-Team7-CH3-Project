@@ -1,6 +1,5 @@
-﻿#include "Effect/SpareAmmoAddingEffect.h"
+#include "Effect/SpareAmmoAddingEffect.h"
 #include "Weapon/EquipComponent.h"
-#include "Weapon/ShootWeapon.h"
 
 USpareAmmoAddingEffect::USpareAmmoAddingEffect()
 {
@@ -18,13 +17,7 @@ void USpareAmmoAddingEffect::ApplyEffect(AActor* TargetActor, const float& BaseD
 	{
 		if (UEquipComponent* EquipComp = Cast<UEquipComponent>(Character->GetComponentByClass<UEquipComponent>()))
 		{
-			// 이 부분부터 수정 될 가능성 있음
-			if (AShootWeapon* CurWeapon = Cast<AShootWeapon>(EquipComp->GetCurrentWeapon()))
-			{
-				int32 RemainAmmo = CurWeapon->GetRemainSpareAmmo();
-				RemainAmmo += RemainAmmo * AddingPercent;
-				EquipComp->AmmoSupply(RemainAmmo);
-			}
+			EquipComp->AmmoSupply(AddingPercent);
 		}
 	}
 }
