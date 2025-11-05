@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Weapon/ProjectileWeapon.h"
@@ -15,6 +15,7 @@
 #include "Engine/OverlapResult.h"
 #include "DamageCalculator/DamageCalculator.h"
 #include "DrawDebugHelpers.h"
+#include "Enemy/RangedAIController.h"
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -194,12 +195,23 @@ FVector AProjectileWeapon::ComputeThrowDirection() const
     }
 
     const AController* Controller = PawnOwner->GetController();
+
     if (const APlayerController* PC = Cast<APlayerController>(Controller))
     {
         FVector CamLoc; FRotator CamRot;
         PC->GetPlayerViewPoint(CamLoc, CamRot);
         return CamRot.Vector();
     }
+
+	if (const ARangedAIController* RAC = Cast<ARangedAIController>(Controller))
+	{
+		FVector TargetVec;
+		RAC->GetTargetVector(TargetVec);
+		 
+		DrawDebugLine(GetWorld(), TargetVec , PawnOwner->GetActorLocation() , FColor::Red, false, 0.2f, 0, 1.5f);
+		const FVector Dir = (TargetVec - PawnOwner->GetActorLocation()).GetSafeNormal();
+		return Dir;
+	}
 
     const FVector Fwd = PawnOwner->GetActorForwardVector();
     const FVector Dir = (Fwd + FVector::UpVector * 0.2f).GetSafeNormal();
