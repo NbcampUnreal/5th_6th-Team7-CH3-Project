@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Weapon/ProjectileWeapon.h"
@@ -15,7 +15,7 @@
 #include "Engine/OverlapResult.h"
 #include "DamageCalculator/DamageCalculator.h"
 #include "DrawDebugHelpers.h"
-#include "Enemy/RangedAIController.h"
+#include "AoE/AoESpawningManager.h"
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -195,23 +195,12 @@ FVector AProjectileWeapon::ComputeThrowDirection() const
     }
 
     const AController* Controller = PawnOwner->GetController();
-
     if (const APlayerController* PC = Cast<APlayerController>(Controller))
     {
         FVector CamLoc; FRotator CamRot;
         PC->GetPlayerViewPoint(CamLoc, CamRot);
         return CamRot.Vector();
     }
-
-	if (const ARangedAIController* RAC = Cast<ARangedAIController>(Controller))
-	{
-		FVector TargetVec;
-		RAC->GetTargetVector(TargetVec);
-		 
-		DrawDebugLine(GetWorld(), TargetVec , PawnOwner->GetActorLocation() , FColor::Red, false, 0.2f, 0, 1.5f);
-		const FVector Dir = (TargetVec - PawnOwner->GetActorLocation()).GetSafeNormal();
-		return Dir;
-	}
 
     const FVector Fwd = PawnOwner->GetActorForwardVector();
     const FVector Dir = (Fwd + FVector::UpVector * 0.2f).GetSafeNormal();
@@ -287,6 +276,8 @@ void AProjectileWeapon::ApplyStat(const FProjectileWeaponStats& ModingStat, EWea
 
 void AProjectileWeapon::OnProjectileStop(const FHitResult& ImpactResult)
 {
+	HitLocation = ImpactResult.ImpactPoint;
+
 	if (ProjectileWeaponStat.FuseTime > 0.f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
@@ -347,12 +338,14 @@ void AProjectileWeapon::DamageBoom()
 	{
 		if (IsDamagableActor(TargetActor) == true)
 		{
-			/*UDamageCalculator::DamageCalculate(
-				GetWorld(),
-				OwningCharacter,
-				TargetActor,
-				ProjectileWeaponStat.AttackPower,
-				BaseEffectClasses);*/
+			FZWaveDamageEvent DamageEvent;
+			DamageEvent.BaseDamage = ProjectileWeaponStat.AttackPower;
+			DamageEvent.Duration = 0.0f;
+
+			TArray<TSubclassOf<UEffectBase>> EffectClasses;
+			EquipModingEffectClassMap.GenerateValueArray(EffectClasses);
+			DamageEvent.EffectArray = EffectClasses;
+			UDamageCalculator::DamageHelper(GetWorld(), TargetActor, GetOwner(), DamageEvent);
 		}
 	}
 }
@@ -361,15 +354,11 @@ void AProjectileWeapon::Explode()
 {
 	// 해당 AttackPower 부분은 DamageCalculator와 연계 예정
 	DamageBoom();
-	//UGameplayStatics::ApplyRadialDamage(this,
-	//	ProjectileWeaponStat.AttackPower, /*BaseDamage=*/
-	//	GetActorLocation(),
-	//	ProjectileWeaponStat.Radius,   /*Radius=*/
-	//	nullptr,  // DamageTypeClass
-	//	TArray<AActor*>(),
-	//	this,
-	//	GetInstigatorController(),
-	//	true);
+
+	if (UAoESpawningManager* AoeManager = GetWorld()->GetSubsystem<UAoESpawningManager>())
+	{
+		AoeManager->SpawnAoEActor(GetOwner(), ProjectileWeaponStat.ProjectileIdx, HitLocation);
+	}
 
 	bCanAttack = false;
 

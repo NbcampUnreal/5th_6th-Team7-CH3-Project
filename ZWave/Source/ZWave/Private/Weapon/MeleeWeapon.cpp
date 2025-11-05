@@ -29,15 +29,14 @@ void AMeleeWeapon::Attack()
 	{
 		if (IsDamagableActor(TargetActor) == true)
 		{
+			FZWaveDamageEvent DamageEvent;
+			DamageEvent.BaseDamage = MeleeWeaponStat.AttackPower;
+			DamageEvent.Duration = 0.0f;
+
 			TArray<TSubclassOf<UEffectBase>> EffectClasses;
 			EquipModingEffectClassMap.GenerateValueArray(EffectClasses);
-
-			UDamageCalculator::DamageCalculate(
-				GetWorld(),
-				OwningCharacter,
-				TargetActor,
-				MeleeWeaponStat.AttackPower,
-				EffectClasses);
+			DamageEvent.EffectArray = EffectClasses;
+			UDamageCalculator::DamageHelper(GetWorld(), TargetActor, OwningCharacter, DamageEvent);
 		}
 	}
 }

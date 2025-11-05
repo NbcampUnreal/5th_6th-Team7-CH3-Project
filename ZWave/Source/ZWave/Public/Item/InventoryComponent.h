@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 CountItem(const UItemDefinition* ItemDef) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int32 CountItemByName(const FString& Name) const;
+
 	// 직접적인 장착 X
 	// EquipComponent에서 해당 슬롯에 장착 가능하도록 세팅
 	UFUNCTION(BlueprintCallable)

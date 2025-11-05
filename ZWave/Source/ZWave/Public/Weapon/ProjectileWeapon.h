@@ -76,4 +76,6 @@ protected:
 
 	FTimerHandle FuseTimer;
 	FTimerHandle AttackTimer;
+
+	FVector HitLocation;
 };

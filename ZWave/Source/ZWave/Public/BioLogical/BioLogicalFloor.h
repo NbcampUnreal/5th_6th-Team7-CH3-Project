@@ -30,6 +30,7 @@ public:
 	virtual void Attacked(AActor* DamageCauser, float Damage);
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true);
 	virtual void Die();
+	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	//
 	

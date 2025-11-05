@@ -35,6 +35,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TryEquipWeapon(APlayerController* Player, const FString& Name, int32 Slot);
 
+	UFUNCTION(BlueprintCallable)
 	UItemDefinition* FindItemByDisplayName(const FString& Name) const;
 
 protected:
