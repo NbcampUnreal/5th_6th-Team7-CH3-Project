@@ -13,6 +13,8 @@ class APawn;
 class ADoorControlPanel;
 class UPointLightComponent;
 class USpotLightComponent;
+class UEffectApplyManager;
+class UEffectBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackoutStateChangedSignature, bool, bIsBlackoutActive);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStimStateChangedSignature, bool, bIsNowOnCooldown);
@@ -82,6 +84,12 @@ protected:
 
 	bool bBlackoutUsedThisWave = false;
 
+
+	UPROPERTY(Transient)
+	TObjectPtr<UEffectApplyManager> EffectManager;
+
+	UPROPERTY(VisibleAnywhere, Category = "Stim System")
+	TSubclassOf<UEffectBase> StimEffectClass;
 
 	EGameState CurrentState = EGameState::EGS_None;
 

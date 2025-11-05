@@ -13,6 +13,10 @@
 #include "Components/PointLightComponent.h"
 #include "Components/SpotLightComponent.h" 
 #include "GameFramework/Actor.h"
+#include "Effect/SpeedBuffEffect.h"
+#include "Effect/EffectApplyManager.h"
+#include "Effect/EffectBase.h"
+
 
 void UGameManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -27,6 +31,8 @@ void UGameManager::Initialize(FSubsystemCollectionBase& Collection)
         1.0f,
         false
     );
+    EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>();
+    StimEffectClass = USpeedBuffEffect::StaticClass();
 
     AllManagedPointLights.Empty();
     AllManagedSpotLights.Empty();
@@ -48,35 +54,6 @@ void UGameManager::StartGame()
     UE_LOG(LogTemp, Warning, TEXT("Game Starting..."));
     CurrentWaveNumber = 0;
     BeginPreparationPhase();
-}
-
-void UGameManager::BeginPreparationPhase()
-{
-    if (CurrentState == EGameState::EGS_GameOver) return;
-
-    CurrentState = EGameState::EGS_Preparing;
-
-    CurrentWaveNumber++;
-
-
-    UE_LOG(LogTemp, Warning, TEXT("Preparation Phase Started for Wave %d. (Time: 30s)"), CurrentWaveNumber);
-
-    if (AZWaveGameState* LocalGameState = GetGameState())
-    {
-        LocalGameState->SetCurrentGameState(CurrentState);
-        LocalGameState->SetCurrentWave(CurrentWaveNumber);
-
-        UIngameHUD* LocalHUD = LocalGameState->GetIngameHUD();
-        if (IsValid(LocalHUD))
-        {
-            LocalHUD->OnChangedWaveMode(false);
-            LocalHUD->OnBreakTimeStart();
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("GameManger : IngameHUD was Invalid."), CurrentWaveNumber);
-        }
-    }
 
     UWorld* World = GetWorld();
     if (World)
@@ -105,6 +82,34 @@ void UGameManager::BeginPreparationPhase()
 
         UE_LOG(LogTemp, Log, TEXT("GameManager: Found %d PointLights, %d SpotLights, %d ControlPanels."),
             AllManagedPointLights.Num(), AllManagedSpotLights.Num(), AllControlPanelsInLevel.Num());
+    }
+}
+
+void UGameManager::BeginPreparationPhase()
+{
+    if (CurrentState == EGameState::EGS_GameOver) return;
+
+    CurrentState = EGameState::EGS_Preparing;
+
+    CurrentWaveNumber++;
+
+    UE_LOG(LogTemp, Warning, TEXT("Preparation Phase Started for Wave %d. (Time: 30s)"), CurrentWaveNumber);
+
+    if (AZWaveGameState* LocalGameState = GetGameState())
+    {
+        LocalGameState->SetCurrentGameState(CurrentState);
+        LocalGameState->SetCurrentWave(CurrentWaveNumber);
+
+        UIngameHUD* LocalHUD = LocalGameState->GetIngameHUD();
+        if (IsValid(LocalHUD))
+        {
+            LocalHUD->OnChangedWaveMode(false);
+            LocalHUD->OnBreakTimeStart();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("GameManger : IngameHUD was Invalid."), CurrentWaveNumber);
+        }
     }
 
     GetWorld()->GetTimerManager().SetTimer(
@@ -271,6 +276,12 @@ void UGameManager::EndBlackoutEvent()
 
 void UGameManager::UseStim(AActor* Interactor)
 {
+    if (!StimEffectClass)
+    {
+        UE_LOG(LogTemp, Error, TEXT("GameManager::UseStim - StimEffectClass is NULL!"));
+        return;
+    }
+
     if (bIsStimUsedThisWave)
     {
         UE_LOG(LogTemp, Log, TEXT("Stim already used this wave."));
@@ -284,4 +295,7 @@ void UGameManager::UseStim(AActor* Interactor)
     OnStimStateChanged.Broadcast(true);
     UE_LOG(LogTemp, Log, TEXT("GameManager: Stim Used!"));
 
+    TArray<TSubclassOf<UEffectBase>> EffectArray;
+    EffectArray.Add(StimEffectClass);
+    EffectManager->ApplyEffect(Interactor, EffectArray, StimBuffDuration);
 }
