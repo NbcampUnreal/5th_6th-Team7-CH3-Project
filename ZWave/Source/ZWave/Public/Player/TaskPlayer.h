@@ -40,6 +40,8 @@ public:
 
 	FORCEINLINE float GetSpeedMultiply() const { return SpeedMultiply; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	void AddPlayerStat(EPlayerShopStat statType, float value);
 protected:
 
 	virtual void BeginPlay() override;
@@ -63,9 +65,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EShootType GetShootType() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void AddPlayerStat(EPlayerShopStat statType, float value);
 
 
 private:
