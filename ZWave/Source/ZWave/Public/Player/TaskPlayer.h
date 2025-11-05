@@ -40,7 +40,7 @@ public:
 
 	FORCEINLINE float GetSpeedMultiply() const { return SpeedMultiply; }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable)
 	void AddPlayerStat(EPlayerShopStat statType, float value);
 protected:
 
