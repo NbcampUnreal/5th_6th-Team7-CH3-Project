@@ -7,6 +7,7 @@
 #include "ZWaveTypes.generated.h"
 
 class ABaseCharacter;
+class UItemDefinition;
 
 UENUM(BlueprintType)
 enum class EGameState : uint8
@@ -43,4 +44,22 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
     int32 WaveClearRewardBioCoin;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave | Item Drops")
+    int32 T1_Count = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave | Item Drops")
+    int32 T2_Count = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave | Item Drops")
+    int32 T3_Count = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave | Item Drops")
+    int32 Accessory_Count = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave | Item Drops")
+    int32 HealthPackCount = 3;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave | Item Drops")
+    int32 AmmoPackCount = 2;
 };
