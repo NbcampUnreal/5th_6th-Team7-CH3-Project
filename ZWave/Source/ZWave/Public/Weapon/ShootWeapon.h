@@ -36,6 +36,8 @@ public:
 
 	virtual void UnEquipModing(EModingSlot ModingSlot) override;
 
+	void AddRemainSpareAmmo(float AddingPercent);
+
 protected:
 	virtual void ApplyCurrentModing() override;
 
