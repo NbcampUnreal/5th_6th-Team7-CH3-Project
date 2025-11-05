@@ -244,6 +244,65 @@ bool UShopManager::TryEquipWeapon(APlayerController* Player, const FString& Name
 	return true;
 }
 
+bool UShopManager::TryEquipModingToWeapon(APlayerController* Player, const FString& WeaponName, const FString& ModingName)
+{
+	UItemDefinition* WeaponItemDef = FindItemByDisplayName(WeaponName);
+	UItemDefinition* ModingItemDef = FindItemByDisplayName(ModingName);
+
+	if (Player == nullptr
+		|| WeaponItemDef == nullptr
+		|| ModingItemDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: invalid args"));
+		return false;
+	}
+
+	UInventoryComponent* InvComp = GetInventoryFromPlayer(Player);
+	if (InvComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: Inventory not found"));
+		return false;
+	}
+
+	const UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(WeaponItemDef->Definition);
+	if (WeaponDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: Item is not weapon"));
+		return false;
+	}
+
+	int32 WeaponEntryIdx = InvComp->FindItemByDef(WeaponItemDef);
+	if (WeaponEntryIdx == INDEX_NONE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: WeaponItem was not found"));
+		return false;
+	}
+
+	const UWeaponDefinition* ModeDef = Cast<UWeaponDefinition>(ModingItemDef->Definition);
+	if (ModeDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: Item is not mode"));
+		return false;
+	}
+
+	int32 ModingEntryIdx = InvComp->FindItemByDef(ModingItemDef);
+	if (ModingEntryIdx == INDEX_NONE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: ModingItem was not found"));
+		return false;
+	}
+
+	bool bResult = InvComp->EquipModingToWeapon(WeaponEntryIdx, ModingEntryIdx);
+
+	if (bResult == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: EquipModing Failed"));
+		return false;
+	}
+
+	return true;
+}
+
 bool UShopManager::HasEnoughCore(APlayerController* Player, int32 Price)
 {
 	if (Price <= 0)
