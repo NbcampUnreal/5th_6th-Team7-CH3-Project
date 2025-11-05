@@ -6,6 +6,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/Character.h>
 #include "Components/SkeletalMeshComponent.h"
+#include "Weapon/ShootWeapon.h"
 
 UEquipComponent::UEquipComponent()
 {
@@ -147,8 +148,20 @@ void UEquipComponent::ClearSlotData(EEquipSlot Slot)
 	}
 }
 
-void UEquipComponent::AmmoSupply(int32 AmmoAmount)
+void UEquipComponent::AmmoSupply(float AddingPercent)
 {
+	if (AddingPercent < 0.0f)
+		return;
+
+	for (auto& SlotPair : SlotMaps)
+	{
+		AShootWeapon* EquippingWeapon = Cast<AShootWeapon>(SlotPair.Value);
+
+		if (EquippingWeapon != nullptr)
+		{
+			EquippingWeapon->AddRemainSpareAmmo(AddingPercent);
+		}
+	}
 }
 
 AWeaponBase* UEquipComponent::GetTargetWeapon(EEquipSlot Slot)

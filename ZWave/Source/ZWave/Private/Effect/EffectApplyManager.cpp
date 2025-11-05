@@ -1,6 +1,7 @@
 ﻿#include "Effect/EffectApplyManager.h"
 #include "Effect/EffectBase.h"
 #include "Effect/StaggerEffect.h"
+#include "Effect/GainItemEffect.h"
 #include "Base/Damagable.h"
 
 UEffectApplyManager::UEffectApplyManager()
@@ -43,13 +44,20 @@ void UEffectApplyManager::ApplyEffect(
 /// </summary>
 /// <param name="Causer">호출자</param>
 /// <param name="EffectClass">적용 효과 클래스</param>
-void UEffectApplyManager::ApplyEffect(AActor* Causer, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray, const float& Duration)
+void UEffectApplyManager::ApplyEffect(AActor* Causer, const TArray<TSubclassOf<UEffectBase>>& EffectClassArray, const float& Duration, const int32& ItemIndex)
 {
 	for (const auto& EffectClass : EffectClassArray)
 	{
 		if (UEffectBase* NewEffect = CreateEffect(EffectClass))
 		{
-			NewEffect->ApplyEffect(Causer, Duration);
+			if (NewEffect->IsA(UGainItemEffect::StaticClass()))
+			{
+				NewEffect->ApplyEffect(Causer, ItemIndex);
+			}
+			else
+			{
+				NewEffect->ApplyEffect(Causer, Duration);
+			}
 		}
 
 	}

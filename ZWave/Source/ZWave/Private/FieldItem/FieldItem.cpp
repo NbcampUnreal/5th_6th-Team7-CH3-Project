@@ -28,6 +28,8 @@ void AFieldItem::BeginPlay()
 
 }
 
+
+
 void AFieldItem::OnFieldItemBeingOverlap(UPrimitiveComponent* OtherlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (ATaskPlayer* Player = Cast<ATaskPlayer>(OtherActor))
@@ -42,13 +44,20 @@ void AFieldItem::OnFieldItemEndOverlap(UPrimitiveComponent* OtherlappedComponent
 {
 }
 
+void AFieldItem::Init(int32 ItemIndex)
+{
+	this->FieldItemIndex = ItemIndex;
+}
+
 void AFieldItem::ActiveEffect(AActor* OtherActor)
 {
 	if (UEffectApplyManager* EffectApplyManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Activated Player"));
-		EffectApplyManager->ApplyEffect(OtherActor, FieldItemEffectClassArray);
+		EffectApplyManager->ApplyEffect(OtherActor, FieldItemEffectClassArray, 0, FieldItemIndex);
 		this->CauserActor = nullptr;
+
+		DestroyItem();
 	}
 }
 
