@@ -18,4 +18,5 @@ public:
 	ARangedEnemy();
 
 	virtual void Attack() override;
+	virtual void Die() override;
 };
