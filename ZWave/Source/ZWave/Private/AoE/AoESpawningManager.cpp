@@ -40,7 +40,7 @@ bool UAoESpawningManager::SpawnAoEActor(AActor* Causer, int32 index, FVector Spa
 
 		AAoEActor* AoE = GetWorld()->SpawnActor<AAoEActor>(
 			SpawnActorClass,
-			SpawnPoint + FVector(0,0, 10.0f), // 임시 포지션
+			SpawnPoint, // 임시 포지션
 			FRotator::ZeroRotator,
 			SpawnParam
 		);

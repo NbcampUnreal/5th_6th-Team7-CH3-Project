@@ -15,21 +15,18 @@ UCharacterActionComponent::UCharacterActionComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UCharacterActionComponent::InitRefs(UCharacterMovementComponent* InMoveComp, USpringArmComponent* InSpringArm, UCameraComponent* InCamera)
+void UCharacterActionComponent::InitRefs(ATaskPlayer* InPlayerCharacter, UCharacterMovementComponent* InMoveComp, USpringArmComponent* InSpringArm, UCameraComponent* InCamera)
 {
 	MoveComp = InMoveComp;
 	SpringArm = InSpringArm;
 	Camera = InCamera;
+	OwnerCharacter = InPlayerCharacter;
 	SpringArmNormalSocketOffsetY = SpringArmShoulderSocketOffsetY;
 
 	if (SpringArm.IsValid())
 	{
 		NormalSocketOffsetY = SpringArm->SocketOffset.Y;
 		SpringArm->SocketOffset = FVector{ 0.f,SpringArmNormalSocketOffsetY, SpringArmSocketOffsetZ };
-	}
-	if (MoveComp.IsValid())
-	{
-		NormalWalkSpeed = MoveComp->MaxWalkSpeed * SpeedMultiply;
 	}
 }
 
@@ -100,7 +97,7 @@ void UCharacterActionComponent::StartShoulder()
 {
 	SpringArm->SocketOffset = FVector{ 0.f,SpringArmShoulderSocketOffsetY, SpringArmSocketOffsetZ };
 	MoveSpeed = ShoulderSpeed;
-	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+	MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed); 
 	bShoulder = true;
 }
 
@@ -108,23 +105,23 @@ void UCharacterActionComponent::StopShoulder()
 {
 	SpringArm->SocketOffset = FVector{ 0.f,SpringArmNormalSocketOffsetY, SpringArmSocketOffsetZ };
 	MoveSpeed = NormalWalkSpeed;
-	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+	MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed); 
 	bShoulder = false;
 }
 
-void UCharacterActionComponent::Shooting(ATaskPlayer* OwnerChar, EShootType ShootType)
+void UCharacterActionComponent::Shooting(EShootType ShootType, float ShootSpeedMultiply)
 {
 	MoveSpeed = NormalWalkSpeed;
-	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+	MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed);
 	bIsShooting = true;
 
-	if (OwnerChar)
+	if (OwnerCharacter.Get())
 	{
 		if (CachedAnimInstance)
 		{
-			UnbindMontageNotifies(OwnerChar);
+			UnbindMontageNotifies();
 		}
-		auto MeshCheck = OwnerChar->GetMesh();
+		auto MeshCheck = OwnerCharacter->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
@@ -135,7 +132,7 @@ void UCharacterActionComponent::Shooting(ATaskPlayer* OwnerChar, EShootType Shoo
 				{
 					Anim->Montage_Play(
 						ShotgunFireMontage,
-						1.f,
+						ShootSpeedMultiply,
 						EMontagePlayReturnType::MontageLength,
 						0.f,
 						true
@@ -146,7 +143,7 @@ void UCharacterActionComponent::Shooting(ATaskPlayer* OwnerChar, EShootType Shoo
 				{
 					Anim->Montage_Play(
 						RifleFireMontage,
-						1.f,
+						ShootSpeedMultiply,
 						EMontagePlayReturnType::MontageLength,
 						0.f,
 						true
@@ -158,7 +155,7 @@ void UCharacterActionComponent::Shooting(ATaskPlayer* OwnerChar, EShootType Shoo
 				{
 					Anim->Montage_Play(
 						PistolFireMontage,
-						1.f,
+						ShootSpeedMultiply,
 						EMontagePlayReturnType::MontageLength,
 						0.f,
 						true
@@ -178,11 +175,11 @@ void UCharacterActionComponent::StopShooting()
 	bIsShooting = false;
 }
 
-void UCharacterActionComponent::EquipChange(ATaskPlayer* OwnerChar, EShootType ShootType)
+void UCharacterActionComponent::EquipChange(EShootType ShootType)
 {
-	if (OwnerChar)
+	if (OwnerCharacter.Get())
 	{
-		auto MeshCheck = OwnerChar->GetMesh();
+		auto MeshCheck = OwnerCharacter->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
@@ -223,18 +220,18 @@ void UCharacterActionComponent::EquipChange(ATaskPlayer* OwnerChar, EShootType S
 	}
 }
 
-void UCharacterActionComponent::DryShot(ATaskPlayer* OwnerChar, EShootType ShootType)
+void UCharacterActionComponent::DryShot(EShootType ShootType)
 {
 	if (bDryShooting) return;
 
-	if (OwnerChar)
+	if (OwnerCharacter.Get())
 	{
 		if (CachedAnimInstance)
 		{
-			UnbindMontageNotifies(OwnerChar);
+			UnbindMontageNotifies();
 		}
 
-		auto MeshCheck = OwnerChar->GetMesh();
+		auto MeshCheck = OwnerCharacter->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			bDryShooting = true;
@@ -284,16 +281,16 @@ void UCharacterActionComponent::DryShot(ATaskPlayer* OwnerChar, EShootType Shoot
 	}
 }
 
-void UCharacterActionComponent::Reload(ATaskPlayer* OwnerChar, EShootType ShootType)
+void UCharacterActionComponent::Reload(EShootType ShootType, float ReloadSpeedMultiply)
 {
-	if (OwnerChar)
+	if (OwnerCharacter.Get())
 	{
 		if (CachedAnimInstance)
 		{
-			UnbindMontageNotifies(OwnerChar);
+			UnbindMontageNotifies();
 		}
 
-		auto MeshCheck = OwnerChar->GetMesh();
+		auto MeshCheck = OwnerCharacter->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
@@ -305,7 +302,7 @@ void UCharacterActionComponent::Reload(ATaskPlayer* OwnerChar, EShootType ShootT
 				{
 					const float PlayedLen = Anim->Montage_Play(
 						ShotgunReloadMontage,
-						1.f,
+						ReloadSpeedMultiply,
 						EMontagePlayReturnType::MontageLength,
 						0.f,
 						true
@@ -317,7 +314,7 @@ void UCharacterActionComponent::Reload(ATaskPlayer* OwnerChar, EShootType ShootT
 				{
 					const float PlayedLen = Anim->Montage_Play(
 						RifleReloadMontage,
-						1.f,
+						ReloadSpeedMultiply,
 						EMontagePlayReturnType::MontageLength,
 						0.f,
 						true
@@ -330,7 +327,7 @@ void UCharacterActionComponent::Reload(ATaskPlayer* OwnerChar, EShootType ShootT
 				{
 					const float PlayedLen = Anim->Montage_Play(
 						PistolReloadMontage,
-						1.f,
+						ReloadSpeedMultiply,
 						EMontagePlayReturnType::MontageLength,
 						0.f,
 						true
@@ -352,18 +349,18 @@ void UCharacterActionComponent::TickAction(float DeltaTime)
 	SetMeshDir(DeltaTime);
 }
 
-void UCharacterActionComponent::Attacked(ATaskPlayer* OwnerChar, AActor* DamageCauser)
+void UCharacterActionComponent::Attacked(AActor* DamageCauser)
 {
 	if (!IsValid(DamageCauser))
 		return;
 
-	if (OwnerChar)
+	if (OwnerCharacter.Get())
 	{
-		FVector SelfLocation = OwnerChar->GetActorLocation();
+		FVector SelfLocation = OwnerCharacter->GetActorLocation();
 		FVector CauserLocation = DamageCauser->GetActorLocation();
 		FVector ToCauser = (CauserLocation - SelfLocation).GetSafeNormal();
-		FVector Forward = OwnerChar->GetActorForwardVector();
-		FVector Right = OwnerChar->GetActorRightVector();
+		FVector Forward = OwnerCharacter->GetActorForwardVector();
+		FVector Right = OwnerCharacter->GetActorRightVector();
 
 		float ForwardDot = FVector::DotProduct(Forward, ToCauser);
 		float RightDot = FVector::DotProduct(Right, ToCauser);
@@ -388,7 +385,7 @@ void UCharacterActionComponent::Attacked(ATaskPlayer* OwnerChar, AActor* DamageC
 			PlayAnim = GetAttackedMontage(EHitDirection::Left);
 		}
 
-		auto MeshCheck = OwnerChar->GetMesh();
+		auto MeshCheck = OwnerCharacter->GetMesh();
 		if (PlayAnim != nullptr && MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
@@ -423,22 +420,27 @@ UAnimMontage* UCharacterActionComponent::GetAttackedMontage(EHitDirection Direct
 	}
 }
 
-void UCharacterActionComponent::Die(ATaskPlayer* OwnerChar)
+float UCharacterActionComponent::GetSpeedValue(float Speed)
+{
+	return Speed * SpeedMultiply * OwnerCharacter->GetSpeedMultiply();
+}
+
+void UCharacterActionComponent::Die()
 {
 	if (bIsDead) return;
 
-	if (OwnerChar)
+	if (OwnerCharacter.Get())
 	{
-		auto MeshCheck = OwnerChar->GetMesh();
+		auto MeshCheck = OwnerCharacter->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
 			{
 				bIsDead = true;
 
-				OwnerChar->GetCharacterMovement()->DisableMovement();
-				OwnerChar->DisableInput(Cast<APlayerController>(OwnerChar->GetController()));
-				OwnerChar->bUseControllerRotationYaw = false;
+				OwnerCharacter->GetCharacterMovement()->DisableMovement();
+				OwnerCharacter->DisableInput(Cast<APlayerController>(OwnerCharacter->GetController()));
+				OwnerCharacter->bUseControllerRotationYaw = false;
 
 				float const PlayedLen = Anim->Montage_Play(
 					DeathMontage,
@@ -466,16 +468,16 @@ void UCharacterActionComponent::Die(ATaskPlayer* OwnerChar)
 	}
 }
 
-void UCharacterActionComponent::Grenade(ATaskPlayer* OwnerChar)
+void UCharacterActionComponent::Grenade()
 {
-	if (OwnerChar)
+	if (OwnerCharacter.Get())
 	{
 		if (CachedAnimInstance)
 		{
-			UnbindMontageNotifies(OwnerChar);
+			UnbindMontageNotifies();
 		}
 
-		auto MeshCheck = OwnerChar->GetMesh();
+		auto MeshCheck = OwnerCharacter->GetMesh();
 		if (MeshCheck != nullptr)
 		{
 			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
@@ -495,7 +497,7 @@ void UCharacterActionComponent::Grenade(ATaskPlayer* OwnerChar)
 void UCharacterActionComponent::ChangeSpeedMultiply(float Multiply)
 {
 	SpeedMultiply = Multiply;
-	MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+	MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed);
 }
 
 void UCharacterActionComponent::EnsureBindMontageNotifies(UAnimInstance* Anim)
@@ -504,7 +506,7 @@ void UCharacterActionComponent::EnsureBindMontageNotifies(UAnimInstance* Anim)
 
 	if (CachedAnimInstance && CachedAnimInstance != Anim)
 	{
-		UnbindMontageNotifies(Cast<ATaskPlayer>(GetOwner()));
+		UnbindMontageNotifies();
 	}
 
 	if (!bNotifyBound)
@@ -514,25 +516,25 @@ void UCharacterActionComponent::EnsureBindMontageNotifies(UAnimInstance* Anim)
 	}
 }
 
-void UCharacterActionComponent::UnbindMontageNotifies(ATaskPlayer* Player)
+void UCharacterActionComponent::UnbindMontageNotifies()
 {
 	CachedAnimInstance = nullptr;
 	bNotifyBound = false;
-	if(Player)
-		Player->AttachWeaponTo(TEXT("WeaponSocket"));
+	if(OwnerCharacter.Get())
+		OwnerCharacter->AttachWeaponTo(TEXT("WeaponSocket"));
 }
 
 void UCharacterActionComponent::OnMontageNotifyBegin(FName NotifyName)
 {
-	if (ATaskPlayer* Player = Cast<ATaskPlayer>(GetOwner()))
+	if (OwnerCharacter.Get())
 	{
 		if (NotifyName == "WeaponL")
 		{
-			Player->AttachWeaponTo(TEXT("RifleMove"));
+			OwnerCharacter->AttachWeaponTo(TEXT("RifleMove"));
 		}
 		else if (NotifyName == "WeaponR")
 		{
-			UnbindMontageNotifies(Player);
+			UnbindMontageNotifies();
 		}
 	}
 }
@@ -598,12 +600,12 @@ void UCharacterActionComponent::CheckMoveSpeed(float DeltaTime)
 		if (MoveSpeed < MaxSprintSpeed)
 		{
 			MoveSpeed += DeltaTime * SprintAnimationSpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+			MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed);
 		}
 		else
 		{
 			MoveSpeed = MaxSprintSpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+			MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed);
 		}
 	}
 	else
@@ -611,12 +613,12 @@ void UCharacterActionComponent::CheckMoveSpeed(float DeltaTime)
 		if (MoveSpeed > NormalWalkSpeed)
 		{
 			MoveSpeed -= DeltaTime * SprintAnimationRecovorySpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+			MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed); 
 		}
 		else
 		{
 			MoveSpeed = NormalWalkSpeed;
-			MoveComp->MaxWalkSpeed = MoveSpeed * SpeedMultiply;
+			MoveComp->MaxWalkSpeed = GetSpeedValue(MoveSpeed); 
 		}
 	}
 }

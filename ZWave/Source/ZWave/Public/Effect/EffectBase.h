@@ -19,6 +19,7 @@ class ZWAVE_API UEffectBase : public UObject
 
 public:
 	virtual void ApplyEffect(AActor* TargetActor, const float& Duration) PURE_VIRTUAL(UEffectBase::ApplyEffect, );
+	virtual void ApplyEffect(AActor* TargetActor, const int32& ItemIndex) PURE_VIRTUAL(UEffectBase::ApplyEffect, );
 	virtual void RemoveEffect();
 
 protected:

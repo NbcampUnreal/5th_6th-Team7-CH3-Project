@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -33,6 +33,7 @@ protected:
 
 public:
 	void ThrowFromOwner();
+
 
 protected:
 	FVector ComputeThrowDirection() const;
@@ -75,4 +76,6 @@ protected:
 
 	FTimerHandle FuseTimer;
 	FTimerHandle AttackTimer;
+
+	FVector HitLocation;
 };

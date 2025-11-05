@@ -23,6 +23,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeapon Stats")
 	UNiagaraSystem* ExplosionVFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ProjectileWeapon Stats")
+	int32 ProjectileIdx;
 };
 
 /**

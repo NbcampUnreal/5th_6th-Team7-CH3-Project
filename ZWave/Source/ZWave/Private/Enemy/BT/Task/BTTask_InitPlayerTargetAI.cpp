@@ -49,7 +49,7 @@ EBTNodeResult::Type UBTTask_InitPlayerTargetAI::ExecuteTask(UBehaviorTreeCompone
 		} while (NewSpawn && FVector::Dist2D(NewSpawn->GetActorLocation(), MyCharacter->GetActorLocation()) < 10.f);
 
 		const FVector NewDest = NewSpawn->GetActorLocation();
-		OwnerBlackboard->SetValueAsVector(FName("MoveDestLocation"), NewDest);
+		OwnerBlackboard->SetValueAsVector(FName("MoveDestTargetLocation"), NewDest);
 	}
 
 	return EBTNodeResult::Succeeded;

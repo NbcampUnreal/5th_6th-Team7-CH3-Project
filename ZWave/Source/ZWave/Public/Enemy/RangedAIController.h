@@ -16,4 +16,9 @@ class ZWAVE_API ARangedAIController : public APlayerTargetBaseAIController
 
 public:
 	virtual bool CheckCondition(AActor* Target) override;
+
+	void GetTargetVector(FVector& OutTargetVector) const;
+
+protected:
+	FVector TargetVector;
 };
