@@ -3,7 +3,9 @@
 #include "Effect/EffectApplyManager.h"
 #include "Player/TaskPlayer.h"
 #include "Enemy/BaseEnemy.h"
+
 #include "State/EnemyStateComponent.h"
+
 
 
 
@@ -34,6 +36,7 @@ void UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 				StateComp->SetState(EStateType::EST_Stagger);
 			}
 		}*/
+
 
 		this->Target = Enemy;
 		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() / StaggerSpeedMultiplier);
@@ -73,6 +76,7 @@ void UStaggerEffect::RemoveEffect()
 		{
 			StateComp->SetState(EStateType::EST_None);
 		}*/
+
 
 		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() * StaggerSpeedMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect DeActive! EnemySpeed : %f"), Enemy->GetMoveSpeed());

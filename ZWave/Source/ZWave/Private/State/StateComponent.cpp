@@ -11,12 +11,17 @@
 // Sets default values for this component's properties
 UStateComponent::UStateComponent()
 {
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
+	CurrentState = EStateType::EST_None;
 }
 
+
+// Called when the game starts
 void UStateComponent::BeginPlay()
 {
+	Super::BeginPlay();
 }
 
 //
@@ -75,12 +80,9 @@ void UStateComponent::BeginPlay()
 //	//}
 //}
 
-//void UStateComponent::OnRecoverStun()
-//{
-//	if (Montage_RecoverStun != nullptr)
-//	{
-//		AnimInstance->Montage_Play(Montage_RecoverStun, 2.0f);
-//	}
-//}
+void UStateComponent::SetState(EStateType SetType)
+{
+	CurrentState = SetType;
+}
 
 

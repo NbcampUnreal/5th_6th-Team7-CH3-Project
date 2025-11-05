@@ -2,7 +2,9 @@
 
 
 #include "Effect/DecoyEffect.h"
+
 #include "State/EnemyStateComponent.h"
+
 
 UDecoyEffect::UDecoyEffect()
 {
@@ -10,6 +12,7 @@ UDecoyEffect::UDecoyEffect()
 
 void UDecoyEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
+
 	//if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	//{
 	//	Target = Enemy;
@@ -22,6 +25,7 @@ void UDecoyEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 	{
 		Target = Enemy;
 		Enemy->StateComp->SetState(EEnemyStateType::EST_Decoy);
+
 	}
 
 
@@ -47,6 +51,7 @@ void UDecoyEffect::RemoveEffect()
 
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
 	{
+
 		Enemy->StateComp->SetState(EEnemyStateType::EST_None);
 	}
 	//if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
