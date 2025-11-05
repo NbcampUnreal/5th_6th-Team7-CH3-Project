@@ -219,7 +219,7 @@ bool UShopManager::TryEquipWeapon(APlayerController* Player, const FString& Name
 		return false;
 	}
 
-	const UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(ItemDef);
+	const UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(ItemDef->Definition);
 	if (WeaponDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipWeapon: Item is not weapon"));
