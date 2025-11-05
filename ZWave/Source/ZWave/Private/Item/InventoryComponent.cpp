@@ -64,7 +64,21 @@ void UInventoryComponent::AddItem(UItemDefinition* ItemDef, int32 Quantity)
 		{
 			const int32 ToCreate = FMath::Min(ItemDef->MaxStack, Remaining);
 
-			UItemInstance* NewItem = NewObject<UItemInstance>(this);
+			UItemInstance* NewItem;
+
+			switch (ItemDef->ItemType)
+			{
+			case EItemType::EIT_Weapon:
+				NewItem = NewObject<UItemWeaponInstance>(this);
+				break;
+			case EItemType::EIT_Mode:
+				NewItem = NewObject<UItemModeInstance>(this);
+				break;
+			default:
+				NewItem = NewObject<UItemInstance>(this);
+				break;
+			}
+
 			NewItem->Initialize(ItemDef, ToCreate);
 
 			Entry.ItemInstance = NewItem;
