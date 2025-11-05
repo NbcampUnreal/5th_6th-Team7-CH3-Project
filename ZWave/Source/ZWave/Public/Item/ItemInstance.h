@@ -21,7 +21,7 @@ public:
     int32 StackCount = 1;
 
     UFUNCTION(BlueprintCallable, Category = "Item Instance")
-    void Initialize(UItemDefinition* Definition, int32 Count = 1);
+    virtual void Initialize(UItemDefinition* Definition, int32 Count = 1);
 
     UFUNCTION(BlueprintCallable, Category = "Item Instance")
     void SetStackCount(int32 NewCount);
