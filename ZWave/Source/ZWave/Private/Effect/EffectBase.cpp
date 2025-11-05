@@ -14,3 +14,5 @@ void UEffectBase::RemoveEffect()
 
 	MarkAsGarbage();
 }
+
+
