@@ -58,6 +58,12 @@ void ABioLogicalFloor::Die()
 	SetActorEnableCollision(false);
 }
 
+float ABioLogicalFloor::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Attacked(DamageCauser, DamageAmount); 
+	return DamageAmount;
+}
+
 FGenericTeamId ABioLogicalFloor::GetGenericTeamId() const
 {
 	return TeamID;
