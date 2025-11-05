@@ -13,10 +13,17 @@ void UGainItemEffect::Init()
 
 void UGainItemEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
+	
+}
+
+void UGainItemEffect::ApplyEffect(AActor* TargetActor, const int32& Itemindex)
+{
 	if (ATaskPlayer* Player = Cast<ATaskPlayer>(TargetActor))
 	{
 		// TODO:
-		// 인벤토리 추가 되면 랜덤 확률로 아이템 정해주고, 해당 아이템 인벤토리에 추가 후 삭제
+		// 인덱스에 해당하는 아이템을 인벤토리에 넣어줌
+
+		RemoveEffect();
 	}
 }
 

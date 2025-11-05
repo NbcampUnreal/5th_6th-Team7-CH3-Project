@@ -1,4 +1,4 @@
-#include "Effect/SpareAmmoAddingEffect.h"
+﻿#include "Effect/SpareAmmoAddingEffect.h"
 #include "Weapon/EquipComponent.h"
 
 USpareAmmoAddingEffect::USpareAmmoAddingEffect()
@@ -18,6 +18,8 @@ void USpareAmmoAddingEffect::ApplyEffect(AActor* TargetActor, const float& BaseD
 		if (UEquipComponent* EquipComp = Cast<UEquipComponent>(Character->GetComponentByClass<UEquipComponent>()))
 		{
 			EquipComp->AmmoSupply(AddingPercent);
+
+			RemoveEffect();
 		}
 	}
 }

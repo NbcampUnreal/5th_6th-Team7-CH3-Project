@@ -52,8 +52,15 @@ protected:
 		int32 OtehrBodyIndex
 	);
 
+	UFUNCTION(BlueprintCallable, Category = "Initalize")
+	void Init(int32 ItemIndex);
+
 	UFUNCTION(BlueprintCallable, Category = "Event")
 	virtual void ActiveEffect(AActor* OtherActor);
 
 	virtual void DestroyItem();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Index")
+	int32 FieldItemIndex;
+
 };

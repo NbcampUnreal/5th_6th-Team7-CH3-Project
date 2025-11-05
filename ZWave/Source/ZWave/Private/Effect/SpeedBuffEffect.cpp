@@ -28,6 +28,8 @@ void USpeedBuffEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 			const float CharacterSpeed = Character->GetMoveSpeed();
 			Character->SetMoveSpeed(CharacterSpeed * SpeedMultiplier);
 		}
+
+		RemoveEffect();
 	}
 }
 

@@ -20,6 +20,8 @@ void USpeedDebuffEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 		Target = Character;
 		const float CharacterSpeed = Character->GetMoveSpeed();
 		Character->SetMoveSpeed(CharacterSpeed - (CharacterSpeed * SpeedMultiplier));
+
+		RemoveEffect();
 	}
 }
 
