@@ -49,3 +49,8 @@ void AZWaveGameState::RegisterSpawnPoint(ASpawnPoint* SP)
 {
     SpawnPoints.Add(SP);
 }
+
+void AZWaveGameState::RegisterClimbingPoint(AClimbingPoint* CP)
+{
+    ClimbingPoints.Add(CP);
+}

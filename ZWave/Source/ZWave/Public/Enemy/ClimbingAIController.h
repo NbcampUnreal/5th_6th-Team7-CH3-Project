@@ -4,21 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/PlayerTargetBaseAIController.h"
-#include "RangedAIController.generated.h"
+#include "ClimbingAIController.generated.h"
 
+class AClimbingPoint;
 /**
  * 
  */
 UCLASS()
-class ZWAVE_API ARangedAIController : public APlayerTargetBaseAIController
+class ZWAVE_API AClimbingAIController : public APlayerTargetBaseAIController
 {
 	GENERATED_BODY()
-
+	
 public:
+	AClimbingAIController();
+
 	virtual bool CheckCondition(AActor* Target) override;
 
-	void GetTargetVector(FVector& OutTargetVector) const;
+	void ResetClimbingPoint();
+
+	void StartClimbing();
+	void StopClimbing();
 
 protected:
-	FVector TargetVector;
+
+	AClimbingPoint* TargetClimbingPoint;
 };

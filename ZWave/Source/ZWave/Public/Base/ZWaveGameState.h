@@ -9,6 +9,7 @@
 
 class UIngameHUD;
 class ASpawnPoint;
+class AClimbingPoint;
 
 UCLASS()
 class ZWAVE_API AZWaveGameState : public AGameStateBase
@@ -29,6 +30,9 @@ public:
     UFUNCTION(BlueprintPure, Category = "Game State")
     TArray<ASpawnPoint*> GetSpawnPointArray() { return SpawnPoints; }
 
+    UFUNCTION(BlueprintPure, Category = "Game State")
+    TArray<AClimbingPoint*> GetClimbingPointArray() { return ClimbingPoints; }
+
     void SetCurrentGameState(EGameState NewState);
 
     void SetCurrentWave(int32 NewWave);
@@ -38,6 +42,8 @@ public:
     void RegisterIngameHUD(UIngameHUD* InHUD);
 
     void RegisterSpawnPoint(ASpawnPoint* SP);
+
+    void RegisterClimbingPoint(AClimbingPoint* CP);
 
     UIngameHUD* GetIngameHUD();
 
@@ -54,5 +60,5 @@ protected:
     int32 EnemiesRemaining = 0;
 
     TArray<ASpawnPoint*> SpawnPoints;
-
+    TArray<AClimbingPoint*> ClimbingPoints;
 };
