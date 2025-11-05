@@ -30,9 +30,8 @@ public:
 	virtual void BeginPlay() override;
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Components")
-	class UStateComponent* StateComp;
-
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UEnemyStateComponent> StateComp;
 
 /// <summary>
 /// 피격, 사망 관련

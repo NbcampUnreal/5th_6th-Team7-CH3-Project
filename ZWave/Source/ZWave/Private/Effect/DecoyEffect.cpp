@@ -2,7 +2,7 @@
 
 
 #include "Effect/DecoyEffect.h"
-#include "State/StateComponent.h"
+#include "State/EnemyStateComponent.h"
 
 UDecoyEffect::UDecoyEffect()
 {
@@ -10,13 +10,18 @@ UDecoyEffect::UDecoyEffect()
 
 void UDecoyEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
+	//if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
+	//{
+	//	Target = Enemy;
+	//	if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
+	//	{
+	//		StateComp->SetState(EStateType::EST_None);
+	//	}
+	//}
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{
 		Target = Enemy;
-		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
-		{
-			StateComp->SetState(EStateType::EST_None);
-		}
+		Enemy->StateComp->SetState(EEnemyStateType::EST_Decoy);
 	}
 
 
@@ -42,11 +47,15 @@ void UDecoyEffect::RemoveEffect()
 
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
 	{
-		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
-		{
-			StateComp->SetState(EStateType::EST_None);
-		}
+		Enemy->StateComp->SetState(EEnemyStateType::EST_None);
 	}
+	//if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
+	//{
+	//	if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
+	//	{
+	//		StateComp->SetState(EStateType::EST_None);
+	//	}
+	//}
 
 	Super::RemoveEffect();
 }

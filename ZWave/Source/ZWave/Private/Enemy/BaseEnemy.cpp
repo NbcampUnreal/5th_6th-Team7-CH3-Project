@@ -8,15 +8,17 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "State/EnemyStateComponent.h"
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
-#include "State/StateComponent.h"
+
 
 ABaseEnemy::ABaseEnemy()
 {
 	TeamID = 2;
 
-	StateComp = CreateDefaultSubobject<UStateComponent>(TEXT("StateComopnent"));
+	StateComp = CreateDefaultSubobject<UEnemyStateComponent>(TEXT("UEnemyStateComponent"));
+	//MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("UMyActorComponent"));
 }
 
 void ABaseEnemy::BeginPlay()

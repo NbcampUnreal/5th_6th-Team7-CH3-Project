@@ -3,7 +3,8 @@
 #include "Effect/EffectApplyManager.h"
 #include "Player/TaskPlayer.h"
 #include "Enemy/BaseEnemy.h"
-#include "State/StateComponent.h"
+#include "State/EnemyStateComponent.h"
+
 
 
 UStaggerEffect::UStaggerEffect()
@@ -15,7 +16,14 @@ void UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{
-		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
+		if (Enemy->StateComp->GetCurrentState() == EEnemyStateType::EST_Stagger) {
+			return;
+		}
+		else
+		{
+			Enemy->StateComp->SetState(EEnemyStateType::EST_Stagger);
+		}
+		/*if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
 		{
 			if (StateComp->GetCurrentState() == EStateType::EST_Stagger)
 			{
@@ -25,7 +33,8 @@ void UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 			{
 				StateComp->SetState(EStateType::EST_Stagger);
 			}
-		}
+		}*/
+
 		this->Target = Enemy;
 		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() / StaggerSpeedMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Active! EnemySpeed : %f"), Enemy->GetMoveSpeed());
@@ -56,13 +65,15 @@ void UStaggerEffect::RemoveEffect()
 		}
 	}
 
-	// 경직 효과 제거 (몬스터 코드 추가 후)
+	//경직 효과 제거 (몬스터 코드 추가 후)
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
 	{
-		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
+		Enemy->StateComp->SetState(EEnemyStateType::EST_None);
+		/*if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
 		{
 			StateComp->SetState(EStateType::EST_None);
-		}
+		}*/
+
 		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() * StaggerSpeedMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect DeActive! EnemySpeed : %f"), Enemy->GetMoveSpeed());
 	}

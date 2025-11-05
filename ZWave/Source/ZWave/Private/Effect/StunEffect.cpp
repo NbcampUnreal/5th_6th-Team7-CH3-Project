@@ -2,8 +2,8 @@
 
 
 #include "Effect/StunEffect.h"
-#include "State/StateComponent.h"
 #include "Enemy/BaseAIController.h"
+#include "State/EnemyStateComponent.h"
 
 UStunEffect::UStunEffect()
 {
@@ -14,17 +14,11 @@ void UStunEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{
 		Target = Enemy;
-		static_cast<ABaseAIController*>(Enemy->GetController())->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), true);
-		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
-		{
-			StateComp->SetState(EStateType::EST_Stun);
-			UE_LOG(LogTemp, Log, TEXT("EffectType: %s"),
-				*UEnum::GetValueAsString(StateComp->GetCurrentState()));
-		}
+		//static_cast<ABaseAIController*>(Enemy->GetController())->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), true);
+		Enemy->StateComp->SetState(EEnemyStateType::EST_Stun, 5);
+		UE_LOG(LogTemp, Log, TEXT("EffectType: %s"),
+			*UEnum::GetValueAsString(Enemy->StateComp->GetCurrentState()));
 	}
-
-	SetStunTimer(5);
-	return;
 
 	/*if (!FMath::IsNearlyZero(Duration))
 	{
@@ -46,14 +40,13 @@ void UStunEffect::RemoveEffect()
 		}
 	}
 
-	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
-	{
-		if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
-		{
-			static_cast<ABaseAIController*>(Enemy->GetController())->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), false);
-			StateComp->SetState(EStateType::EST_None);
-		}
-	}
+	//if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
+	//{
+	//	if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
+	//	{
+	//		StateComp->SetState(EStateType::EST_None);
+	//	}
+	//}
 
 	Super::RemoveEffect();
 }
