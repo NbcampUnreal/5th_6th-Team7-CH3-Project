@@ -16,9 +16,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Stats")
 	float AttackRate;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon Stats")
-	int ModingAllows;
 };
 
 /**

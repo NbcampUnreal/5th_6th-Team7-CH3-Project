@@ -9,7 +9,7 @@
 
 class UItemModeInstance;
 
-UCLASS()
+UCLASS(BlueprintType)
 class ZWAVE_API UItemWeaponInstance : public UItemInstance
 {
 	GENERATED_BODY()
