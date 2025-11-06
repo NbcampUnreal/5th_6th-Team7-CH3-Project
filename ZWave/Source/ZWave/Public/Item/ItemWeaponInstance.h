@@ -22,7 +22,6 @@ public:
     EEquipSlot EquipSlot = EEquipSlot::None;
 
 public:
-    UFUNCTION(BlueprintCallable, Category = "Weapon Instance")
     virtual void Initialize(UItemDefinition* Definition, int32 Count = 1) override;
 
     UFUNCTION(BlueprintCallable, Category = "Weapon Instance")
