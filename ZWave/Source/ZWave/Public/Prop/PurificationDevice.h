@@ -27,15 +27,22 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> Mesh;
 
+
+/// <summary>
+/// 피격 관련
+/// </summary>
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	float MaxHealth;
-
-	UPROPERTY(VisibleAnywhere)
-	float Health;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Team")
 	uint8 TeamID = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	float MaxHealth;
+	UPROPERTY(VisibleAnywhere)
+	float Health;
+	bool bIsEnd = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<class USoundBase> ExplodeSound;
 
 public:
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;

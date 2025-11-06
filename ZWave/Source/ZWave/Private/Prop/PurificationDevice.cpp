@@ -4,6 +4,8 @@
 #include "Prop/PurificationDevice.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Effect/EffectApplyManager.h"
 #include "DamageCalculator/DamageCalculator.h"
 
@@ -57,6 +59,10 @@ void APurificationDevice::ApplyDamage(float Damage, bool CheckArmor)
 
 void APurificationDevice::Die()
 {
-	UE_LOG(LogTemp, Display, TEXT("Game End"));
+	if (bIsEnd == false)
+	{
+		bIsEnd = true;
+		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+	}
 }
 

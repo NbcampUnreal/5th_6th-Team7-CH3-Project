@@ -56,7 +56,6 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 void ABaseEnemy::PlayHitAnimMontage(AActor* DamageCauser)
 {
 	if (StateComp->GetCurrentState() == EEnemyStateType::EST_Stun) {
-		UE_LOG(LogTemp, Display, TEXT("hit when stun"));
 		return;
 	}
 
