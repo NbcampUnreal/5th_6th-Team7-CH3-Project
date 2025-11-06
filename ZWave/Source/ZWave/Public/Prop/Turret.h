@@ -45,6 +45,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<class UAnimMontage> AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	uint8 TeamID = 0;
+
 
 /// <summary>
 /// 체력, 피격, 사망관련

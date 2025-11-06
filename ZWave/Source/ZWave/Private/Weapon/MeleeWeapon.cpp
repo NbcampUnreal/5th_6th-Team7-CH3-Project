@@ -153,9 +153,11 @@ void AMeleeWeapon::EndAttack()
 
 void AMeleeWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Display, TEXT("Melee weapon overlap :%s"), *OtherActor->GetActorNameOrLabel());
 	if (OtherActor && 
 		(MeleeWeaponStat.bCanOverlapSelf == true || (OtherActor != GetOwner() && OtherActor != OwningCharacter)))
 	{
+		UE_LOG(LogTemp, Display, TEXT("Melee weapon overlap :%s IN!!!!!!!"), *OtherActor->GetActorNameOrLabel());
 		OverlappedEnemies.AddUnique(OtherActor);
 	}
 }

@@ -36,4 +36,7 @@ public:
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	uint8 TeamID = 0;
+
 };

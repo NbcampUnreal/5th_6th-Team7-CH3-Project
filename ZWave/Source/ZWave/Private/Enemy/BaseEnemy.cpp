@@ -126,12 +126,22 @@ void ABaseEnemy::SetNewTarget(AActor* DamageCauser)
 	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
 	if (AIController == nullptr) return;
 
-	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
-	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
+	if(DamageCauser != nullptr)
+	{
+		FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
+		FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
 
-	AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
-	AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
-	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+		AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
+		AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
+		AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+	}
+	else // 외부에서 타겟을 해제할수 있도록 해준다.
+	{
+		AIController->ClearValueFromBlackboard(FName(TEXT("SecondaryTarget")));
+		AIController->ClearValueFromBlackboard(FName(TEXT("AttackLocation")));
+
+		AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), false);
+	}
 }
 
 void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)

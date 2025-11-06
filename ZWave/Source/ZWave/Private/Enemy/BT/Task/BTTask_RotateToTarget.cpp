@@ -31,7 +31,6 @@ EBTNodeResult::Type UBTTask_RotateToTarget::ExecuteTask(UBehaviorTreeComponent& 
 
 	FRotator LookAtRot = ToTargetVector.Rotation();
 	FRotator NewRot = FRotator(0, LookAtRot.Yaw, 0);
-	UE_LOG(LogTemp, Display, TEXT("New Rot: %s"), *NewRot.ToCompactString());
 
 	MyCharacter->SetActorRotation(NewRot);
 
