@@ -6,6 +6,10 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+
 #include "Effect/EffectApplyManager.h"
 #include "DamageCalculator/DamageCalculator.h"
 
@@ -17,6 +21,9 @@ APurificationDevice::APurificationDevice()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
+
+	ExplodeLocation = CreateDefaultSubobject<USceneComponent>(TEXT("ExplodeLocation"));
+	ExplodeLocation->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +70,8 @@ void APurificationDevice::Die()
 	{
 		bIsEnd = true;
 		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Niagara_Explode, ExplodeLocation->GetComponentLocation(), FRotator::ZeroRotator);
+
 	}
 }
 
