@@ -69,6 +69,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
 	UInputAction* ShopUIAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
+	UInputAction* ActiveAction;
+
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
