@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GenericTeamAgentInterface.h"
 
 #include "Base/Damagable.h"
-#include "GenericTeamAgentInterface.h"
 
 #include "Turret.generated.h"
 
