@@ -49,6 +49,12 @@ bool UEquipComponent::Equip(EEquipSlot Slot)
 		return false;
 	}
 
+	if (SlotMaps.Contains(Slot) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EquipComp::Equip - That's Not Weapon Settings"));
+		return false;
+	}
+
 	if (AWeaponBase* FindWeapon = SlotMaps.Find(Slot)->Get())
 	{
 		ACharacter* OwnChara = Cast<ACharacter>(GetOwner());
