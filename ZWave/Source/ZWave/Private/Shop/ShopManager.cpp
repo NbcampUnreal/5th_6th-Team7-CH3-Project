@@ -106,14 +106,26 @@ bool UShopManager::TrySellItem(APlayerController* Player, const FString& Name)
 }
 
 
-bool UShopManager::TryUpgradeStat(APlayerController* Player, const FString& Name)
+bool UShopManager::TryUpgradeStat(APlayerController* Player, EPlayerShopStat ShopStatType, float UpValue, int32 Price)
 {
-	UItemDefinition* ItemDef = FindItemByDisplayName(Name);
-
-	if (Player == nullptr
-		|| ItemDef == nullptr)
+	if (Player == nullptr ||
+		UpValue < 0.0f ||
+		Price < 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryUpgradeStat: invalid args"));
+		return false;
+	}
+
+	ATaskPlayer* TaskPlayer = nullptr;
+
+	if (ACharacter* OwnChara = Cast<ACharacter>(Player->GetPawn()))
+	{
+		TaskPlayer = Cast<ATaskPlayer>(OwnChara);
+	}
+
+	if (TaskPlayer == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUpgradeStat: Player Is Not TaskPlayer Type"));
 		return false;
 	}
 
@@ -124,22 +136,15 @@ bool UShopManager::TryUpgradeStat(APlayerController* Player, const FString& Name
 		return false;
 	}
 
-	if (HasEnoughCore(Player, ItemDef->BuyPrice) == false)
+	if (HasEnoughCore(Player, Price) == false)
 	{
-		UE_LOG(LogTemp, Log, TEXT("TryUpgradeStat: not enough money. Need %d"), ItemDef->BuyPrice);
+		UE_LOG(LogTemp, Log, TEXT("TryUpgradeStat: not enough money. Need %d"), Price);
 		return false;
 	}
 
-	// 실제 Stat 관련 적용 함수 Call
-	const bool bApplied = true;
+	TaskPlayer->AddPlayerStat(ShopStatType, UpValue);
 
-	if (bApplied == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TryUpgradeStat: apply failed"));
-		return false;
-	}
-
-	DeductCore(Player, ItemDef->BuyPrice);
+	DeductCore(Player, Price);
 	return true;
 }
 
@@ -244,13 +249,19 @@ bool UShopManager::TryEquipWeapon(APlayerController* Player, const FString& Name
 	return true;
 }
 
-bool UShopManager::TryEquipModingToWeapon(APlayerController* Player, const FString& WeaponName, const FString& ModingName)
+bool UShopManager::TryEquipModingToWeapon(APlayerController* Player, const FString& WeaponName, const FString& ModingName, int32 EquipSlot)
 {
+	if (Player == nullptr ||
+		EquipSlot < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: invalid args"));
+		return false;
+	}
+
 	UItemDefinition* WeaponItemDef = FindItemByDisplayName(WeaponName);
 	UItemDefinition* ModingItemDef = FindItemByDisplayName(ModingName);
 
-	if (Player == nullptr
-		|| WeaponItemDef == nullptr
+	if (WeaponItemDef == nullptr
 		|| ModingItemDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: invalid args"));
@@ -271,13 +282,6 @@ bool UShopManager::TryEquipModingToWeapon(APlayerController* Player, const FStri
 		return false;
 	}
 
-	int32 WeaponEntryIdx = InvComp->FindItemByDef(WeaponItemDef);
-	if (WeaponEntryIdx == INDEX_NONE)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: WeaponItem was not found"));
-		return false;
-	}
-
 	const UWeaponDefinition* ModeDef = Cast<UWeaponDefinition>(ModingItemDef->Definition);
 	if (ModeDef == nullptr)
 	{
@@ -285,18 +289,53 @@ bool UShopManager::TryEquipModingToWeapon(APlayerController* Player, const FStri
 		return false;
 	}
 
-	int32 ModingEntryIdx = InvComp->FindItemByDef(ModingItemDef);
-	if (ModingEntryIdx == INDEX_NONE)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: ModingItem was not found"));
-		return false;
-	}
-
-	bool bResult = InvComp->EquipModingToWeapon(WeaponEntryIdx, ModingEntryIdx);
+	bool bResult = InvComp->EquipModingToWeapon(WeaponItemDef, ModingItemDef, EquipSlot);
 
 	if (bResult == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: EquipModing Failed"));
+		return false;
+	}
+
+	return true;
+}
+
+bool UShopManager::TryUnequipModingToWeapon(APlayerController* Player, const FString& WeaponName, int32 EquipSlot)
+{
+	if (Player == nullptr ||
+		EquipSlot < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: invalid args"));
+		return false;
+	}
+
+	UItemDefinition* WeaponItemDef = FindItemByDisplayName(WeaponName);
+
+	if (WeaponItemDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: invalid args"));
+		return false;
+	}
+
+	UInventoryComponent* InvComp = GetInventoryFromPlayer(Player);
+	if (InvComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: Inventory not found"));
+		return false;
+	}
+
+	const UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(WeaponItemDef->Definition);
+	if (WeaponDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: Item is not weapon"));
+		return false;
+	}
+
+	bool bResult = InvComp->UnequipModingToWeapon(WeaponItemDef, EquipSlot);
+
+	if (bResult == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: UnequipModing Failed"));
 		return false;
 	}
 

@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Player/TaskPlayer.h"
@@ -9,9 +9,11 @@
 #include "EnhancedInputComponent.h"
 #include "Player/TaskPlayerController.h"
 #include "Weapon/EquipComponent.h"
+#include "Item/InventoryComponent.h"
 #include "Weapon/ShootWeapon.h"
 #include "UI/IngameHUD.h"
 #include "Base/ZWaveGameState.h"
+#include "Player/InteractInterface.h"
 
 ATaskPlayer::ATaskPlayer()
 {
@@ -30,6 +32,8 @@ ATaskPlayer::ATaskPlayer()
 	CameraComp->bUsePawnControlRotation = false;
 
 	ActionComp = CreateDefaultSubobject<UCharacterActionComponent>(TEXT("ActionComp"));
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 
@@ -154,6 +158,14 @@ void ATaskPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 					ETriggerEvent::Triggered,
 					PlayerController,
 					&ATaskPlayerController::ShowShopUI
+				);
+			}
+			if (PlayerController->ActiveAction)
+			{
+				EnhancedInput->BindAction(PlayerController->ActiveAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ATaskPlayer::ActiveFieldObject
 				);
 			}
 
@@ -400,6 +412,16 @@ void ATaskPlayer::Grenade()
 	ActionComp->Grenade();
 }
 
+void ATaskPlayer::ActiveFieldObject()
+{
+	AActor* ActiveObject = PickNearestActiveObject();
+	if (ActiveObject)
+	{
+		IInteractInterface::Execute_OnInteract(ActiveObject, this);
+		ActionComp->ActiveFuildObject();
+	}
+}
+
 EShootType ATaskPlayer::GetShootType() const
 {
 	if (!NowShootWeapon)
@@ -428,6 +450,53 @@ void ATaskPlayer::AddPlayerStat(EPlayerShopStat statType, float value)
 	default:
 		break;
 	}
+}
+
+void ATaskPlayer::AddActiveObject(AActor* inActiveObject)
+{
+	if (!IsValid(inActiveObject))
+		return;
+
+	if (!inActiveObject->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+		return;
+
+	InteractCandidates.AddUnique(inActiveObject);
+}
+
+void ATaskPlayer::RemoveActiveObject(AActor* inActiveObject)
+{
+	InteractCandidates.RemoveAllSwap([inActiveObject](const TWeakObjectPtr<AActor>& W) {
+		return !W.IsValid() || W.Get() == inActiveObject;
+		});
+}
+
+void ATaskPlayer::PruneInvalid()
+{
+	InteractCandidates.RemoveAllSwap([](const TWeakObjectPtr<AActor>& W) {
+		return !W.IsValid();
+		});
+}
+
+AActor* ATaskPlayer::PickNearestActiveObject()
+{
+	PruneInvalid();
+
+	AActor* ActiveObject = nullptr;
+	float BestDistSqr = TNumericLimits<float>::Max();
+
+	for (const TWeakObjectPtr<AActor>& CheckActiveObject : InteractCandidates)
+	{
+		if (AActor* Actor = CheckActiveObject.Get())
+		{
+			const float Distance = FVector::DistSquared(this->GetActorLocation(), Actor->GetActorLocation());
+			if (Distance < BestDistSqr)
+			{
+				BestDistSqr = Distance;
+				ActiveObject = Actor;
+			}
+		}
+	}
+	return ActiveObject;
 }
 
 UIngameHUD* ATaskPlayer::GetIngameHud()

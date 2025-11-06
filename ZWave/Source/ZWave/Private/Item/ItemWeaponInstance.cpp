@@ -1,9 +1,19 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Item/ItemWeaponInstance.h"
 #include "Item/ItemModeInstance.h"
+#include "Item/ItemDefinition.h"
 
+void UItemWeaponInstance::Initialize(UItemDefinition* Definition, int32 Count)
+{
+    Super::Initialize(Definition, Count);
+
+    if (Definition != nullptr)
+    {
+        AttachedMods.SetNum(Definition->ModingAllows);
+    }
+}
 
 bool UItemWeaponInstance::AttachMod(UItemModeInstance* ModInstance)
 {

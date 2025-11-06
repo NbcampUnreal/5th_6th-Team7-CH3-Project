@@ -6,12 +6,13 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "Engine/DataTable.h"
 #include "Weapon/EquipComponent.h"
+#include "Player/TaskPlayer.h"
 #include "ShopManager.generated.h"
 
 class UItemDefinition;
 
 /**
- * 
+ *
  */
 UCLASS()
 class ZWAVE_API UShopManager : public UWorldSubsystem
@@ -27,7 +28,7 @@ public:
 	bool TrySellItem(APlayerController* Player, const FString& Name);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryUpgradeStat(APlayerController* Player, const FString& Name);
+	bool TryUpgradeStat(APlayerController* Player, EPlayerShopStat ShopStat, float UpValue, int32 Price);
 
 	UFUNCTION(BlueprintCallable)
 	bool TryCombineWeapon(APlayerController* Player, const FString& Name);
@@ -36,7 +37,10 @@ public:
 	bool TryEquipWeapon(APlayerController* Player, const FString& Name, int32 Slot);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryEquipModingToWeapon(APlayerController* Player, const FString& WeaponName, const FString& ModingName);
+	bool TryEquipModingToWeapon(APlayerController* Player, const FString& WeaponName, const FString& ModingName, int32 EquipSlot);
+
+	UFUNCTION(BlueprintCallable)
+	bool TryUnequipModingToWeapon(APlayerController* Player, const FString& WeaponName, int32 EquipSlot);
 
 	UFUNCTION(BlueprintCallable)
 	UItemDefinition* FindItemByDisplayName(const FString& Name) const;

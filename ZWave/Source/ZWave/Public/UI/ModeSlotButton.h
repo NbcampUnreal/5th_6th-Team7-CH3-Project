@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "UI/ModeSlotButtonInfo.h"
+#include "UI/ItemSlotInfo.h"
 
 #include "CommonButtonBase.h"
 #include "ModeSlotButton.generated.h"
@@ -16,7 +16,7 @@ class ZWAVE_API UModeSlotButton : public UCommonButtonBase
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mode")
-	FModeSlotButtonInfo ModeData;
+	FItemSlotInfo ModeData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mode")
 	TObjectPtr<UPanelModeSlot> ParentPanel;
@@ -26,7 +26,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Mode")
-	void InitModeSlot(FModeSlotButtonInfo Data, UPanelModeSlot* Parent);
+	void InitModeSlot(FItemSlotInfo Data, UPanelModeSlot* Parent);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Mode")
 	void OnSelectedMode(UCommonButtonBase* Button);
@@ -34,5 +34,5 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Mode")
 	void OnDeselectedMode();
 
-	FORCEINLINE FModeSlotButtonInfo* GetModeData() { return &ModeData; }
+	FORCEINLINE FItemSlotInfo* GetModeData() { return &ModeData; }
 };
