@@ -1,6 +1,7 @@
 #include "UI/PanelModeSlot.h"
 
 #include "UI/ModeSlotButton.h"
+#include "UI/ItemCategoryInfo.h"
 #include "UI/PanelModeDesc.h"
 
 #include "Components/UniformGridPanel.h"
@@ -20,7 +21,32 @@ void UPanelModeSlot::NativeOnInitialized()
 
 	static const FString ContextString(TEXT("ModeSlotInfoContext"));
 
-	TArray<FName> RowNameList = ModeSlotInfoDataTable->GetRowNames();
+	FItemCategoryInfo* RowData = ModeSlotInfoDataTable->FindRow<FItemCategoryInfo>(FName("CategoryMode"), ContextString);
+	for (auto& ItemData : RowData->ItemSlotInfoList)
+	{
+		FString Name = ItemData.ItemName.ToString() + "Mode";
+		UUserWidget* Widget = WidgetTree->ConstructWidget<UUserWidget>(ModeSlotClass, FName(Name));
+		if (IsValid(Widget))
+		{
+			UModeSlotButton* ModeSlot = Cast<UModeSlotButton>(Widget);
+			if (IsValid(ModeSlot))
+			{
+				ModeSlot->InitModeSlot(ItemData, this);
+
+				ModeSlotList.Add(ModeSlot);
+
+				if (ModeSlotGrid->CanAddMoreChildren())
+				{
+					int row = (ModeSlotList.Num() - 1) / MODES_IN_ROW;
+					int col = (ModeSlotList.Num() - 1) % MODES_IN_ROW;
+
+					ModeSlotGrid->AddChildToUniformGrid(ModeSlot, row, col);
+				}
+			}
+		}
+	}
+
+	/*TArray<FName> RowNameList = ModeSlotInfoDataTable->GetRowNames();
 	for (auto& RowName : RowNameList)
 	{
 		FString Name = RowName.ToString() + "ModeSlot";
@@ -43,7 +69,7 @@ void UPanelModeSlot::NativeOnInitialized()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void UPanelModeSlot::FindPanel()
