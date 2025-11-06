@@ -34,7 +34,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mode")
 	TSubclassOf<UEffectBase> EffectClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UModingInstance> ModingClass;
 };
