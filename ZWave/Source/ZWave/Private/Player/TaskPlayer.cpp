@@ -282,12 +282,18 @@ void ATaskPlayer::Attacked(AActor* DamageCauser, float Damage)
 	ActionComp->Attacked(DamageCauser);
 }
 
-
-
 void ATaskPlayer::Die()
 {
 	ActionComp->Die();
-	//사망 시 UI출력?
+
+}
+
+void ATaskPlayer::GameOver()
+{
+	if (ATaskPlayerController* PlayerController = Cast<ATaskPlayerController>(GetController()))
+	{
+		PlayerController->ShowResultHUD();
+	}
 }
 
 void ATaskPlayer::EquipFirstSlot()

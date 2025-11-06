@@ -589,7 +589,16 @@ void UCharacterActionComponent::SetStopMotion()
 
 void UCharacterActionComponent::GameOver()
 {
-	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
+	ATaskPlayer* Character = Cast<ATaskPlayer>(GetOwner());
+	if (Character)
+	{
+		Character->GameOver();
+
+	}
+	//UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
+
+	
+
 }
 
 void UCharacterActionComponent::UpdateShoulder(float DeltaTime)
