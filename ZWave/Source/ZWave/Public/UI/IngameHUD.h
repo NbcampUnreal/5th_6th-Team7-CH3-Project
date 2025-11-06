@@ -26,6 +26,9 @@ public:
 	void OnHealthChange(float CurrentHealth, float TargetHealth);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnObjectHealthChange(float CurrentHealth, float TargetHealth);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnGunChanged(EShootType SlotIdx);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
