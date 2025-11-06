@@ -22,7 +22,7 @@ void UEquipComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentSlot = EEquipSlot::None;
-	WeaponDefinitionMap.Reserve(static_cast<int32>(EEquipSlot::None));
+	WeaponDefinitionMap.Reserve(100);
 
 	if (WeaponDefinitionMap.Num() == 0)
 	{
