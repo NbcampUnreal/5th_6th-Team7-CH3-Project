@@ -15,6 +15,8 @@ enum class EPlayerShopStat : uint8
 	MoveSpeedMultiply,
 	ReloadSpeedMultiply,
 	ShotSpeedMultiplay,
+	MaxBatteryAmount,
+	TurretInstall,
 };
 
 class UCharacterActionComponent;

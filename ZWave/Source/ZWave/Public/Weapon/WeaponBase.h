@@ -61,7 +61,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	bool bCanAttack = true;
-	UPROPERTY(VisibleAnywhere)
+
+	UPROPERTY(EditDefaultsOnly)
 	TMap<EModingSlot, TObjectPtr<UModingInstance>> EquipModingMap;
 
 	// 내부 Effect 관리용
