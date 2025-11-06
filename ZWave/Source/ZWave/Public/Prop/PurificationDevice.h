@@ -23,22 +23,24 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> Mesh;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	float MaxHealth;
+
+	UPROPERTY(VisibleAnywhere)
+	float Health;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	uint8 TeamID = 0;
 
 public:
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Team")
-	uint8 TeamID = 0;
 
 };

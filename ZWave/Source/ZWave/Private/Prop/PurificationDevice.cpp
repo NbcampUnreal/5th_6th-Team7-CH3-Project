@@ -22,13 +22,7 @@ void APurificationDevice::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-// Called every frame
-void APurificationDevice::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	Health = MaxHealth;
 }
 
 float APurificationDevice::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -49,13 +43,20 @@ float APurificationDevice::TakeDamage(float DamageAmount, const FDamageEvent& Da
 
 void APurificationDevice::Attacked(AActor* DamageCauser, float Damage)
 {
+	ApplyDamage(Damage);
 }
 
 void APurificationDevice::ApplyDamage(float Damage, bool CheckArmor)
 {
+	Health -= Damage;
+	if (Health <= 0.f)
+	{
+		Die();
+	}
 }
 
 void APurificationDevice::Die()
 {
+	UE_LOG(LogTemp, Display, TEXT("Game End"));
 }
 
