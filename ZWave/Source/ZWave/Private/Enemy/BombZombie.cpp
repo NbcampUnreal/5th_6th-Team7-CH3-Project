@@ -8,25 +8,10 @@
 #include "Weapon/EquipComponent.h"
 
 
-void ABombZombie::BeginPlay()
-{
-	Super::BeginPlay();
-}
 
-void ABombZombie::Die()
-{
-	//SuisideBomb();
-
-	Super::Die();
-}
-
-void ABombZombie::Attacked(AActor* DamageCauser, float Damage)
-{
-	Super::Attacked(DamageCauser, Damage);
-}
 
 void ABombZombie::Suiside()
 {
-
+	this->Attacked(this, 100);
 }
 

@@ -27,6 +27,7 @@ EBTNodeResult::Type UBTTask_RotateToTargetActor::ExecuteTask(UBehaviorTreeCompon
 	if (MyCharacter == nullptr) return EBTNodeResult::Failed;
 
 	AActor* Target = static_cast<AActor*>(OwnerBlackboard->GetValueAsObject(GetSelectedBlackboardKey()));
+	if (Target == nullptr) return EBTNodeResult::Failed;
 	FVector ToTargetVector = (Target->GetActorLocation() - MyCharacter->GetActorLocation()).GetSafeNormal();
 
 	FRotator LookAtRot = ToTargetVector.Rotation();
