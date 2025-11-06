@@ -55,6 +55,9 @@ public:
 
 	UFUNCTION()
 	AActor* PickNearestActiveObject();
+
+	UFUNCTION()
+	void GameOver();
 protected:
 
 	virtual void BeginPlay() override;
