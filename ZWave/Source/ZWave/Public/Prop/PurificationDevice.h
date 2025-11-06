@@ -10,7 +10,7 @@
 #include "PurificationDevice.generated.h"
 
 UCLASS()
-class ZWAVE_API APurificationDevice : public AActor, public IDamagable
+class ZWAVE_API APurificationDevice : public AActor, public IDamagable, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 	

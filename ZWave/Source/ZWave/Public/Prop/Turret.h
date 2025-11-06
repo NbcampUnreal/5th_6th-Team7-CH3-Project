@@ -6,11 +6,12 @@
 #include "GameFramework/Actor.h"
 
 #include "Base/Damagable.h"
+#include "GenericTeamAgentInterface.h"
 
 #include "Turret.generated.h"
 
 UCLASS()
-class ZWAVE_API ATurret : public AActor, public IDamagable
+class ZWAVE_API ATurret : public AActor, public IDamagable, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 	
