@@ -326,6 +326,10 @@ bool UInventoryComponent::EquipModingToWeapon(int32 TargetWeaponSlotIdx, int32 T
 	if (TargetWeaponItem == nullptr)
 		return false;
 
+	UItemDefinition* TargetWeaponDef = TargetWeaponItem->ItemDef;
+	if (TargetWeaponDef == nullptr)
+		return false;
+
 	UItemWeaponInstance* WeaponItem = Cast<UItemWeaponInstance>(TargetWeaponItem);
 	if (WeaponItem == nullptr)
 		return false;
@@ -337,6 +341,12 @@ bool UInventoryComponent::EquipModingToWeapon(int32 TargetWeaponSlotIdx, int32 T
 	UItemModeInstance* ModingItem = Cast<UItemModeInstance>(TargetModingItem);
 	if (ModingItem == nullptr)
 		return false;
+
+	if (WeaponItem->AttachedMods.Num() >= TargetWeaponDef->ModingAllows)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Full Moding!"));
+		return false;
+	}
 
 	if (ModingItem->IsEquipped() == true ||
 		WeaponItem->IsModAttached(ModingItem))
