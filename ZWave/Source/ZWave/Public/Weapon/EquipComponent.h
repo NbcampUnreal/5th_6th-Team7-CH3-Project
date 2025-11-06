@@ -38,7 +38,7 @@ public:
 	bool Equip(EEquipSlot Slot);
 	void UnEquip(EEquipSlot Slot);
 
-	void SetSlotData(EEquipSlot Slot, const UWeaponDefinition* WeaponDef);
+	void SetSlotData(EEquipSlot Slot, UWeaponDefinition* WeaponDef);
 	void ClearSlotData(EEquipSlot Slot);
 	void AmmoSupply(float AddingPercent);
 

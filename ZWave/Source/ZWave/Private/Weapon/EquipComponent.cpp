@@ -22,6 +22,7 @@ void UEquipComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentSlot = EEquipSlot::None;
+	WeaponDefinitionMap.Reserve(static_cast<int32>(EEquipSlot::None));
 
 	if (WeaponDefinitionMap.Num() == 0)
 	{
@@ -97,7 +98,7 @@ void UEquipComponent::UnEquip(EEquipSlot Slot)
 	}
 }
 
-void UEquipComponent::SetSlotData(EEquipSlot Slot, const UWeaponDefinition* WeaponDef)
+void UEquipComponent::SetSlotData(EEquipSlot Slot, UWeaponDefinition* WeaponDef)
 {
 	if (WeaponDef == nullptr ||
 		GetOwner() == nullptr)
@@ -136,6 +137,7 @@ void UEquipComponent::SetSlotData(EEquipSlot Slot, const UWeaponDefinition* Weap
 
 		UGameplayStatics::FinishSpawningActor(WeaponActor, FTransform::Identity);
 		SlotMaps.Add(Slot, WeaponActor);
+		WeaponDefinitionMap.Add(Slot, WeaponDef);
 		UnEquip(Slot);
 	}
 }
@@ -150,7 +152,8 @@ void UEquipComponent::ClearSlotData(EEquipSlot Slot)
 	if (AWeaponBase* FindWeapon = SlotMaps.Find(Slot)->Get())
 	{
 		FindWeapon->Destroy();
-		SlotMaps[Slot] = nullptr;
+		SlotMaps.Remove(Slot);
+		WeaponDefinitionMap.Remove(Slot);
 	}
 }
 
