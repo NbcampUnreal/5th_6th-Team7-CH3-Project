@@ -33,6 +33,7 @@ private:
 
 
 public:
+	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;

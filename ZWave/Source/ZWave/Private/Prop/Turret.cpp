@@ -11,6 +11,8 @@
 #include "Weapon/EquipComponent.h"
 #include "Weapon/WeaponBase.h"
 #include "Enemy/BaseEnemy.h"
+#include "Effect/EffectApplyManager.h"
+#include "DamageCalculator/DamageCalculator.h"
 
 // Sets default values
 ATurret::ATurret()
@@ -69,11 +71,25 @@ void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	}
 }
 
+float ATurret::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (const FZWaveDamageEvent* CustomDamageEvent = static_cast<const FZWaveDamageEvent*>(&DamageEvent))
+	{
+		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
+		{
+			EffectManager->ApplyEffect(this, CustomDamageEvent->EffectArray, CustomDamageEvent->Duration);
+		}
+
+
+		Attacked(DamageCauser, DamageAmount); //데미지 계산 후 넘겨줄 수도 있고 아니면 그냥 이렇게 쓸 수도 있을 듯
+	}
+
+	return DamageAmount;
+}
+
 void ATurret::Attacked(AActor* DamageCauser, float Damage)
 {
 	ApplyDamage(Damage, false);
-
-	UE_LOG(LogTemp, Display, TEXT("DC: %s"), *DamageCauser->GetActorNameOrLabel());
 }
 
 void ATurret::ApplyDamage(float Damage, bool CheckArmor)
@@ -89,12 +105,20 @@ void ATurret::ApplyDamage(float Damage, bool CheckArmor)
 
 void ATurret::Die()
 {
-	SetLifeSpan(0.5f);
+
+	/*SetLifeSpan(0.5f);*/	
+	if (Mesh != nullptr) {
+		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+
+		if (AnimInstance != nullptr) {
+			AnimInstance->Montage_Play(Montage_Destory);
+		}
+	}
 }
 
 void ATurret::Attack()
 {
-	if (Target == nullptr) {
+	if (Target == nullptr || Health <= 0.f) {
 		UE_LOG(LogTemp, Display, TEXT("Null Target"));
 		return;
 	}
