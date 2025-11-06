@@ -36,7 +36,7 @@ void AFieldItem::BeginPlay()
 
 void AFieldItem::OnFieldItemBeingOverlap(UPrimitiveComponent* OtherlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (ABaseCharacter* Player = Cast<ABaseCharacter>(OtherActor))
+	if (ATaskPlayer* Player = Cast<ATaskPlayer>(OtherActor))
 	{
 		CauserActor = Player;
 		ActiveEffect(Player);
@@ -55,6 +55,19 @@ void AFieldItem::Init(int32 ItemIndex)
 	int32 Key = FieldItemIndex > FieldItemMap.Num() ? 3 : FieldItemIndex; // 재료 아이템 키 보정
 	Mesh->SetStaticMesh(FieldItemMap[Key].Get<0>());
 	Mesh->SetRelativeScale3D(FieldItemMap[Key].Get<1>());
+
+	switch (FieldItemIndex)
+	{
+	case 1:
+		FieldItemEffectClassArray.Add(UHealthEffect::StaticClass());
+		break;
+	case 2:
+		FieldItemEffectClassArray.Add(USpareAmmoAddingEffect::StaticClass());
+		break;
+	default:
+		FieldItemEffectClassArray.Add(UGainItemEffect::StaticClass());
+		break;
+	}
 }
 
 void AFieldItem::ActiveEffect(AActor* OtherActor)
@@ -83,17 +96,14 @@ void AFieldItem::SetMaps()
 	if (KitMesh.Succeeded())
 	{
 		FieldItemMap.Add(1, MakeTuple(KitMesh.Object, FVector(1.0f)));
-		FieldItemEffectClassArray.Add(UHealthEffect::StaticClass());
 	}
 	if (AmmoMesh.Succeeded())
 	{
 		FieldItemMap.Add(2, MakeTuple(AmmoMesh.Object, FVector(4.5f)));
-		FieldItemEffectClassArray.Add(USpareAmmoAddingEffect::StaticClass());
 	}
 	if (IngrediantMesh.Succeeded())
 	{
 		FieldItemMap.Add(3, MakeTuple(IngrediantMesh.Object, FVector(0.3f)));
-		FieldItemEffectClassArray.Add(UGainItemEffect::StaticClass());
 	}
 }
 
