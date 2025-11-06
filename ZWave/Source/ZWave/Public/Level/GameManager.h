@@ -15,6 +15,8 @@ class UPointLightComponent;
 class USpotLightComponent;
 class UEffectApplyManager;
 class UEffectBase;
+class ATurret;
+class UEnemySpawnManager;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackoutStateChangedSignature, bool, bIsBlackoutActive);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStimStateChangedSignature, bool, bIsNowOnCooldown);
@@ -54,6 +56,11 @@ public:
 
 	bool GetIsBlackOutActive() { return bIsBlackoutActive; }
 
+	UFUNCTION(BlueprintCallable, Category = "Turret")
+	bool SpawnTurret(int32 SpawnPointIndex);
+
+	void GetRewardBioCoin(int32 value);
+
 protected:
 	UPROPERTY()
 	TWeakObjectPtr<UWaveManager> WaveManager;
@@ -84,12 +91,20 @@ protected:
 
 	bool bBlackoutUsedThisWave = false;
 
+	UFUNCTION(BlueprintPure, Category = "Game Stats")
+	int32 GetCumulativeKills() const { return CumulativeKills; }
 
 	UPROPERTY(Transient)
 	TObjectPtr<UEffectApplyManager> EffectManager;
 
 	UPROPERTY(VisibleAnywhere, Category = "Stim System")
 	TSubclassOf<UEffectBase> StimEffectClass;
+
+	UPROPERTY()
+	TArray<FTransform> TurretSpawnTransforms;
+
+	UPROPERTY(VisibleAnywhere, Category = "Turret")
+	TSubclassOf<ATurret> TurretClassToSpawn;
 
 	EGameState CurrentState = EGameState::EGS_None;
 
@@ -98,6 +113,15 @@ protected:
 	FTimerHandle PrepPhaseTimerHandle;
 	FTimerHandle GameStartTimerHandle;
 	FTimerHandle BlackoutTimerHandle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Stats")
+	int32 CumulativeKills = 0;
+
+	UPROPERTY()
+	TWeakObjectPtr<UEnemySpawnManager> EnemySpawnManager;
+
+	UFUNCTION()
+	void HandleEnemyKilled(ABaseCharacter* DiedEnemy);
 
 	UFUNCTION()
 	void OnPlayerDied(AActor* DiedActor);
@@ -113,8 +137,5 @@ protected:
 	void EndBlackoutEvent();
 
 	AZWaveGameState* GetGameState();
-
-
-
 
 };

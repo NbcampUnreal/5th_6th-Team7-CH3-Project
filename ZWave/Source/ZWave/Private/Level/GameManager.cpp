@@ -16,7 +16,10 @@
 #include "Effect/SpeedBuffEffect.h"
 #include "Effect/EffectApplyManager.h"
 #include "Effect/EffectBase.h"
-
+#include "Prop/Turret.h"
+#include "Item/InventoryComponent.h"
+#include "Level/EnemySpawnManager.h"
+#include "Player/TaskPlayer.h"
 
 void UGameManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -34,6 +37,12 @@ void UGameManager::Initialize(FSubsystemCollectionBase& Collection)
     EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>();
     StimEffectClass = USpeedBuffEffect::StaticClass();
 
+    EnemySpawnManager = GetWorld()->GetSubsystem<UEnemySpawnManager>();
+
+    if (EnemySpawnManager.IsValid())
+    {
+        EnemySpawnManager->OnEnemyDied.AddUObject(this, &UGameManager::HandleEnemyKilled);
+    }
     AllManagedPointLights.Empty();
     AllManagedSpotLights.Empty();
     AllControlPanelsInLevel.Empty();
@@ -47,12 +56,15 @@ void UGameManager::BindPlayerEvents(APawn* PlayerPawn)
         PlayerPawn->OnDestroyed.AddDynamic(this, &UGameManager::OnPlayerDied);
         UE_LOG(LogTemp, Log, TEXT("Player events bound to GameManager."));
     }
+
+    
 }
 
 void UGameManager::StartGame()
 {
     UE_LOG(LogTemp, Warning, TEXT("Game Starting..."));
     CurrentWaveNumber = 0;
+    CumulativeKills = 0;
     BeginPreparationPhase();
 
     UWorld* World = GetWorld();
@@ -82,6 +94,31 @@ void UGameManager::StartGame()
 
         UE_LOG(LogTemp, Log, TEXT("GameManager: Found %d PointLights, %d SpotLights, %d ControlPanels."),
             AllManagedPointLights.Num(), AllManagedSpotLights.Num(), AllControlPanelsInLevel.Num());
+
+        TArray<AActor*> FoundTurretSpawns;
+        UGameplayStatics::GetAllActorsWithTag(World, FName("TurretSpawnPoint"), FoundTurretSpawns);
+
+        for (AActor* SpawnActor : FoundTurretSpawns)
+        {
+            if (SpawnActor)
+            {
+                TurretSpawnTransforms.Add(SpawnActor->GetActorTransform());
+            }
+        }
+    }
+
+    {
+        FSoftClassPath ItemClassPath(TEXT("Blueprint'/Game/Prop/Turret/BP_Turret.BP_Turret_C'"));
+        UClass* LoadedClass = ItemClassPath.TryLoadClass<ATurret>();
+        if (LoadedClass)
+        {
+            TurretClassToSpawn = LoadedClass;
+            UE_LOG(LogTemp, Warning, TEXT("GameManager : Success to load TurretClass!"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("GameManager : FAILED to load TurretClass!"));
+        }
     }
 }
 
@@ -298,4 +335,63 @@ void UGameManager::UseStim(AActor* Interactor)
     TArray<TSubclassOf<UEffectBase>> EffectArray;
     EffectArray.Add(StimEffectClass);
     EffectManager->ApplyEffect(Interactor, EffectArray, StimBuffDuration);
+}
+
+bool UGameManager::SpawnTurret(int32 SpawnPointIndex)
+{
+    if (!TurretClassToSpawn)
+    {
+        UE_LOG(LogTemp, Error, TEXT("SpawnTurret FAILED: TurretClassToSpawn is NULL."));
+        return false;
+    }
+
+    if (TurretSpawnTransforms.IsValidIndex(SpawnPointIndex))
+    {
+        FTransform SpawnTransform = TurretSpawnTransforms[SpawnPointIndex];
+
+        GetWorld()->SpawnActor<ATurret>(TurretClassToSpawn, SpawnTransform);
+
+        UE_LOG(LogTemp, Log, TEXT("Turret spawned at index %d"), SpawnPointIndex);
+        return true;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("SpawnTurret FAILED: Invalid SpawnPointIndex %d"), SpawnPointIndex);
+    return false;
+}
+
+void UGameManager::GetRewardBioCoin(int32 value)
+{
+    if (value > 0)
+    {
+        APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+        ATaskPlayer* TaskPlayer = Cast<ATaskPlayer>(PlayerPawn);
+        if (TaskPlayer)
+        {
+            UInventoryComponent* PlayerInventory = TaskPlayer->FindComponentByClass<UInventoryComponent>();
+            if (PlayerInventory)
+            {
+                PlayerInventory->AddBioCoreCount(value);
+
+                UE_LOG(LogTemp, Log, TEXT("Awarded %d BioCore to Player for clearing wave."), value);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Log, TEXT("Inventory is null"), value);
+            }
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("Player Ref is null"), value);
+        }
+    }
+}
+
+void UGameManager::HandleEnemyKilled(ABaseCharacter* DiedEnemy)
+{
+    if (DiedEnemy)
+    {
+        CumulativeKills++;
+
+        UE_LOG(LogTemp, Log, TEXT("Total Kills: %d"), CumulativeKills);
+    }
 }
