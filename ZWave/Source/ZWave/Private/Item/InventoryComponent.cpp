@@ -208,14 +208,14 @@ int32 UInventoryComponent::CountItemByName(const FString& Name) const
 
 	if (ShopMgr == nullptr)
 	{
-		UE_LOG(LogTemp, Fatal, TEXT("CountItemByName : Shop Manager Null...??"));
+		UE_LOG(LogTemp, Warning, TEXT("CountItemByName : Shop Manager Null...??"));
 		return 0;
 	}
 
 	const UItemDefinition* ItemDef = ShopMgr->FindItemByDisplayName(Name);
 	if (ItemDef == nullptr)
 	{
-		UE_LOG(LogTemp, Fatal, TEXT("CountItemByName : Item Name is not valid"));
+		UE_LOG(LogTemp, Warning, TEXT("CountItemByName : Item Name is not valid"));
 		return 0;
 	}
 
