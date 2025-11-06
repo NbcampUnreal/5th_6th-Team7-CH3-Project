@@ -12,6 +12,8 @@
 
 #include "Effect/EffectApplyManager.h"
 #include "DamageCalculator/DamageCalculator.h"
+#include "Base/ZWaveGameState.h"
+#include "UI/IngameHUD.h"
 
 // Sets default values
 APurificationDevice::APurificationDevice()
@@ -32,6 +34,20 @@ void APurificationDevice::BeginPlay()
 	Super::BeginPlay();
 	
 	Health = MaxHealth;
+	//GetIngameHud()->OnObjectHealthChange(0, Health);
+}
+
+UIngameHUD* APurificationDevice::GetIngameHud()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (AZWaveGameState* ZGS = Cast<AZWaveGameState>(World->GetGameState()))
+		{
+			return ZGS->IngameHUD;
+		}
+	}
+
+	return nullptr;
 }
 
 float APurificationDevice::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -57,7 +73,10 @@ void APurificationDevice::Attacked(AActor* DamageCauser, float Damage)
 
 void APurificationDevice::ApplyDamage(float Damage, bool CheckArmor)
 {
+	float CurHealth = Health;
 	Health -= Damage;
+	GetIngameHud()->OnObjectHealthChange(CurHealth, Health);
+
 	if (Health <= 0.f)
 	{
 		Die();

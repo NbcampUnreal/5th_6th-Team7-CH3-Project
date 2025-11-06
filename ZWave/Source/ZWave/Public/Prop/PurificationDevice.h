@@ -29,6 +29,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USceneComponent> ExplodeLocation;
 	
+	class UIngameHUD* GetIngameHud();
 
 /// <summary>
 /// 피격 관련
