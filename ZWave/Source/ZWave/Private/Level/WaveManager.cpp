@@ -49,6 +49,9 @@ void UWaveManager::StartWave(int32 WaveNumber)
     const FName RowName = FName(*FString::FromInt(WaveNumber));
     FWaveDataInfo* WaveData = WaveDataTable->FindRow<FWaveDataInfo>(RowName, TEXT("WaveManager"));
 
+    CurrentWaveDataCache = WaveData;
+    CurrentWaveNumber = WaveNumber;
+
     if (WaveData)
     {
         UE_LOG(LogTemp, Warning, TEXT("WaveData found! MonsterSpawnList contains %d entries."), WaveData->MonsterSpawnList.Num());
@@ -105,7 +108,10 @@ void UWaveManager::OnWaveCleared()
     if (GameManager.IsValid())
     {
         GameManager->BeginPreparationPhase();
+
+        GameManager->GetRewardBioCoin(CurrentWaveDataCache->WaveClearRewardBioCoin);
     }
+
 }
 
 AZWaveGameState* UWaveManager::GetGameState()

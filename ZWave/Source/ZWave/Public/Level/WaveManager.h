@@ -25,6 +25,10 @@ public:
 
     void StartWave(int32 WaveNumber);
 
+    const FWaveDataInfo* GetCurrentWaveData() const { return CurrentWaveDataCache; }
+
+    int32 GetCurrentWaveNumber() const { return CurrentWaveNumber; }
+
     UFUNCTION(BlueprintPure, Category = "WaveManager")
     int32 GetEnemiesRemaining() const { return EnemiesRemainingInWave; }
 
@@ -47,6 +51,11 @@ protected:
 
     UPROPERTY()
     TWeakObjectPtr<AZWaveGameState> GameState;
+
+    FWaveDataInfo* CurrentWaveDataCache;
+
+    UPROPERTY(Transient)
+    int32 CurrentWaveNumber = 0;
 
     int32 EnemiesToSpawnThisWave = 0;
 
