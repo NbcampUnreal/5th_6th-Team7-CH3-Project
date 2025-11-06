@@ -20,10 +20,4 @@ public:
 	virtual void ApplyEffect(AActor* TargetActor, const float& Duration) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy() override;
-
-	UFUNCTION(BlueprintCallable, Category = "Timer")
-	void SetStunTimer(const float& Duration);
-
-private:
-	FTimerHandle StunTimer;
 };

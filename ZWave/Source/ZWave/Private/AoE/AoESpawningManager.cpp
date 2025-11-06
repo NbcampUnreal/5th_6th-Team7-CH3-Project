@@ -7,9 +7,13 @@
 void UAoESpawningManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-
+	
+	UAoEData* GrenadeData = LoadObject<UAoEData>(nullptr, TEXT("/Game/HyunJeongSeok/AoE/GrenadeData.GrenadeData"));
+	UAoEData* FlashBangData = LoadObject<UAoEData>(nullptr, TEXT("/Game/HyunJeongSeok/AoE/FlashBangData.FlashBangData"));
+	UAoEData* BaitGrenadeData = LoadObject<UAoEData>(nullptr, TEXT("/Game/HyunJeongSeok/AoE/BaitGrenadeData.BaitGrenadeData"));
 	UAoEData* FireBombAoEData = LoadObject<UAoEData>(nullptr, TEXT("/Game/HyunJeongSeok/AoE/FireBombData.FireBombData"));
 	UAoEData* PoisonAoEData = LoadObject<UAoEData>(nullptr, TEXT("/Game/HyunJeongSeok/AoE/PoisonData.PoisonData"));
+	
 	UBlueprint* BPAsset = LoadObject<UBlueprint>(nullptr, TEXT("/Game/HyunJeongSeok/BP_AoEActor.BP_AoEActor"));
 	
 
@@ -18,11 +22,22 @@ void UAoESpawningManager::Initialize(FSubsystemCollectionBase& Collection)
 		SpawnActorClass = BPAsset->GeneratedClass;
 	}
 
+	if (GrenadeData)
+	{
+		AoEDataArray.Add(GrenadeData);
+	}
+	if (FlashBangData)
+	{
+		AoEDataArray.Add(FlashBangData);
+	}
+	if (BaitGrenadeData)
+	{
+		AoEDataArray.Add(BaitGrenadeData);
+	}
 	if (FireBombAoEData)
 	{
 		AoEDataArray.Add(FireBombAoEData);
 	}
-
 	if (PoisonAoEData)
 	{
 		AoEDataArray.Add(PoisonAoEData);
