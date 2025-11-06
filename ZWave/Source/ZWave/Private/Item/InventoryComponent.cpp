@@ -24,7 +24,21 @@ void UInventoryComponent::BeginPlay()
 		if (BaseWeapon)
 		{
 			AddItem(BaseWeapon, 1);
+
+			int32 Idx = FindItemByDef(BaseWeapon);
+
+			if (Idx == INDEX_NONE)
+			{
+				return;
+			}
+
+			if (UItemWeaponInstance* WeaponInst = Cast<UItemWeaponInstance>(Entries[Idx].ItemInstance))
+			{
+				WeaponInst->EquipSlot = EEquipSlot::First;
+			}
 		}
+
+		
 	}
 }
 
@@ -373,7 +387,7 @@ bool UInventoryComponent::EquipModingToWeapon(const UItemDefinition* WeaponItemD
 	if (ModingItem == nullptr)
 		return false;
 
-	if (WeaponItem->AttachedMods.Num() >= TargetEquipModingSlot)
+	if (TargetEquipModingSlot >= WeaponItem->AttachedMods.Num())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Wrong Moding Slot!"));
 		return false;
@@ -387,12 +401,12 @@ bool UInventoryComponent::EquipModingToWeapon(const UItemDefinition* WeaponItemD
 	}
 
 	UItemModeInstance* NowModingItem = WeaponItem->AttachedMods[TargetEquipModingSlot];
-	if (ModingItem != nullptr)
+	if (NowModingItem != nullptr)
 	{
 		WeaponItem->DetachMod(ModingItem);
 	}
 
-	WeaponItem->AttachMod(ModingItem);
+	WeaponItem->AttachModSlot(ModingItem, TargetEquipModingSlot);
 
 	if (WeaponItem->EquipSlot != EEquipSlot::None)
 	{
@@ -482,7 +496,7 @@ void UInventoryComponent::EquipModingOnWeaponActor(UItemWeaponInstance* WeaponIt
 			AttachedMod->ItemDef == nullptr)
 			continue;
 
-		UModeDefinition* ModeDef = Cast<UModeDefinition>(AttachedMod->ItemDef);
+		UModeDefinition* ModeDef = Cast<UModeDefinition>(AttachedMod->ItemDef->Definition);
 		if (ModeDef == nullptr)
 			continue;
 

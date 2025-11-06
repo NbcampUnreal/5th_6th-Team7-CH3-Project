@@ -39,6 +39,35 @@ bool UItemWeaponInstance::AttachMod(UItemModeInstance* ModInstance)
     return true;
 }
 
+bool UItemWeaponInstance::AttachModSlot(UItemModeInstance* ModeInstance, int32 ModingSlot)
+{
+    if (!ModeInstance || !ItemDef)
+    {
+        return false; // 유효하지 않음
+    }
+
+    if (IsModAttached(ModeInstance))
+    {
+        return false; // 이미 이 무기에 장착됨
+    }
+
+    if (ModeInstance->IsEquipped())
+    {
+        return false; // 다른 무기에 장착됨
+    }
+
+    if (ModingSlot < 0 ||
+        ModingSlot >= AttachedMods.Num())
+    {
+        return false;
+    }
+
+    AttachedMods[ModingSlot] = ModeInstance;
+    ModeInstance->OnEquipped(this);
+
+    return true;
+}
+
 void UItemWeaponInstance::DetachMod(UItemModeInstance* ModInstance)
 {
     if (!ModInstance || !IsModAttached(ModInstance))
