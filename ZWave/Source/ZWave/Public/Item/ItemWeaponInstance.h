@@ -15,12 +15,14 @@ class ZWAVE_API UItemWeaponInstance : public UItemInstance
 	GENERATED_BODY()
 	
 public:
-
     UPROPERTY(BlueprintReadOnly, Category = "Weapon Instance")
     TArray<TObjectPtr<UItemModeInstance>> AttachedMods;
 
     UPROPERTY(BlueprintReadOnly, Category = "Weapon Instance")
     EEquipSlot EquipSlot = EEquipSlot::None;
+
+public:
+    virtual void Initialize(UItemDefinition* Definition, int32 Count = 1) override;
 
     UFUNCTION(BlueprintCallable, Category = "Weapon Instance")
     bool AttachMod(UItemModeInstance* ModeInstance);

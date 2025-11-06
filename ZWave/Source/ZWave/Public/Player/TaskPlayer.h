@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,6 +15,8 @@ enum class EPlayerShopStat : uint8
 	MoveSpeedMultiply,
 	ReloadSpeedMultiply,
 	ShotSpeedMultiplay,
+	MaxBatteryAmount,
+	TurretInstall,
 };
 
 class UCharacterActionComponent;
@@ -93,6 +95,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|Action", meta = (AllowPrivateAccess = "true"))
 	UCharacterActionComponent* ActionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|Inventory", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInventoryComponent> InventoryComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TaskPlayer|AimSet", meta = (AllowPrivateAccess = "true"))
 	float ControllerPitch = 0.0f;

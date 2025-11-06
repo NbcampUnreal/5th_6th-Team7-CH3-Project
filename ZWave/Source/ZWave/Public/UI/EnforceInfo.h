@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Player/TaskPlayer.h"
 #include "EnforceInfo.generated.h"
 
 USTRUCT(BlueprintType)
@@ -25,4 +26,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<int32> PriceList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	EPlayerShopStat StatType;
 };
