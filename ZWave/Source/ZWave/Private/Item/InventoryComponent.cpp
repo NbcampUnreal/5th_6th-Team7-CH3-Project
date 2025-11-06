@@ -396,39 +396,34 @@ bool UInventoryComponent::EquipModingToWeapon(const UItemDefinition* WeaponItemD
 	return true;
 }
 
-bool UInventoryComponent::UnequipModingToWeapon(int32 TargetWeaponSlotIdx, int32 TargetModingSlotIdx)
+bool UInventoryComponent::UnequipModingToWeapon(const UItemDefinition* WeaponItemDef, int32 TargetUnEquipModingSlot)
 {
-	if (GetOwner() == nullptr)
+	if (GetOwner() == nullptr ||
+		WeaponItemDef == nullptr)
 		return false;
 
-	if (TargetWeaponSlotIdx < 0 ||
-		TargetWeaponSlotIdx >= MaxEntryCount ||
-		TargetModingSlotIdx < 0 ||
-		TargetModingSlotIdx >= MaxEntryCount)
+	if (TargetUnEquipModingSlot < 0)
 		return false;
 
-	UItemInstance* TargetWeaponItem = Entries[TargetWeaponSlotIdx].ItemInstance;
+	int32 TargetWeaponSlot = FindItemByDef(WeaponItemDef);
+	if (TargetWeaponSlot == INDEX_NONE)
+		return false;
+
+	UItemInstance* TargetWeaponItem = Entries[TargetWeaponSlot].ItemInstance;
 	if (TargetWeaponItem == nullptr)
+		return false;
+
+	UItemDefinition* TargetWeaponDef = TargetWeaponItem->ItemDef;
+	if (TargetWeaponDef == nullptr)
 		return false;
 
 	UItemWeaponInstance* WeaponItem = Cast<UItemWeaponInstance>(TargetWeaponItem);
 	if (WeaponItem == nullptr)
 		return false;
 
-	UItemInstance* TargetModingItem = Entries[TargetModingSlotIdx].ItemInstance;
-	if (TargetModingItem == nullptr)
-		return false;
-
-	UItemModeInstance* ModingItem = Cast<UItemModeInstance>(TargetModingItem);
+	UItemModeInstance* ModingItem = WeaponItem->AttachedMods[TargetUnEquipModingSlot];
 	if (ModingItem == nullptr)
 		return false;
-
-	if (ModingItem->IsEquipped() == false ||
-		WeaponItem->IsModAttached(ModingItem) == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Not Equipped Moding!"));
-		return false;
-	}
 
 	WeaponItem->DetachMod(ModingItem);
 
