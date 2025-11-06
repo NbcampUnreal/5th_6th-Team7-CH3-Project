@@ -66,7 +66,8 @@ void AStimInjector::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponen
     if (Player)
     {
         //Player->SetCurrentInteractable(this);
-        OnInteract_Implementation(Player); // 테스트용
+        //OnInteract_Implementation(Player); // 테스트용
+        Player->AddActiveObject(this);
         UE_LOG(LogTemp, Log, TEXT("Player entered interact range of Injector."));
     }
 }
@@ -77,6 +78,7 @@ void AStimInjector::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent,
     if (Player)
     {
         //Player->ClearCurrentInteractable(this);
+        Player->RemoveActiveObject(this);
         UE_LOG(LogTemp, Log, TEXT("Player left interact range of Injector."));
     }
 }

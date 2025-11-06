@@ -42,6 +42,19 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddPlayerStat(EPlayerShopStat statType, float value);
+
+
+	UFUNCTION()
+	void AddActiveObject(AActor* inActiveObject);
+
+	UFUNCTION()
+	void RemoveActiveObject(AActor* inActiveObject);
+
+	UFUNCTION()
+	void PruneInvalid();
+
+	UFUNCTION()
+	AActor* PickNearestActiveObject();
 protected:
 
 	virtual void BeginPlay() override;
@@ -59,6 +72,7 @@ protected:
 	void CheckShooting();
 	void Reload();
 	void Grenade();
+	void ActiveFieldObject();
 
 	UFUNCTION()
 	void ShootingAction();
@@ -93,4 +107,7 @@ private:
 
 	float ReloadSpeedMultiply;
 	float ShotSpeedMultiplay;
+
+	UPROPERTY()
+	TArray<TWeakObjectPtr<AActor>> InteractCandidates;
 };

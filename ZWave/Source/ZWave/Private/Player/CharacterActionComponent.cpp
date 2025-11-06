@@ -494,6 +494,32 @@ void UCharacterActionComponent::Grenade()
 	}
 }
 
+void UCharacterActionComponent::ActiveFuildObject()
+{
+	if (OwnerCharacter.Get())
+	{
+		if (CachedAnimInstance)
+		{
+			UnbindMontageNotifies();
+		}
+
+		auto MeshCheck = OwnerCharacter->GetMesh();
+		if (MeshCheck != nullptr)
+		{
+			if (UAnimInstance* Anim = MeshCheck->GetAnimInstance())
+			{
+				float const PlayedLen = Anim->Montage_Play(
+					ActiveMontage,
+					1.f,
+					EMontagePlayReturnType::MontageLength,
+					0.f,
+					true
+				);
+			}
+		}
+	}
+}
+
 void UCharacterActionComponent::ChangeSpeedMultiply(float Multiply)
 {
 	SpeedMultiply = Multiply;

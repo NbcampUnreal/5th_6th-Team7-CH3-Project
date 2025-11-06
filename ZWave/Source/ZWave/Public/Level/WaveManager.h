@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -12,6 +12,7 @@ class UGameManager;
 class ABaseCharacter;
 class UDataTable;
 class AZWaveGameState;
+class UItemSpawnManager;
 
 UCLASS()
 class ZWAVE_API UWaveManager : public UWorldSubsystem
@@ -51,6 +52,9 @@ protected:
 
     UPROPERTY()
     TWeakObjectPtr<AZWaveGameState> GameState;
+
+    UPROPERTY()
+    TWeakObjectPtr<UItemSpawnManager> ItemSpawnManager;
 
     FWaveDataInfo* CurrentWaveDataCache;
 

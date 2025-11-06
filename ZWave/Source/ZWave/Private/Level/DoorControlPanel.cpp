@@ -196,7 +196,8 @@ void ADoorControlPanel::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp
     if (Player)
     {
         //Player->SetCurrentInteractable(this);
-        OnInteract_Implementation(Player); // 테스트용
+        //OnInteract_Implementation(Player); // 테스트용
+        Player->AddActiveObject(this);
         UE_LOG(LogTemp, Log, TEXT("Player entered interact range of Panel."));
     }
 }
@@ -207,6 +208,7 @@ void ADoorControlPanel::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedCompon
     if (Player)
     {
         //Player->ClearCurrentInteractable(this);
+        Player->RemoveActiveObject(this);
         UE_LOG(LogTemp, Log, TEXT("Player left interact range of Panel."));
     }
 }

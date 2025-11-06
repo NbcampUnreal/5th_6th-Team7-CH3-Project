@@ -6,6 +6,8 @@
 #include "Base/ZWaveGameState.h"
 #include "Engine/DataTable.h"
 #include "Engine/World.h"
+#include "Level/ItemSpawnManager.h"
+
 
 UWaveManager::UWaveManager()
 {
@@ -27,6 +29,7 @@ void UWaveManager::Initialize(FSubsystemCollectionBase& Collection)
 
     EnemySpawnManager = GetWorld()->GetSubsystem<UEnemySpawnManager>();
     GameManager = GetWorld()->GetSubsystem<UGameManager>();
+    ItemSpawnManager = GetWorld()->GetSubsystem<UItemSpawnManager>();
     UE_LOG(LogTemp, Log, TEXT("WaveManager Initialized."));
 
     if (EnemySpawnManager.IsValid())
@@ -78,6 +81,36 @@ void UWaveManager::StartWave(int32 WaveNumber)
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to find Wave Data for Wave %d in DataTable!"), WaveNumber);
         OnWaveCleared();
+    }
+
+    if (WaveData)
+    {
+        int32 TotalMonsterCount = 0;
+        for (const FMonsterSpawnInfo& SpawnInfo : WaveData->MonsterSpawnList)
+        {
+            TotalMonsterCount += SpawnInfo.NumberToSpawn;
+        }
+
+        if (ItemSpawnManager.IsValid())
+        {
+            ItemSpawnManager->GenerateDropQueue(*WaveData, TotalMonsterCount);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("WaveManager: ItemSpawnManager is NULL!"));
+        }
+
+        for (const FMonsterSpawnInfo& SpawnInfo : WaveData->MonsterSpawnList)
+        {
+            if (EnemySpawnManager.IsValid())
+            {
+                EnemySpawnManager->RequestSpawn(SpawnInfo.MonsterClass, SpawnInfo.NumberToSpawn);
+            }
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("WaveManager: WavaDropData is NULL!"));
     }
 }
 
