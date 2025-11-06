@@ -50,23 +50,22 @@ void ATurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bShouldRot)
-	{
-		RotateToTarget(DeltaTime);
-	}
+	RotateToTarget(DeltaTime);
 }
 
 void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Display, TEXT("OnSphereBeginOverlap 1"));
 	if (OtherActor->IsA(ABaseEnemy::StaticClass()))
 	{
+		UE_LOG(LogTemp, Display, TEXT("OnSphereBeginOverlap 2 %d"), Target == nullptr);
 		if (Target == nullptr)
 		{
-			Target = static_cast<ABaseEnemy*>(OtherActor);
-			bShouldRot = true;
+			UE_LOG(LogTemp, Display, TEXT("OnSphereBeginOverlap 3"));
+			SetTarget(static_cast<ABaseEnemy*>(OtherActor));
 			
 			//Attack();
-			//GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+			GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 		}
 	}
 }
@@ -116,13 +115,42 @@ void ATurret::Die()
 	}
 }
 
+
+void ATurret::SetTarget(ABaseEnemy* NewTarget)
+{
+	if (NewTarget == nullptr)
+	{
+		Target = nullptr;
+	} 
+	else
+	{
+		if (Target == nullptr)
+		{
+			Target = NewTarget;
+			UE_LOG(LogTemp, Display, TEXT("New Target: %s"), *NewTarget->GetActorNameOrLabel());
+		}
+	}
+}
+
 void ATurret::Attack()
 {
+	UE_LOG(LogTemp, Display, TEXT("Attack 1"));
 	if (Target == nullptr || Health <= 0.f) {
 		UE_LOG(LogTemp, Display, TEXT("Null Target"));
 		return;
 	}
 
+	UE_LOG(LogTemp, Display, TEXT("Attack 2"));
+	FVector TargetDirection = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	FRotator TargetRot = FRotator(0, TargetDirection.Rotation().Yaw, 0);
+
+	FRotator CurrentRot = GetActorRotation();
+
+	if (FMath::Abs(TargetRot.Yaw - CurrentRot.Yaw) > 10) {
+
+		return;
+	}
+	UE_LOG(LogTemp, Display, TEXT("Attack 3"));
 	//Weapon->Attack();
 	if (Mesh != nullptr) {
 		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
@@ -131,7 +159,7 @@ void ATurret::Attack()
 			AnimInstance->Montage_Play(AttackMontage);
 		}
 	}
-
+	UE_LOG(LogTemp, Display, TEXT("Attack 4"));
 	Target->Attacked(this, this->WeaponDamage);
 	if (Target->GetHealth() <= 0.f)
 	{
@@ -149,18 +177,13 @@ void ATurret::RotateToTarget(float DeltaTime)
 	FRotator CurrentRot = GetActorRotation();
 	FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, RotationSpeed);
 	SetActorRotation(NewRot);
-
-	if (FMath::Abs(TargetRot.Yaw - CurrentRot.Yaw) < 1) {
-		bShouldRot = false;
-
-		Attack();
-		GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
-	}
 }
 
 void ATurret::StopAttack()
 {
-	Target = nullptr;
+	UE_LOG(LogTemp, Display, TEXT("StopAttack 1 %d"), Target == nullptr);
+	SetTarget(nullptr);
+	UE_LOG(LogTemp, Display, TEXT("StopAttack 2 %d"), Target == nullptr);
 
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
 	SearchEnemy();
@@ -185,11 +208,12 @@ void ATurret::SearchEnemy()
 		{
 			if (Hit.GetActor()->IsA(ABaseEnemy::StaticClass()))
 			{
-				Target = static_cast<ABaseEnemy*>(Hit.GetActor());
+				ABaseEnemy* Temp = static_cast<ABaseEnemy*>(Hit.GetActor());
 
-				if (Target->GetHealth() > 0)
+				if (Temp->GetHealth() > 0)
 				{
-					bShouldRot = true;
+					SetTarget(Temp);
+					GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 					break;
 				}
 			}

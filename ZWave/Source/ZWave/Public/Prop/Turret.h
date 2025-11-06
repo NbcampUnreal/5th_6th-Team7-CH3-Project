@@ -88,9 +88,8 @@ protected:
 	class ABaseEnemy* Target;
 	FTimerHandle AttackTimerHandle;
 
-	bool bShouldRot = false;
-
 protected:
+	void SetTarget(ABaseEnemy* NewTarget);
 	virtual void Attack();
 	virtual void RotateToTarget(float DeltaTime);
 	virtual void StopAttack();

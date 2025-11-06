@@ -113,11 +113,13 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 
 		PlayHitAnimMontage(DamageCauser);
 	}
-	else if (DamageCauser->IsA(ATurret::StaticClass()) && CurPriorityLv < 2 && MaxPriorityLv >= 1)
+	else if (DamageCauser->IsA(ATurret::StaticClass()))
 	{
-		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
-		SetNewTarget(DamageCauser);
-
+		if (CurPriorityLv < 2 && MaxPriorityLv >= 1)
+		{
+			AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
+			SetNewTarget(DamageCauser);
+		}
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 	}
 	else if (DamageCauser->IsA(AAoEActor::StaticClass()))
