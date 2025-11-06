@@ -77,7 +77,10 @@ void AAoEActor::ApplyOverlapActorDOT()
 	if (CurrentActiveTime > TotalActiveTime)
 	{
 		GetWorldTimerManager().ClearTimer(DOTHandle);
-		NiagaraParticleInstance->Deactivate();
+		if (NiagaraParticleInstance)
+		{
+			NiagaraParticleInstance->Deactivate();
+		}
 	}
 	else
 	{
