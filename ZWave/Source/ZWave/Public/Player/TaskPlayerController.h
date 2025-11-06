@@ -10,6 +10,7 @@
 class UInputMappingContext;
 class UInputAction;
 class UIngamePauseMenu;
+class AZWaveGameState;
 
 
 UCLASS()
@@ -45,6 +46,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Result")
 	UIngamePauseMenu* ResultWidget;
+
+	UPROPERTY()
+	TWeakObjectPtr<AZWaveGameState> GameState;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
