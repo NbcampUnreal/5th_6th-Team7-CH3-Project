@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE AWeaponBase* GetConsumeItem() { return ConsumeMaps[CurrentConsumeSlot]; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE EEquipSlot GetCurrentWeaponEquipSlot() { return CurrentSlot; }
+
 	void EquipConsumeItem(EConsumeSlot Slot);
 
 protected:
