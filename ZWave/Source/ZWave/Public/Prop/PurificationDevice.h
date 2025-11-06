@@ -42,7 +42,9 @@ protected:
 	float MaxHealth;
 	UPROPERTY(VisibleAnywhere)
 	float Health;
+	
 	bool bIsEnd = false;
+	FTimerHandle GameOverTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TObjectPtr<class USoundBase> ExplodeSound;
@@ -56,4 +58,5 @@ public:
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;
 
+	void CallGameOver();
 };

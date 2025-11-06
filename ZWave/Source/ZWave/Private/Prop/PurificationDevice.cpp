@@ -5,7 +5,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "TimerManager.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
@@ -14,6 +14,7 @@
 #include "DamageCalculator/DamageCalculator.h"
 #include "Base/ZWaveGameState.h"
 #include "UI/IngameHUD.h"
+#include "Player/TaskPlayer.h"
 
 // Sets default values
 APurificationDevice::APurificationDevice()
@@ -91,6 +92,18 @@ void APurificationDevice::Die()
 		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Niagara_Explode, ExplodeLocation->GetComponentLocation(), FRotator::ZeroRotator);
 
+		GetWorld()->GetTimerManager().SetTimer(GameOverTimerHandle, this, &APurificationDevice::CallGameOver, 3, false);
 	}
+}
+
+void APurificationDevice::CallGameOver()
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController == nullptr) return;
+
+	ATaskPlayer* TaskPlayer = static_cast<ATaskPlayer*>(PlayerController->GetCharacter());
+	if (TaskPlayer == nullptr) return;
+
+	TaskPlayer->GameOver();
 }
 
