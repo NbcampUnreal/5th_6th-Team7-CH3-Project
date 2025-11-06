@@ -243,6 +243,12 @@ bool UInventoryComponent::EquipWeaponItem(const UItemDefinition* ItemDef, EEquip
 	if (EquipComp == nullptr)
 		return false;
 
+	if (EquipComp->GetCurrentWeaponEquipSlot() == EquipSlot)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EquipWeaponItem : EquipSlot Is Cuurent Weapon Equip!"));
+		return false;
+	}
+
 	if (WeaponItem->ItemDef == nullptr ||
 		WeaponItem->ItemDef->Definition == nullptr)
 		return false;
