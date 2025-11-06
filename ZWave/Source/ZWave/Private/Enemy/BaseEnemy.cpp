@@ -54,6 +54,11 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 
 void ABaseEnemy::PlayHitAnimMontage(AActor* DamageCauser)
 {
+	if (StateComp->GetCurrentState() == EEnemyStateType::EST_Stun) {
+		UE_LOG(LogTemp, Display, TEXT("hit when stun"));
+		return;
+	}
+
 	if (GetMesh())
 	{
 		FVector SelfLocation = GetActorLocation();
@@ -139,20 +144,7 @@ void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
 void ABaseEnemy::Die()
 {
 	//Super::Die();
-	if (ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController()))
-	{
-		AIController->StopMovement();
-		AIController->StopBehaviorTree();
-	}
-
-	if (GetMesh() && DieMontage)
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance)
-		{
-			AnimInstance->Montage_Play(DieMontage);
-		}
-	}
+	StateComp->SetState(EEnemyStateType::EST_Death);
 }
 
 

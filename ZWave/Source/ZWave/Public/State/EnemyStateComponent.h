@@ -12,7 +12,8 @@ enum class EEnemyStateType : uint8
 	EST_None,
 	EST_Stagger, // 경직 효과 중첩 방지를 위해 추가
 	EST_Stun,
-	EST_Decoy
+	EST_Decoy,
+	EST_Death,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -39,17 +40,26 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AnimationMontage")
 	TObjectPtr<class UAnimMontage> Montage_Stun;
+	float MontageStunPlayRate = 1.5f;
+	float MontageStunLength = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AnimationMontage")
 	TObjectPtr<class UAnimMontage> Montage_RecoverStun;
-
+	float MontageRecoverStunPlayRate = 2.0f;
+	float MontageRecoverStunLength = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AnimationMontage")
+	TObjectPtr<class UAnimMontage> Montage_Die;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "State")
-	EEnemyStateType CurrentState = EEnemyStateType::EST_None;;
+	EEnemyStateType CurrentState = EEnemyStateType::EST_None;
+	EEnemyStateType PreState = EEnemyStateType::EST_None;
 
 	FTimerHandle StateManageHandle;
 
 	void OnNone();
 	void OnStun(const float Duration);
-	void OnRecoverStun();
+	void RecoverStun();
+	void OnDeath();
+	
+	void ExcuteDestroy();
 };
