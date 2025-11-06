@@ -295,6 +295,48 @@ bool UShopManager::TryEquipModingToWeapon(APlayerController* Player, const FStri
 	return true;
 }
 
+bool UShopManager::TryUnequipModingToWeapon(APlayerController* Player, const FString& WeaponName, int32 EquipSlot)
+{
+	if (Player == nullptr ||
+		EquipSlot < 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: invalid args"));
+		return false;
+	}
+
+	UItemDefinition* WeaponItemDef = FindItemByDisplayName(WeaponName);
+
+	if (WeaponItemDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: invalid args"));
+		return false;
+	}
+
+	UInventoryComponent* InvComp = GetInventoryFromPlayer(Player);
+	if (InvComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: Inventory not found"));
+		return false;
+	}
+
+	const UWeaponDefinition* WeaponDef = Cast<UWeaponDefinition>(WeaponItemDef->Definition);
+	if (WeaponDef == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: Item is not weapon"));
+		return false;
+	}
+
+	bool bResult = InvComp->UnequipModingToWeapon(WeaponItemDef, EquipSlot);
+
+	if (bResult == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUnequipModingToWeapon: UnequipModing Failed"));
+		return false;
+	}
+
+	return true;
+}
+
 bool UShopManager::HasEnoughCore(APlayerController* Player, int32 Price)
 {
 	if (Price <= 0)

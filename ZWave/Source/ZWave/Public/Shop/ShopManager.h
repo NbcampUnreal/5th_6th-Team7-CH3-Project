@@ -39,6 +39,9 @@ public:
 	bool TryEquipModingToWeapon(APlayerController* Player, const FString& WeaponName, const FString& ModingName, int32 EquipSlot);
 
 	UFUNCTION(BlueprintCallable)
+	bool TryUnequipModingToWeapon(APlayerController* Player, const FString& WeaponName, int32 EquipSlot);
+
+	UFUNCTION(BlueprintCallable)
 	UItemDefinition* FindItemByDisplayName(const FString& Name) const;
 
 protected:
