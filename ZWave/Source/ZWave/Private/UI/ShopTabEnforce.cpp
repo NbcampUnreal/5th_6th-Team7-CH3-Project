@@ -1,6 +1,7 @@
 #include "UI/ShopTabEnforce.h"
 
 #include "UI/EnforceMenu.h"
+#include "UI/ShopUI.h"
 
 #include "CommonUI/Public/CommonHierarchicalScrollBox.h"
 
