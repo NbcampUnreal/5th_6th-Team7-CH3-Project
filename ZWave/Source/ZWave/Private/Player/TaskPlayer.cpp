@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Player/TaskPlayer.h"
@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "Player/TaskPlayerController.h"
 #include "Weapon/EquipComponent.h"
+#include "Item/InventoryComponent.h"
 #include "Weapon/ShootWeapon.h"
 #include "UI/IngameHUD.h"
 #include "Base/ZWaveGameState.h"
@@ -30,6 +31,8 @@ ATaskPlayer::ATaskPlayer()
 	CameraComp->bUsePawnControlRotation = false;
 
 	ActionComp = CreateDefaultSubobject<UCharacterActionComponent>(TEXT("ActionComp"));
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 
