@@ -22,7 +22,8 @@ ATaskPlayerController::ATaskPlayerController()
 	IngameHUDClass(nullptr),
 	ShopHUDClass(nullptr),
 	IngameHUD(nullptr),
-	ShopHUD(nullptr)
+	ShopHUD(nullptr), 
+	ActiveAction(nullptr)
 {
 }
 

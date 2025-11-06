@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -12,6 +12,7 @@ class UGameManager;
 class ABaseCharacter;
 class UDataTable;
 class AZWaveGameState;
+class UItemSpawnManager;
 
 UCLASS()
 class ZWAVE_API UWaveManager : public UWorldSubsystem
@@ -24,6 +25,10 @@ public:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
     void StartWave(int32 WaveNumber);
+
+    const FWaveDataInfo* GetCurrentWaveData() const { return CurrentWaveDataCache; }
+
+    int32 GetCurrentWaveNumber() const { return CurrentWaveNumber; }
 
     UFUNCTION(BlueprintPure, Category = "WaveManager")
     int32 GetEnemiesRemaining() const { return EnemiesRemainingInWave; }
@@ -47,6 +52,14 @@ protected:
 
     UPROPERTY()
     TWeakObjectPtr<AZWaveGameState> GameState;
+
+    UPROPERTY()
+    TWeakObjectPtr<UItemSpawnManager> ItemSpawnManager;
+
+    FWaveDataInfo* CurrentWaveDataCache;
+
+    UPROPERTY(Transient)
+    int32 CurrentWaveNumber = 0;
 
     int32 EnemiesToSpawnThisWave = 0;
 

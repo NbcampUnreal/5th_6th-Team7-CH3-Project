@@ -58,6 +58,7 @@ public:
 	void EquipChange(EShootType ShootType);
 	void DryShot( EShootType ShootType);
 	void Grenade();
+	void ActiveFuildObject();
 	
 	void Attacked(AActor* DamageCauser);
 	void Die();
@@ -134,6 +135,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
 	TObjectPtr<UAnimMontage> DeathMontage = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
+	TObjectPtr<UAnimMontage> ActiveMontage = nullptr;
 
 
 	UPROPERTY()        

@@ -29,6 +29,9 @@ public:
 
 	virtual void BeginPlay() override;
 
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UEnemyStateComponent> StateComp;
 
 /// <summary>
 /// 피격, 사망 관련

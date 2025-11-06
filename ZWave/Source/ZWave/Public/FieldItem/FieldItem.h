@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect")
 	AActor* CauserActor;
 
+	UFUNCTION(BlueprintCallable, Category = "Initalize")
+	void Init(int32 ItemIndex);
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Event")
@@ -52,9 +54,6 @@ protected:
 		int32 OtehrBodyIndex
 	);
 
-	UFUNCTION(BlueprintCallable, Category = "Initalize")
-	void Init(int32 ItemIndex);
-
 	UFUNCTION(BlueprintCallable, Category = "Event")
 	virtual void ActiveEffect(AActor* OtherActor);
 
@@ -62,5 +61,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Index")
 	int32 FieldItemIndex;
+
+private:
+	TMap<int32, TTuple<UStaticMesh*, FVector>> FieldItemMap;
+
+	void SetMaps();
 
 };

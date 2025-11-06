@@ -1,0 +1,82 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Effect/StunEffect.h"
+
+#include "Enemy/BaseAIController.h"
+#include "State/EnemyStateComponent.h"
+
+
+UStunEffect::UStunEffect()
+{
+}
+
+void UStunEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
+{
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
+	{
+		Target = Enemy;
+
+		//static_cast<ABaseAIController*>(Enemy->GetController())->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), true);
+		Enemy->StateComp->SetState(EEnemyStateType::EST_Stun, 5);
+		UE_LOG(LogTemp, Log, TEXT("EffectType: %s"),
+			*UEnum::GetValueAsString(Enemy->StateComp->GetCurrentState()));
+	}
+
+	/*if (!FMath::IsNearlyZero(Duration))
+
+	{
+		SetStunTimer(Duration);
+	}
+	else
+	{
+		RemoveEffect();
+	}*/
+
+}
+
+void UStunEffect::RemoveEffect()
+{
+	if (UObject* Outer = GetOuter())
+	{
+		if (UWorld* World = Outer->GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(StunTimer);
+		}
+	}
+
+
+	//if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
+	//{
+	//	if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
+	//	{
+	//		StateComp->SetState(EStateType::EST_None);
+	//	}
+	//}
+
+
+	Super::RemoveEffect();
+}
+
+void UStunEffect::BeginDestroy()
+{
+	Super::BeginDestroy();
+	UE_LOG(LogTemp, Warning, TEXT("UStunEffect has been successfully collected by GC."));
+}
+
+void UStunEffect::SetStunTimer(const float& Duration)
+{
+	if (UObject* Outer = GetOuter())
+	{
+		if (UWorld* World = Outer->GetWorld())
+		{
+			World->GetTimerManager().SetTimer(
+				StunTimer,
+				this,
+				&UStunEffect::RemoveEffect,
+				Duration,
+				false
+			);
+		}
+	}
+}

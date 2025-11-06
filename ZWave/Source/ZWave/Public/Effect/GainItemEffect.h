@@ -20,7 +20,4 @@ public:
 	virtual void ApplyEffect(AActor* TargetActor, const int32& Itemindex) override;
 	virtual void RemoveEffect() override;
 	virtual void BeginDestroy();
-
-	UFUNCTION(BlueprintCallable, Category = "Init")
-	void Init();
 };
