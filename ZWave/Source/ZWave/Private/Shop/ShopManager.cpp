@@ -106,14 +106,26 @@ bool UShopManager::TrySellItem(APlayerController* Player, const FString& Name)
 }
 
 
-bool UShopManager::TryUpgradeStat(APlayerController* Player, const FString& Name)
+bool UShopManager::TryUpgradeStat(APlayerController* Player, EPlayerShopStat ShopStatType, float UpValue, int32 Price)
 {
-	UItemDefinition* ItemDef = FindItemByDisplayName(Name);
-
-	if (Player == nullptr
-		|| ItemDef == nullptr)
+	if (Player == nullptr ||
+		UpValue < 0.0f ||
+		Price < 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryUpgradeStat: invalid args"));
+		return false;
+	}
+
+	ATaskPlayer* TaskPlayer = nullptr;
+
+	if (ACharacter* OwnChara = Cast<ACharacter>(Player->GetPawn()))
+	{
+		TaskPlayer = Cast<ATaskPlayer>(OwnChara);
+	}
+
+	if (TaskPlayer == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TryUpgradeStat: Player Is Not TaskPlayer Type"));
 		return false;
 	}
 
@@ -124,22 +136,15 @@ bool UShopManager::TryUpgradeStat(APlayerController* Player, const FString& Name
 		return false;
 	}
 
-	if (HasEnoughCore(Player, ItemDef->BuyPrice) == false)
+	if (HasEnoughCore(Player, Price) == false)
 	{
-		UE_LOG(LogTemp, Log, TEXT("TryUpgradeStat: not enough money. Need %d"), ItemDef->BuyPrice);
+		UE_LOG(LogTemp, Log, TEXT("TryUpgradeStat: not enough money. Need %d"), Price);
 		return false;
 	}
 
-	// 실제 Stat 관련 적용 함수 Call
-	const bool bApplied = true;
+	TaskPlayer->AddPlayerStat(ShopStatType, UpValue);
 
-	if (bApplied == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TryUpgradeStat: apply failed"));
-		return false;
-	}
-
-	DeductCore(Player, ItemDef->BuyPrice);
+	DeductCore(Player, Price);
 	return true;
 }
 
