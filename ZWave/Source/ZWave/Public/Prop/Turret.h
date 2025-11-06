@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GenericTeamAgentInterface.h"
 
 #include "Base/Damagable.h"
 
 #include "Turret.generated.h"
 
 UCLASS()
-class ZWAVE_API ATurret : public AActor, public IDamagable
+class ZWAVE_API ATurret : public AActor, public IDamagable, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 	
@@ -42,29 +43,35 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	TObjectPtr<class USphereComponent> SphereComp;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	TObjectPtr<class UAnimMontage> AttackMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	uint8 TeamID = 0;
 
 
 /// <summary>
 /// 체력, 피격, 사망관련
 /// </summary>
-public:
-	virtual void Attacked(AActor* DamageCauser, float Damage) override;
-	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
-	virtual void Die() override;
-
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class UAnimMontage> Montage_Destory;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float MaxHealth;
 
 	UPROPERTY(VisibleAnywhere)
 	float Health;
 
+public:
+	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Attacked(AActor* DamageCauser, float Damage) override;
+	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
+	virtual void Die() override;
+
 /// <summary>
 /// 공격 관련, EquipComp에서 SetSlotData에서 GetPawn()을 실행해서, AWeaponBase와 WeaponDefinition 을 사용할수 없음.. 
 /// </summary>
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class UAnimMontage> AttackMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float AwarenessRange = 1000;
 	UPROPERTY(EditAnywhere, Category = "Ability")
@@ -81,9 +88,8 @@ protected:
 	class ABaseEnemy* Target;
 	FTimerHandle AttackTimerHandle;
 
-	bool bShouldRot = false;
-
 protected:
+	void SetTarget(ABaseEnemy* NewTarget);
 	virtual void Attack();
 	virtual void RotateToTarget(float DeltaTime);
 	virtual void StopAttack();

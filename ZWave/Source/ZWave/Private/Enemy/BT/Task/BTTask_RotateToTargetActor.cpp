@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Enemy/BT/Task/BTTask_RotateToTarget.h"
+#include "Enemy/BT/Task/BTTask_RotateToTargetActor.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 
 #include "Enemy/BaseEnemy.h"
 #include "Enemy/BaseAIController.h"
 
-UBTTask_RotateToTarget::UBTTask_RotateToTarget()
+UBTTask_RotateToTargetActor::UBTTask_RotateToTargetActor()
 {
-	NodeName = FString(TEXT("RotateToTarget"));
+	NodeName = FString(TEXT("UBTTask_RotateToTargetActor"));
 }
 
-EBTNodeResult::Type UBTTask_RotateToTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_RotateToTargetActor::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
@@ -26,8 +26,8 @@ EBTNodeResult::Type UBTTask_RotateToTarget::ExecuteTask(UBehaviorTreeComponent& 
 	ABaseEnemy* MyCharacter = static_cast<ABaseEnemy*>(AIController->GetCharacter());
 	if (MyCharacter == nullptr) return EBTNodeResult::Failed;
 
-	FVector TargetLocation = OwnerBlackboard->GetValueAsVector(GetSelectedBlackboardKey());
-	FVector ToTargetVector = (TargetLocation - MyCharacter->GetActorLocation()).GetSafeNormal();
+	AActor* Target = static_cast<AActor*>(OwnerBlackboard->GetValueAsObject(GetSelectedBlackboardKey()));
+	FVector ToTargetVector = (Target->GetActorLocation() - MyCharacter->GetActorLocation()).GetSafeNormal();
 
 	FRotator LookAtRot = ToTargetVector.Rotation();
 	FRotator NewRot = FRotator(0, LookAtRot.Yaw, 0);

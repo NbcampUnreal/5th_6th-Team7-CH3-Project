@@ -4,6 +4,8 @@
 #include "Prop/PurificationDevice.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Effect/EffectApplyManager.h"
+#include "DamageCalculator/DamageCalculator.h"
 
 // Sets default values
 APurificationDevice::APurificationDevice()
@@ -27,6 +29,22 @@ void APurificationDevice::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+float APurificationDevice::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (const FZWaveDamageEvent* CustomDamageEvent = static_cast<const FZWaveDamageEvent*>(&DamageEvent))
+	{
+		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
+		{
+			EffectManager->ApplyEffect(this, CustomDamageEvent->EffectArray, CustomDamageEvent->Duration);
+		}
+		
+
+		Attacked(DamageCauser, DamageAmount); //데미지 계산 후 넘겨줄 수도 있고 아니면 그냥 이렇게 쓸 수도 있을 듯
+	}
+
+	return DamageAmount;
 }
 
 void APurificationDevice::Attacked(AActor* DamageCauser, float Damage)

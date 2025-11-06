@@ -32,12 +32,25 @@ void UEnemyStateComponent::BeginPlay()
 
 	AnimInstance = Mesh->GetAnimInstance();
 	if (AnimInstance == nullptr) return;
+
+	if (Montage_Stun)
+	{
+		MontageStunLength = Montage_Stun->GetPlayLength() / MontageStunPlayRate;
+	}
+	if (Montage_RecoverStun)
+	{
+		MontageRecoverStunLength = Montage_RecoverStun->GetPlayLength() / MontageRecoverStunPlayRate;
+	}
 }
 
 void UEnemyStateComponent::SetState(EEnemyStateType SetType, float Duration)
 {
+	PreState = CurrentState;
 	CurrentState = SetType;
-	switch (GetCurrentState())
+	UE_LOG(LogTemp, Log, TEXT("StateType: %s -> %s"),
+		*UEnum::GetValueAsString(PreState), *UEnum::GetValueAsString(CurrentState));
+
+	switch (CurrentState)
 	{
 	case EEnemyStateType::EST_None:
 		OnNone();
@@ -48,6 +61,9 @@ void UEnemyStateComponent::SetState(EEnemyStateType SetType, float Duration)
 		OnStun(Duration);
 		break;
 	case EEnemyStateType::EST_Decoy:
+		break;
+	case EEnemyStateType::EST_Death:
+		OnDeath();
 		break;
 	default:
 		break;
@@ -65,18 +81,58 @@ void UEnemyStateComponent::OnStun(const float Duration)
 
 	if (Montage_Stun != nullptr)
 	{
-		AnimInstance->Montage_Play(Montage_Stun, 1.5f); //1.5초간 재생
+		AnimInstance->Montage_Play(Montage_Stun, MontageStunPlayRate); //1.5초간 재생
 
 		float delay = (Duration - 1.5f < 0 ? 0 : Duration - 1.5f) + 1.5;
-		GetWorld()->GetTimerManager().SetTimer(StateManageHandle, this, &UEnemyStateComponent::OnRecoverStun, delay, false);
+		GetWorld()->GetTimerManager().SetTimer(StateManageHandle, this, &UEnemyStateComponent::RecoverStun, delay, false);
 	}
 }
 
-void UEnemyStateComponent::OnRecoverStun()
+void UEnemyStateComponent::RecoverStun()
 {
-	if (Montage_RecoverStun != nullptr)
+	if (CurrentState == EEnemyStateType::EST_Death)
 	{
-		AnimInstance->Montage_Play(Montage_RecoverStun, 2.0f);
+		return;
+	}
+	else
+	{
+		if (AnimInstance && Montage_RecoverStun != nullptr)
+		{
+			AnimInstance->Montage_Play(Montage_RecoverStun, 2.0f);
+		}
+	}
+}
+
+void UEnemyStateComponent::OnDeath()
+{
+	if (AIController)
+	{
+		AIController->StopMovement();
+		AIController->StopBehaviorTree();
+	}
+
+	// 스턴에서 die로 넘어오는 경우, 죽는 애니메이션 실행x
+	if (PreState == EEnemyStateType::EST_Stun)
+	{
+		// 스턴애니메이션 끝나고 실행(이미 StateManageHanle에 OnRecoverStun이 예약됨)
+		GetWorld()->GetTimerManager().ClearTimer(StateManageHandle);
+		GetWorld()->GetTimerManager().SetTimer(StateManageHandle, this, &UEnemyStateComponent::ExcuteDestroy, 2, false);
+	}
+	else
+	{
+		if (Mesh && AnimInstance && Montage_Die)
+		{
+			AnimInstance->Montage_Play(Montage_Die);
+		}
+	}
+}
+
+void UEnemyStateComponent::ExcuteDestroy()
+{
+	AActor* Owner = GetOwner();
+	if (Owner)
+	{
+		Owner->SetLifeSpan(0.05f);
 	}
 }
 

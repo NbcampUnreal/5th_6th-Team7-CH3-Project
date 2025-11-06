@@ -51,6 +51,14 @@ FVector ABaseAIController::GetAttackLocation(FVector TargetLocation)
 	return Destination;
 }
 
+void ABaseAIController::ClearValueFromBlackboard(FName BlackboardKeyName)
+{
+	UBlackboardComponent* OwnerBlackboardComp = GetBlackboardComponent();
+	if (OwnerBlackboardComp == nullptr) return;
+
+	OwnerBlackboardComp->ClearValue(BlackboardKeyName);
+}
+
 void ABaseAIController::SetValueAsVectorToBlackboard(FName BlackboardKeyName, FVector Value)
 {
 	UBlackboardComponent* OwnerBlackboardComp = GetBlackboardComponent();

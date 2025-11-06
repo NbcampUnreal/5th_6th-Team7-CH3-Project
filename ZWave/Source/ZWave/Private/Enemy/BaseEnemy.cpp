@@ -11,6 +11,7 @@
 #include "State/EnemyStateComponent.h"
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
+#include "AoE/AoEActor.h"
 
 
 ABaseEnemy::ABaseEnemy()
@@ -54,6 +55,11 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 
 void ABaseEnemy::PlayHitAnimMontage(AActor* DamageCauser)
 {
+	if (StateComp->GetCurrentState() == EEnemyStateType::EST_Stun) {
+		UE_LOG(LogTemp, Display, TEXT("hit when stun"));
+		return;
+	}
+
 	if (GetMesh())
 	{
 		FVector SelfLocation = GetActorLocation();
@@ -100,19 +106,26 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 	if (AIController == nullptr) return;
 
 	int32 CurPriorityLv = AIController->GetValueAsIntFromBlackboard(FName(TEXT("CurPriorityLv")));
-	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && MaxPriorityLv >= 2)
+	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && CurPriorityLv < 3 && MaxPriorityLv >= 2)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 2);
 		SetNewTarget(DamageCauser);
 
 		PlayHitAnimMontage(DamageCauser);
 	}
-	else if (DamageCauser->IsA(ATurret::StaticClass()) && CurPriorityLv < 2 && MaxPriorityLv >= 1)
+	else if (DamageCauser->IsA(ATurret::StaticClass()))
 	{
-		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
-		SetNewTarget(DamageCauser);
-
+		if (CurPriorityLv < 2 && MaxPriorityLv >= 1)
+		{
+			AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
+			SetNewTarget(DamageCauser);
+		}
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
+	else if (DamageCauser->IsA(AAoEActor::StaticClass()))
+	{
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 3);
+		SetNewTarget(DamageCauser);
 	}
 }
 
@@ -121,12 +134,23 @@ void ABaseEnemy::SetNewTarget(AActor* DamageCauser)
 	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
 	if (AIController == nullptr) return;
 
-	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
-	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
+	if(DamageCauser != nullptr)
+	{
+		FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
+		FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
 
-	AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
-	AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
-	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+		AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
+		AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
+		AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+	}
+	else // 외부에서 타겟을 해제할수 있도록 해준다.
+	{
+		AIController->ClearValueFromBlackboard(FName(TEXT("SecondaryTarget")));
+		AIController->ClearValueFromBlackboard(FName(TEXT("AttackLocation")));
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 0);
+
+		AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), false);
+	}
 }
 
 void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
@@ -139,20 +163,7 @@ void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
 void ABaseEnemy::Die()
 {
 	//Super::Die();
-	if (ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController()))
-	{
-		AIController->StopMovement();
-		AIController->StopBehaviorTree();
-	}
-
-	if (GetMesh() && DieMontage)
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance)
-		{
-			AnimInstance->Montage_Play(DieMontage);
-		}
-	}
+	StateComp->SetState(EEnemyStateType::EST_Death);
 }
 
 
