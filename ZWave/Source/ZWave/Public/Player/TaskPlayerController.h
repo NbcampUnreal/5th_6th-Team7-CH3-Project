@@ -9,6 +9,9 @@
 
 class UInputMappingContext;
 class UInputAction;
+class UIngamePauseMenu;
+class AZWaveGameState;
+
 
 UCLASS()
 class ZWAVE_API ATaskPlayerController : public APlayerController
@@ -34,8 +37,18 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
-	UUserWidget* MainMenuWidgetInstance;
+	UUserWidget* MainMenuWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Result")
+	TSubclassOf<UIngamePauseMenu> ResultWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Result")
+	UIngamePauseMenu* ResultWidget;
+
+	UPROPERTY()
+	TWeakObjectPtr<AZWaveGameState> GameState;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TaskPlayerController|Input")
@@ -81,4 +94,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Shop")
 	void ShowShopUI();
+
+	UFUNCTION(BlueprintCallable, Category = "Result")
+	void ShowResultHUD();
 };

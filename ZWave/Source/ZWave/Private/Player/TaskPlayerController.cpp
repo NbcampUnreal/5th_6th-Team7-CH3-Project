@@ -5,6 +5,9 @@
 #include "EnhancedInputSubSystems.h"
 #include "Components/TextBlock.h"
 #include "UI/ShopUI.h"
+#include "UI/IngamePauseMenu.h"
+#include "Base/ZWaveGameState.h"
+#include "Level/ZWaveTypes.h"
 
 ATaskPlayerController::ATaskPlayerController()
 	:InputMappingContext(nullptr),
@@ -49,14 +52,16 @@ void ATaskPlayerController::BeginPlay()
 	{
 		ShowGameHUD();
 	}
+
+	GameState = GetWorld()->GetGameState<AZWaveGameState>();
 }
 
 void ATaskPlayerController::ShowMainMenu()
 {
-	if (MainMenuWidgetInstance)
+	if (MainMenuWidget)
 	{
-		MainMenuWidgetInstance->RemoveFromParent();
-		MainMenuWidgetInstance = nullptr;
+		MainMenuWidget->RemoveFromParent();
+		MainMenuWidget = nullptr;
 	}
 
 	if (IngameHUD)
@@ -67,10 +72,10 @@ void ATaskPlayerController::ShowMainMenu()
 
 	if (MainMenuWidgetClass)
 	{
-		MainMenuWidgetInstance = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
-		if (MainMenuWidgetInstance)
+		MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
+		if (MainMenuWidget)
 		{
-			MainMenuWidgetInstance->AddToViewport();
+			MainMenuWidget->AddToViewport();
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}
@@ -79,9 +84,13 @@ void ATaskPlayerController::ShowMainMenu()
 
 void ATaskPlayerController::ShowShopUI()
 {
+	if (EGameState::EGS_Preparing != GameState->GetCurrentGameState())
+	{
+		return;
+	}
+
 	if (ShopHUD)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RemovePreShopUI"));
 		ShopHUD->RemoveFromParent();
 		ShopHUD = nullptr;
 	}
@@ -101,13 +110,47 @@ void ATaskPlayerController::ShowShopUI()
 
 }
 
+void ATaskPlayerController::ShowResultHUD()
+{
+	if (MainMenuWidget)
+	{
+		MainMenuWidget->RemoveFromParent();
+		MainMenuWidget = nullptr;
+	}
+
+	if (IngameHUD)
+	{
+		IngameHUD->RemoveFromParent();
+		IngameHUD = nullptr;
+	}
+
+	if (ShopHUD)
+	{
+		ShopHUD->RemoveFromParent();
+		ShopHUD = nullptr;
+	}
+
+	if (ResultWidgetClass)
+	{
+		ResultWidget = CreateWidget<UIngamePauseMenu>(this, ResultWidgetClass);
+		if (ResultWidget)
+		{
+			SetPause(true);
+			ResultWidget->AddToViewport();
+			ResultWidget->OnGameOver();
+			bShowMouseCursor = true;
+			SetInputMode(FInputModeUIOnly());
+		}
+	}
+}
+
 void ATaskPlayerController::ShowGameHUD()
 {
 
-	if (MainMenuWidgetInstance)
+	if (MainMenuWidget)
 	{
-		MainMenuWidgetInstance->RemoveFromParent();
-		MainMenuWidgetInstance = nullptr;
+		MainMenuWidget->RemoveFromParent();
+		MainMenuWidget = nullptr;
 	}
 
 	if (IngameHUD)

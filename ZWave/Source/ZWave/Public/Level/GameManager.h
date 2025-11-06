@@ -78,13 +78,13 @@ protected:
 	TArray<TObjectPtr<ADoorControlPanel>> AllControlPanelsInLevel;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game Wave")
-	float DefaultPreparationTime = 5.0f;
+	float DefaultPreparationTime = 30.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blackout")
-	float BlackoutChancePerWave = 1.0f;
+	float BlackoutChancePerWave = 0.3f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blackout")
-	float BlackoutDuration = 15.0f;
+	float BlackoutDuration = 20.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Blackout")
 	bool bIsBlackoutActive = false;
