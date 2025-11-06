@@ -9,11 +9,21 @@
 #include "Item/ItemDefinition.h" 
 #include "FieldItem/FieldItem.h"    
 #include "Engine/World.h"
+#include "Engine/DataTable.h"
 #include "Level/ZWaveTypes.h" 
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
+UItemSpawnManager::UItemSpawnManager()
+{
+    static ConstructorHelpers::FObjectFinder<UDataTable> DropTableFinder(TEXT("/Game/Data/DT_ItemDropTable.DT_ItemDropTable"));
+
+    if (DropTableFinder.Succeeded())
+    {
+        this->DropTable = DropTableFinder.Object;
+    }
+}
 
 void UItemSpawnManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -93,6 +103,8 @@ void UItemSpawnManager::GenerateDropQueue(const FWaveDataInfo& WaveData, int32 T
     UE_LOG(LogTemp, Log, TEXT("Drop Queue Generated. Total Items: %d (Monsters: %d)"), CurrentWaveDropQueue.Num(), TotalMonsterCount);
 }
 
+
+
 void UItemSpawnManager::HandleEnemyDied(ABaseCharacter* DiedEnemy)
 {
 
@@ -133,5 +145,23 @@ void UItemSpawnManager::HandleEnemyDied(ABaseCharacter* DiedEnemy)
 
         SpawnedItem->Init(ItemIndex);
     }
+}
+
+UItemDefinition* UItemSpawnManager::GetItemDefinitionByIndex(int32 Index) const
+{
+    static const FString ContextString(TEXT("Find Item By Index"));
+    TArray<FItemDropTable*> AllRows;
+
+    DropTable->GetAllRows(ContextString, AllRows);
+
+    for (FItemDropTable* Row : AllRows)
+    {
+        if (Row && Row->ItemIndex == Index)
+        {
+            return Row->ItemDefinition;
+        }
+    }
+
+    return nullptr;
 }
 

@@ -7,6 +7,7 @@
 #include "Item/ItemDefinition.h"
 #include "FieldItem/FieldItem.h"
 #include "Effect/EffectBase.h"
+#include "Level/ItemDropTable.h"
 #include "ItemSpawnManager.generated.h"
 
 class UEnemySpawnManager;
@@ -22,10 +23,13 @@ class ZWAVE_API UItemSpawnManager : public UWorldSubsystem
 	GENERATED_BODY()
 	
 public:
+    UItemSpawnManager();
 
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
     void GenerateDropQueue(const FWaveDataInfo& WaveData, int32 TotalMonsterCount);
+
+    UItemDefinition* GetItemDefinitionByIndex(int32 Index) const;
 
 
     UFUNCTION()
@@ -43,6 +47,8 @@ public:
     UPROPERTY()
     TWeakObjectPtr<UWaveManager> WaveManager;
 
+    UDataTable* DropTable;
+
 private:
 
     UPROPERTY()
@@ -56,7 +62,7 @@ private:
     const int32 INDEX_MATERIAL_T3 = 5;
     const int32 INDEX_ACCESSORY_1 = 6;
     const int32 INDEX_ACCESSORY_2 = 7;
-    const int32 INDEX_ACCESSORY_3 = 8;
+    const int32 INDEX_ACCESSORY_3 = 8; 
 
     int32 TotalMonstersThisWave = 0;
     int32 MonstersDiedThisWave = 0;
