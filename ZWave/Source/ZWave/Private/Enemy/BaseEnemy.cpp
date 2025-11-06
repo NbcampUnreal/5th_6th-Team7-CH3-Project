@@ -11,6 +11,7 @@
 #include "State/EnemyStateComponent.h"
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
+#include "AoE/AoEActor.h"
 
 
 ABaseEnemy::ABaseEnemy()
@@ -105,7 +106,7 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 	if (AIController == nullptr) return;
 
 	int32 CurPriorityLv = AIController->GetValueAsIntFromBlackboard(FName(TEXT("CurPriorityLv")));
-	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && MaxPriorityLv >= 2)
+	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && CurPriorityLv < 3 && MaxPriorityLv >= 2)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 2);
 		SetNewTarget(DamageCauser);
@@ -118,6 +119,11 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 		SetNewTarget(DamageCauser);
 
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
+	else if (DamageCauser->IsA(AAoEActor::StaticClass()))
+	{
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 3);
+		SetNewTarget(DamageCauser);
 	}
 }
 
@@ -139,6 +145,7 @@ void ABaseEnemy::SetNewTarget(AActor* DamageCauser)
 	{
 		AIController->ClearValueFromBlackboard(FName(TEXT("SecondaryTarget")));
 		AIController->ClearValueFromBlackboard(FName(TEXT("AttackLocation")));
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 0);
 
 		AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), false);
 	}
