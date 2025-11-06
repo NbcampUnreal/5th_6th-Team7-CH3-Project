@@ -12,6 +12,7 @@ class UGameManager;
 class ABaseCharacter;
 class UDataTable;
 class AZWaveGameState;
+class UItemSpawnManager;
 
 UCLASS()
 class ZWAVE_API UWaveManager : public UWorldSubsystem
@@ -47,6 +48,9 @@ protected:
 
     UPROPERTY()
     TWeakObjectPtr<AZWaveGameState> GameState;
+
+    UPROPERTY()
+    TWeakObjectPtr<UItemSpawnManager> ItemSpawnManager;
 
     int32 EnemiesToSpawnThisWave = 0;
 
