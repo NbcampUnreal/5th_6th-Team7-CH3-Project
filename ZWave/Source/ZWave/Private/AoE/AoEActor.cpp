@@ -1,0 +1,168 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+#include "AoE/AoEActor.h"
+#include "Components/BoxComponent.h"
+#include "Base/BaseCharacter.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "AoE/AoEData.h"
+#include "Effect/DecoyEffect.h"
+#include "DamageCalculator/DamageCalculator.h"
+
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
+AAoEActor::AAoEActor()
+{
+	PrimaryActorTick.bCanEverTick = false;
+
+	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	SetRootComponent(Scene);
+
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	BoxCollision->SetupAttachment(Scene);
+	BoxCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+
+	DamagePerSecond = 0;
+	TotalActiveTime = 0;
+	CurrentActiveTime = 0;
+	AoEEffectClass = nullptr;
+
+	EffectSoundAC = CreateDefaultSubobject<UAudioComponent>(TEXT("EffectSounAC"));
+	EffectSoundAC->SetupAttachment(GetRootComponent());
+	EffectSoundAC->bAutoActivate = false;
+	EffectSoundAC->bAutoDestroy = false;
+	EffectSoundAC->SetUISound(false);
+
+}
+
+void AAoEActor::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (EffectSound)
+	{
+		EffectSoundAC->SetSound(EffectSound);
+		if (EffectSoundAttenuation)
+			EffectSoundAC->AttenuationSettings = EffectSoundAttenuation;
+
+		EffectSoundAC->FadeIn(0.5f, 0.2f, 0.0f);
+	}
+}
+
+void AAoEActor::ActiveAoE(UNiagaraSystem* NiagaraParticle, FAoEParam DamageParam)
+{
+	this->DamagePerSecond = DamageParam.DamagePerSec;
+	this->TotalActiveTime = DamageParam.ActiveTime;
+	this->AoEEffectClass = DamageParam.AoEEffectClass;
+	
+
+
+	BoxCollision->SetBoxExtent(DamageParam.AoERange);
+
+	if (NiagaraParticle)
+	{
+		NiagaraParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			NiagaraParticle,
+			GetActorLocation()
+		);
+	}
+	
+	if (NiagaraParticleInstance)
+	{
+		FVector BoxSize = BoxCollision->GetScaledBoxExtent() * 2.0f; // 실제 풀 사이즈
+		NiagaraParticleInstance->SetWorldScale3D(BoxSize / 100.f);
+		NiagaraParticleInstance->OnSystemFinished.AddDynamic(this, &AAoEActor::DestroyAoEActor);
+	}
+
+	if (!DamageParam.bIsTick)
+	{
+		ApplyOverlapActorDamage();
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(
+			DOTHandle,
+			this,
+			&AAoEActor::ApplyOverlapActorDOT,
+			1.0f,
+			true
+		);
+	}
+}
+
+void AAoEActor::ApplyOverlapActorDOT()
+{
+	if (CurrentActiveTime > TotalActiveTime)
+	{
+		GetWorldTimerManager().ClearTimer(DOTHandle);
+		if (NiagaraParticleInstance)
+		{
+			NiagaraParticleInstance->Deactivate();
+		}
+	}
+	else
+	{
+		CurrentActiveTime += 1.0f;
+
+		TArray<AActor*> OverlapActors;
+		BoxCollision->GetOverlappingActors(OverlapActors, ABaseCharacter::StaticClass());
+
+		for (AActor* OverlapActor : OverlapActors)
+		{
+			if (!OverlapActor && OverlapActor == GetOwner())
+			{
+				continue;
+			}
+
+			FZWaveDamageEvent DamageEvent;
+			DamageEvent.BaseDamage = DamagePerSecond;
+			DamageEvent.Duration = TotalActiveTime;
+			if (AoEEffectClass)
+			{
+				DamageEvent.EffectArray.Add(AoEEffectClass);
+			}
+
+			if (AoEEffectClass == UDecoyEffect::StaticClass())
+			{
+				UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+			}
+			else
+			{
+				UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this->GetInstigator(), DamageEvent);
+			}
+		}
+	}
+}
+
+void AAoEActor::ApplyOverlapActorDamage()
+{
+	TArray<AActor*> OverlapActors;
+	BoxCollision->GetOverlappingActors(OverlapActors, ABaseCharacter::StaticClass());
+
+	for (AActor* OverlapActor : OverlapActors)
+	{
+		if (!OverlapActor && OverlapActor == GetOwner())
+		{
+			continue;
+		}
+
+		FZWaveDamageEvent DamageEvent;
+		DamageEvent.BaseDamage = DamagePerSecond;
+		if (AoEEffectClass)
+		{
+			DamageEvent.EffectArray.Add(AoEEffectClass);
+		}
+
+		UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this->GetInstigator(), DamageEvent);
+	}
+}
+
+
+void AAoEActor::DestroyAoEActor(UNiagaraComponent* NiagaraSys)
+{
+	Destroy();
+}
+
+
+
