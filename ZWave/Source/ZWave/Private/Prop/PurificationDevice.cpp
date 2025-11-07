@@ -35,8 +35,6 @@ void APurificationDevice::BeginPlay()
 	Super::BeginPlay();
 	
 	Health = MaxHealth;
-	UE_LOG(LogTemp, Display, TEXT("Team id: %d"), TeamID);
-	//GetIngameHud()->OnObjectHealthChange(0, Health);
 }
 
 UIngameHUD* APurificationDevice::GetIngameHud()
@@ -59,7 +57,6 @@ FGenericTeamId APurificationDevice::GetGenericTeamId() const
 
 float APurificationDevice::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Display, TEXT("Puri dev attcekd by :%s"), *DamageCauser->GetActorNameOrLabel());
 	if (const FZWaveDamageEvent* CustomDamageEvent = static_cast<const FZWaveDamageEvent*>(&DamageEvent))
 	{
 		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())

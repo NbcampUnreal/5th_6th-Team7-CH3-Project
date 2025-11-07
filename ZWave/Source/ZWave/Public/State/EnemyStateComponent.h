@@ -33,11 +33,6 @@ public:
 	FORCEINLINE EEnemyStateType GetCurrentState() const { return CurrentState; }
 
 protected:
-	class ABaseEnemy* OwningCharacter;
-	class ABaseAIController* AIController;
-	class USkeletalMeshComponent* Mesh;
-	class UAnimInstance* AnimInstance;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AnimationMontage")
 	TObjectPtr<class UAnimMontage> Montage_Stun;
 	float MontageStunPlayRate = 1.5f;

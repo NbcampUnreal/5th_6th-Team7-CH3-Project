@@ -22,7 +22,6 @@ void UDamageCalculator::DamageHelper(UObject* WorldContextObject, TScriptInterfa
 
 	if (!TargetTeam || !DamageCauserTeam)
 	{
-		UE_LOG(LogTemp, Error, TEXT("no team target"));
 		return;
 	}
 

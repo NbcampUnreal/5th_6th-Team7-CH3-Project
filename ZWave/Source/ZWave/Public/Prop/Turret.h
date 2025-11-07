@@ -43,6 +43,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	TObjectPtr<class USphereComponent> SphereComp;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USceneComponent> MuzzleFlashLocation;
+
 
 /// <summary>
 /// Teamp ID 관련
@@ -60,6 +63,11 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<class UAnimMontage> Montage_Destory;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class UNiagaraSystem> NS_Destroy;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class USoundBase> SW_Explosion;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float MaxHealth;
@@ -79,6 +87,12 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<class UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class UNiagaraSystem> NS_MuzzleFlash;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<class USoundBase> SW_Shot;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float AwarenessRange = 1000;
 	UPROPERTY(EditAnywhere, Category = "Ability")
