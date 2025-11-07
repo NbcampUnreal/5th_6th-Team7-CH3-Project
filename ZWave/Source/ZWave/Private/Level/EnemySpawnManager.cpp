@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Enemy/BaseEnemy.h"
 
 
 void UEnemySpawnManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -71,7 +72,7 @@ void UEnemySpawnManager::HandleEnemyDied(AActor* DiedActor)
 {
     if (!DiedActor) return;
 
-    ABaseCharacter* Monster = Cast<ABaseCharacter>(DiedActor);
+    ABaseEnemy* Monster = Cast<ABaseEnemy>(DiedActor);
     if (Monster)
     {
         ActiveEnemies.Remove(Monster);
@@ -125,7 +126,7 @@ void UEnemySpawnManager::OnSpawnTimerTick()
             FActorSpawnParameters SpawnParams;
             SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-            ABaseCharacter* NewMonster = GetWorld()->SpawnActor<ABaseCharacter>(
+            ABaseEnemy* NewMonster = GetWorld()->SpawnActor<ABaseEnemy>(
                 CurrentRequest.MonsterClass,
                 SpawnPoint->GetActorLocation(),
                 SpawnPoint->GetActorRotation(),

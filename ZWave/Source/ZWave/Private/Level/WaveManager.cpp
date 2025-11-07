@@ -57,6 +57,13 @@ void UWaveManager::StartWave(int32 WaveNumber)
 
     if (WaveData)
     {
+        int32 TotalMonsterCount = 0;
+
+        for (const FMonsterSpawnInfo& SpawnInfo : WaveData->MonsterSpawnList)
+        {
+            TotalMonsterCount += SpawnInfo.NumberToSpawn;
+        }
+
         UE_LOG(LogTemp, Warning, TEXT("WaveData found! MonsterSpawnList contains %d entries."), WaveData->MonsterSpawnList.Num());
 
         for (const FMonsterSpawnInfo& SpawnInfo : WaveData->MonsterSpawnList)
@@ -76,20 +83,6 @@ void UWaveManager::StartWave(int32 WaveNumber)
         }
 
         UE_LOG(LogTemp, Log, TEXT("Wave %d Started. Spawning %d enemies."), WaveNumber, EnemiesToSpawnThisWave);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Failed to find Wave Data for Wave %d in DataTable!"), WaveNumber);
-        OnWaveCleared();
-    }
-
-    if (WaveData)
-    {
-        int32 TotalMonsterCount = 0;
-        for (const FMonsterSpawnInfo& SpawnInfo : WaveData->MonsterSpawnList)
-        {
-            TotalMonsterCount += SpawnInfo.NumberToSpawn;
-        }
 
         if (ItemSpawnManager.IsValid())
         {
@@ -99,18 +92,11 @@ void UWaveManager::StartWave(int32 WaveNumber)
         {
             UE_LOG(LogTemp, Error, TEXT("WaveManager: ItemSpawnManager is NULL!"));
         }
-
-        for (const FMonsterSpawnInfo& SpawnInfo : WaveData->MonsterSpawnList)
-        {
-            if (EnemySpawnManager.IsValid())
-            {
-                EnemySpawnManager->RequestSpawn(SpawnInfo.MonsterClass, SpawnInfo.NumberToSpawn);
-            }
-        }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("WaveManager: WavaDropData is NULL!"));
+        UE_LOG(LogTemp, Error, TEXT("Failed to find Wave Data for Wave %d in DataTable!"), WaveNumber);
+        OnWaveCleared();
     }
 }
 

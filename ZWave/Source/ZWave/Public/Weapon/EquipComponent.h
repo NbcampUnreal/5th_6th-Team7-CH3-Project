@@ -38,7 +38,7 @@ public:
 	bool Equip(EEquipSlot Slot);
 	void UnEquip(EEquipSlot Slot);
 
-	void SetSlotData(EEquipSlot Slot, const UWeaponDefinition* WeaponDef);
+	void SetSlotData(EEquipSlot Slot, UWeaponDefinition* WeaponDef);
 	void ClearSlotData(EEquipSlot Slot);
 	void AmmoSupply(float AddingPercent);
 
@@ -50,6 +50,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE AWeaponBase* GetConsumeItem() { return ConsumeMaps[CurrentConsumeSlot]; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE EEquipSlot GetCurrentWeaponEquipSlot() { return CurrentSlot; }
 
 	void EquipConsumeItem(EConsumeSlot Slot);
 

@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "AoE/AoEData.h"
+#include "Effect/DecoyEffect.h"
 #include "DamageCalculator/DamageCalculator.h"
 
 AAoEActor::AAoEActor()
@@ -35,19 +36,20 @@ void AAoEActor::ActiveAoE(UNiagaraSystem* NiagaraParticle, FAoEParam DamageParam
 	this->DamagePerSecond = DamageParam.DamagePerSec;
 	this->TotalActiveTime = DamageParam.ActiveTime;
 	this->AoEEffectClass = DamageParam.AoEEffectClass;
-	if (!NiagaraParticle)
-	{
-		return;
-	}
+	
+
 
 	BoxCollision->SetBoxExtent(DamageParam.AoERange);
 
-	NiagaraParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-		GetWorld(),
-		NiagaraParticle,
-		GetActorLocation()
-	);
-
+	if (NiagaraParticle)
+	{
+		NiagaraParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			NiagaraParticle,
+			GetActorLocation()
+		);
+	}
+	
 	if (NiagaraParticleInstance)
 	{
 		FVector BoxSize = BoxCollision->GetScaledBoxExtent() * 2.0f; // 실제 풀 사이즈
@@ -76,7 +78,10 @@ void AAoEActor::ApplyOverlapActorDOT()
 	if (CurrentActiveTime > TotalActiveTime)
 	{
 		GetWorldTimerManager().ClearTimer(DOTHandle);
-		NiagaraParticleInstance->Deactivate();
+		if (NiagaraParticleInstance)
+		{
+			NiagaraParticleInstance->Deactivate();
+		}
 	}
 	else
 	{
@@ -99,7 +104,15 @@ void AAoEActor::ApplyOverlapActorDOT()
 			{
 				DamageEvent.EffectArray.Add(AoEEffectClass);
 			}
-			UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+
+			if (AoEEffectClass == UDecoyEffect::StaticClass())
+			{
+				UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+			}
+			else
+			{
+				UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this->GetInstigator(), DamageEvent);
+			}
 		}
 	}
 }
@@ -118,8 +131,12 @@ void AAoEActor::ApplyOverlapActorDamage()
 
 		FZWaveDamageEvent DamageEvent;
 		DamageEvent.BaseDamage = DamagePerSecond;
+		if (AoEEffectClass)
+		{
+			DamageEvent.EffectArray.Add(AoEEffectClass);
+		}
 
-		UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+		UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this->GetInstigator(), DamageEvent);
 	}
 }
 

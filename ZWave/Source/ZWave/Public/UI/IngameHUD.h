@@ -23,7 +23,16 @@ public:
 	virtual void NativeOnInitialized() override;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void InitPlayerHealthBar(float MaxHealth);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void InitObjectHealthBar(float MaxHealth);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnHealthChange(float CurrentHealth, float TargetHealth);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnObjectHealthChange(float CurrentHealth, float TargetHealth);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnGunChanged(EShootType SlotIdx);

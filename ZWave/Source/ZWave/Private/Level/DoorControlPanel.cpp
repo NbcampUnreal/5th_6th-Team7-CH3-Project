@@ -212,3 +212,8 @@ void ADoorControlPanel::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedCompon
         UE_LOG(LogTemp, Log, TEXT("Player left interact range of Panel."));
     }
 }
+
+void ADoorControlPanel::UpgradeBattery(float time)
+{
+
+}

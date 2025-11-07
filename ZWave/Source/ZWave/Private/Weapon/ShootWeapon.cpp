@@ -128,24 +128,17 @@ bool AShootWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInst
 	if (ModeInstance == nullptr)
 		return false;
 
-	const UShootWeaponDefinition* ShootDefinition = Cast<UShootWeaponDefinition>(ModeInstance->GetModeWeaponDef());
-	if (ShootDefinition == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("It's Not ShootWeapon Moding!"));
-		return false;
-	}
-
-	if (EquipModingMap.Contains(ModingSlot))
-	{
-		if (EquipModingMap[ModingSlot] != nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Need UnEquip Slot"));
-			return false;
-		}
-	}
-
 	EquipModingMap.Add(ModingSlot, ModeInstance);
-	EquipModingEffectClassMap.Add(ModingSlot,ModeInstance->GetModeEffectClass());
+
+	if (ModeInstance->GetModeEffectClass() != nullptr)
+	{
+		EquipModingEffectClassMap.Add(ModingSlot, ModeInstance->GetModeEffectClass());
+	}
+	else
+	{
+		EquipModingEffectClassMap.Remove(ModingSlot);
+	}
+
 	ApplyCurrentModing();
 	return true;
 }

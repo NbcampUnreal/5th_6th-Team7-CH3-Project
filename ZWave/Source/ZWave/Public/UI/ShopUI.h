@@ -19,4 +19,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnChangeTab(int32 TargetTabIdx);
 	void OnChangeTab_Implementation(int32 TargetTabIdx);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnUpdateBioCoin(float DummyValue);
 };

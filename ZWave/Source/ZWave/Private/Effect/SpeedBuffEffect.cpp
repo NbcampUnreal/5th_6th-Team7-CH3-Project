@@ -25,7 +25,14 @@ void USpeedBuffEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 			Character->SetMoveSpeed(CharacterSpeed * SpeedMultiplier);
 		}
 
-		RemoveEffect();
+		if (!FMath::IsNearlyZero(Duration))
+		{
+			SetBuffTimer(Duration);
+		}
+		else
+		{
+			RemoveEffect();
+		}
 
 	}
 }
