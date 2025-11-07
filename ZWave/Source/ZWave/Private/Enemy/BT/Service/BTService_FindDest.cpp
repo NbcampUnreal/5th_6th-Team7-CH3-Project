@@ -58,10 +58,11 @@ void UBTService_FindDest::TickWithIsAggroedCondtion(UBehaviorTreeComponent& Owne
 
 	FVector NowDestLocation = OwnerBlackboard->GetValueAsVector(FName(TEXT("MoveDestTargetLocation")));
 
-	DrawDebugSphere(GetWorld(), MyCharacter->GetActorLocation(), SightRange, 12, FColor::Yellow, false, 0.2f);
+	//DrawDebugSphere(GetWorld(), MyCharacter->GetActorLocation(), SightRange, 12, FColor::Yellow, false, 0.2f);
 
 	if (FVector::Dist2D(MyCharacter->GetActorLocation(), SecondaryTargetActor->GetActorLocation()) > SightRange)
 	{
+		OwnerBlackboard->ClearValue(FName(TEXT("AttackLocation")));
 		OwnerBlackboard->SetValueAsBool(FName("IsAggroed"), false);
 	}
 	else
@@ -95,6 +96,12 @@ void UBTService_FindDest::TickWithIsNotAggroedCondition(UBehaviorTreeComponent& 
 	{
 		OwnerBlackboard->SetValueAsBool(FName("IsAggroed"), true);
 		return;
+	}
+
+	FVector AttackLoc = OwnerBlackboard->GetValueAsVector(FName("AttackLocation"));
+	if (!AttackLoc.IsNearlyZero())
+	{
+		OwnerBlackboard->ClearValue(FName(TEXT("AttackLocation")));
 	}
 
 	const FVector DestLoc = OwnerBlackboard->GetValueAsVector(FName(TEXT("MoveDestTargetLocation")));
