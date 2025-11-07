@@ -26,6 +26,15 @@ protected:
 	class UBoxComponent* BoxCollision;
 	class UNiagaraComponent* NiagaraParticleInstance;
 
+	UPROPERTY(EditAnywhere, Category = "SFX")
+	USoundWave* EffectSound = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "SFX")
+	UAudioComponent* EffectSoundAC = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "SFX")
+	USoundAttenuation* EffectSoundAttenuation = nullptr;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "AoE")
 	void ActiveAoE(UNiagaraSystem* NiagaraParticle, struct FAoEParam DamageParam);

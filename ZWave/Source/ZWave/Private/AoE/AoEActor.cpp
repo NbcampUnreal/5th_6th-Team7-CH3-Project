@@ -9,6 +9,8 @@
 #include "Effect/DecoyEffect.h"
 #include "DamageCalculator/DamageCalculator.h"
 
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 AAoEActor::AAoEActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -24,11 +26,27 @@ AAoEActor::AAoEActor()
 	TotalActiveTime = 0;
 	CurrentActiveTime = 0;
 	AoEEffectClass = nullptr;
+
+	EffectSoundAC = CreateDefaultSubobject<UAudioComponent>(TEXT("EffectSounAC"));
+	EffectSoundAC->SetupAttachment(GetRootComponent());
+	EffectSoundAC->bAutoActivate = false;
+	EffectSoundAC->bAutoDestroy = false;
+	EffectSoundAC->SetUISound(false);
+
 }
 
 void AAoEActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (EffectSound)
+	{
+		EffectSoundAC->SetSound(EffectSound);
+		if (EffectSoundAttenuation)
+			EffectSoundAC->AttenuationSettings = EffectSoundAttenuation;
+
+		EffectSoundAC->FadeIn(0.5f, 0.2f, 0.0f);
+	}
 }
 
 void AAoEActor::ActiveAoE(UNiagaraSystem* NiagaraParticle, FAoEParam DamageParam)
