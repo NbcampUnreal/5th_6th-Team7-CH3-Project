@@ -202,7 +202,7 @@ FVector AProjectileWeapon::ComputeThrowDirection() const
 		FVector TargetVec;
 		RAC->GetTargetVector(TargetVec);
 
-		DrawDebugLine(GetWorld(), TargetVec, PawnOwner->GetActorLocation(), FColor::Red, false, 0.2f, 0, 1.5f);
+		//DrawDebugLine(GetWorld(), TargetVec, PawnOwner->GetActorLocation(), FColor::Red, false, 0.2f, 0, 1.5f);
 		const FVector Dir = (TargetVec - PawnOwner->GetActorLocation()).GetSafeNormal();
 		return Dir;
 	}
