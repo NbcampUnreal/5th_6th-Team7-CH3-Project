@@ -395,3 +395,14 @@ void UGameManager::HandleEnemyKilled(ABaseCharacter* DiedEnemy)
         UE_LOG(LogTemp, Log, TEXT("Total Kills: %d"), CumulativeKills);
     }
 }
+
+void UGameManager::UpgradeDoorBattery(float time)
+{
+    for (ADoorControlPanel* Panel : AllControlPanelsInLevel)
+    {
+        if (Panel)
+        {
+            Panel->UpgradeBattery(time);
+        }
+    }
+}
