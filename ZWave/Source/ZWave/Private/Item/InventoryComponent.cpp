@@ -449,7 +449,7 @@ bool UInventoryComponent::UnequipModingToWeapon(const UItemDefinition* WeaponIte
 
 	if (WeaponItem->EquipSlot != EEquipSlot::None)
 	{
-		EquipModingOnWeaponActor(WeaponItem, WeaponItem->EquipSlot);
+		UnequipModingOnWeaponActor(WeaponItem, WeaponItem->EquipSlot,TargetUnEquipModingSlot);
 	}
 
 	return true;
@@ -511,4 +511,25 @@ void UInventoryComponent::EquipModingOnWeaponActor(UItemWeaponInstance* WeaponIt
 		ModingInstance->Init(ModeDef);
 		WeaponActor->EquipModing(ModingSlot, ModingInstance);
 	}
+}
+
+void UInventoryComponent::UnequipModingOnWeaponActor(class UItemWeaponInstance* WeaponItem, EEquipSlot EquipWeaponSlot, int32 ModingSlot)
+{
+	if (WeaponItem == nullptr ||
+		ModingSlot < 0)
+		return;
+
+	if (GetOwner() == nullptr)
+		return;
+
+	UEquipComponent* EquipComp = GetOwner()->FindComponentByClass<UEquipComponent>();
+	if (EquipComp == nullptr)
+		return;
+
+	AWeaponBase* WeaponActor = EquipComp->GetTargetWeapon(EquipWeaponSlot);
+	if (WeaponActor == nullptr)
+		return;
+
+	EModingSlot EMSlot = static_cast<EModingSlot>(ModingSlot);
+	WeaponActor->UnEquipModing(EMSlot);
 }
