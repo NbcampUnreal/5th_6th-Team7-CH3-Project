@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 #include "Player/TaskPlayer.h"
 #include "State/EnemyStateComponent.h"
@@ -26,6 +27,8 @@ ABaseEnemy::ABaseEnemy()
 void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 UAnimMontage* ABaseEnemy::GetAttackedMontage(EHitDir Direction)
@@ -163,6 +166,9 @@ void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
 void ABaseEnemy::Die()
 {
 	//Super::Die();
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	StateComp->SetState(EEnemyStateType::EST_Death);
 }
 
