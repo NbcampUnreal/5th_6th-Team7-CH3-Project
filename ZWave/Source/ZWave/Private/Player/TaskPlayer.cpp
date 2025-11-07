@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Player/TaskPlayer.h"
@@ -443,6 +443,12 @@ void ATaskPlayer::AddPlayerStat(EPlayerShopStat statType, float value)
 	case EPlayerShopStat::MaxHealth: 
 		MaxHealth += value;
 		Health += value;
+
+		if (ATaskPlayerController* PlayerController = Cast<ATaskPlayerController>(GetController()))
+		{
+			PlayerController->InitHP(MaxHealth);
+		}
+
 		break;
 	case EPlayerShopStat::MoveSpeedMultiply:
 		MoveSpeedMultiply += value;

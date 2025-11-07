@@ -97,4 +97,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Result")
 	void ShowResultHUD();
+
+	UFUNCTION(BlueprintCallable, Category = "Result")
+	void InitHP(float MaxHealth);
 };
