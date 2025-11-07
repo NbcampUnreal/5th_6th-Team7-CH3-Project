@@ -29,13 +29,6 @@ class ZWAVE_API UGameManager : public UWorldSubsystem
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	void BindPlayerEvents(APawn* PlayerPawn);
-
-	UFUNCTION(BlueprintPure, Category = "GameManger")
-	EGameState GetCurrentState() const { return CurrentState; }
-
-	void BeginPreparationPhase();
-
 	UPROPERTY(BlueprintAssignable, Category = "Blackout")
 	FOnBlackoutStateChangedSignature OnBlackoutStateChanged;
 
@@ -54,12 +47,19 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Stim System")
 	bool IsStimOnCooldown() const { return bIsStimUsedThisWave; }
 
-	bool GetIsBlackOutActive() { return bIsBlackoutActive; }
+	UFUNCTION(BlueprintPure, Category = "GameManger")
+	EGameState GetCurrentState() const { return CurrentState; }
 
 	UFUNCTION(BlueprintCallable, Category = "Turret")
 	bool SpawnTurret(int32 SpawnPointIndex);
 
+	UFUNCTION(BlueprintCallable, Category = "DoorControl")
+	void UpgradeDoorBattery(float time);
+
 	void GetRewardBioCoin(int32 value);
+	void BindPlayerEvents(APawn* PlayerPawn);
+	void BeginPreparationPhase();
+	bool GetIsBlackOutActive() { return bIsBlackoutActive; }
 
 protected:
 	UPROPERTY()
@@ -91,9 +91,6 @@ protected:
 
 	bool bBlackoutUsedThisWave = false;
 
-	UFUNCTION(BlueprintPure, Category = "Game Stats")
-	int32 GetCumulativeKills() const { return CumulativeKills; }
-
 	UPROPERTY(Transient)
 	TObjectPtr<UEffectApplyManager> EffectManager;
 
@@ -106,19 +103,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Turret")
 	TSubclassOf<ATurret> TurretClassToSpawn;
 
-	EGameState CurrentState = EGameState::EGS_None;
-
-	int32 CurrentWaveNumber = 0;
-
-	FTimerHandle PrepPhaseTimerHandle;
-	FTimerHandle GameStartTimerHandle;
-	FTimerHandle BlackoutTimerHandle;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Stats")
 	int32 CumulativeKills = 0;
 
 	UPROPERTY()
 	TWeakObjectPtr<UEnemySpawnManager> EnemySpawnManager;
+
+	EGameState CurrentState = EGameState::EGS_None;
+	int32 CurrentWaveNumber = 0;
+	FTimerHandle PrepPhaseTimerHandle;
+	FTimerHandle GameStartTimerHandle;
+	FTimerHandle BlackoutTimerHandle;
 
 	UFUNCTION()
 	void HandleEnemyKilled(ABaseCharacter* DiedEnemy);
@@ -126,16 +121,14 @@ protected:
 	UFUNCTION()
 	void OnPlayerDied(AActor* DiedActor);
 
+	UFUNCTION(BlueprintPure, Category = "Game Stats")
+	int32 GetCumulativeKills() const { return CumulativeKills; }
+
 	void StartGame();
-
 	void BeginCombatPhase();
-
 	void EndGame(bool bPlayerWon);
-
 	void StartBlackoutEvent();
-
 	void EndBlackoutEvent();
-
 	AZWaveGameState* GetGameState();
 
 };

@@ -34,6 +34,8 @@ public:
 
     void UnlockAllDoors();
 
+    void UpgradeBattery(float time);
+
 protected:
     virtual void BeginPlay() override;
 
