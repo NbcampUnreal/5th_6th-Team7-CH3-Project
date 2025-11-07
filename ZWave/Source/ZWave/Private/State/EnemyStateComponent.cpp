@@ -26,8 +26,8 @@ void UEnemyStateComponent::SetState(EEnemyStateType SetType, float Duration)
 {
 	PreState = CurrentState;
 	CurrentState = SetType;
-	UE_LOG(LogTemp, Log, TEXT("StateType: %s -> %s"),
-		*UEnum::GetValueAsString(PreState), *UEnum::GetValueAsString(CurrentState));
+	//UE_LOG(LogTemp, Log, TEXT("StateType: %s -> %s"),
+	//	*UEnum::GetValueAsString(PreState), *UEnum::GetValueAsString(CurrentState));
 
 	switch (CurrentState)
 	{
