@@ -110,7 +110,7 @@ void ATaskPlayerController::ShowShopUI()
 
 }
 
-void ATaskPlayerController::ShowResultHUD()
+void ATaskPlayerController::ShowResultHUD(bool Result)
 {
 	if (MainMenuWidget)
 	{
@@ -137,7 +137,7 @@ void ATaskPlayerController::ShowResultHUD()
 		{
 			SetPause(true);
 			ResultWidget->AddToViewport();
-			ResultWidget->OnGameOver(false);
+			ResultWidget->OnGameOver(Result);
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}

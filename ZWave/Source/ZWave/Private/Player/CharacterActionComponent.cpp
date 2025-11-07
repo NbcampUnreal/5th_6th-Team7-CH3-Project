@@ -592,7 +592,7 @@ void UCharacterActionComponent::GameOver()
 	ATaskPlayer* Character = Cast<ATaskPlayer>(GetOwner());
 	if (Character)
 	{
-		Character->GameOver();
+		Character->GameOver(true);
 
 	}
 	//UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);

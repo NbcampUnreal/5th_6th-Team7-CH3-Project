@@ -96,7 +96,7 @@ public:
 	void ShowShopUI();
 
 	UFUNCTION(BlueprintCallable, Category = "Result")
-	void ShowResultHUD();
+	void ShowResultHUD(bool Result);
 
 	UFUNCTION(BlueprintCallable, Category = "Result")
 	void InitHP(float MaxHealth);

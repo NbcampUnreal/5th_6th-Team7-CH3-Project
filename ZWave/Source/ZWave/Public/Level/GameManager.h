@@ -51,15 +51,18 @@ public:
 	EGameState GetCurrentState() const { return CurrentState; }
 
 	UFUNCTION(BlueprintCallable, Category = "Turret")
-	bool SpawnTurret(int32 SpawnPointIndex);
+	bool SpawnTurret();
 
 	UFUNCTION(BlueprintCallable, Category = "DoorControl")
-	void UpgradeDoorBattery(float time);
+	void UpgradeDoorBattery();
 
 	void GetRewardBioCoin(int32 value);
 	void BindPlayerEvents(APawn* PlayerPawn);
 	void BeginPreparationPhase();
 	bool GetIsBlackOutActive() { return bIsBlackoutActive; }
+
+	UFUNCTION(BlueprintPure, Category = "Game Stats")
+	int32 GetCumulativeKills() const { return CumulativeKills; }
 
 protected:
 	UPROPERTY()
@@ -111,6 +114,7 @@ protected:
 
 	EGameState CurrentState = EGameState::EGS_None;
 	int32 CurrentWaveNumber = 0;
+	int32 MaxWaveNumber = 10;
 	FTimerHandle PrepPhaseTimerHandle;
 	FTimerHandle GameStartTimerHandle;
 	FTimerHandle BlackoutTimerHandle;
@@ -121,14 +125,14 @@ protected:
 	UFUNCTION()
 	void OnPlayerDied(AActor* DiedActor);
 
-	UFUNCTION(BlueprintPure, Category = "Game Stats")
-	int32 GetCumulativeKills() const { return CumulativeKills; }
-
 	void StartGame();
 	void BeginCombatPhase();
 	void EndGame(bool bPlayerWon);
 	void StartBlackoutEvent();
 	void EndBlackoutEvent();
 	AZWaveGameState* GetGameState();
+
+	int32 CurrentTurretNum = 0;
+	int32 MaxTurretNum = 4;
 
 };

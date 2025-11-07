@@ -126,9 +126,21 @@ void UGameManager::BeginPreparationPhase()
 {
     if (CurrentState == EGameState::EGS_GameOver) return;
 
-    CurrentState = EGameState::EGS_Preparing;
-
     CurrentWaveNumber++;
+
+    if (CurrentWaveNumber > 10)
+    {
+        APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+        ATaskPlayer* TaskPlayer = Cast<ATaskPlayer>(PlayerPawn);
+        if (TaskPlayer)
+        {
+            GetCumulativeKills();
+
+            TaskPlayer->GameOver(false);
+        }
+    }
+
+    CurrentState = EGameState::EGS_Preparing;
 
     UE_LOG(LogTemp, Warning, TEXT("Preparation Phase Started for Wave %d. (Time: 30s)"), CurrentWaveNumber);
 
@@ -337,25 +349,34 @@ void UGameManager::UseStim(AActor* Interactor)
     EffectManager->ApplyEffect(Interactor, EffectArray, StimBuffDuration);
 }
 
-bool UGameManager::SpawnTurret(int32 SpawnPointIndex)
+bool UGameManager::SpawnTurret()
 {
+    if (CurrentTurretNum > MaxTurretNum)
+    {
+        UE_LOG(LogTemp, Error, TEXT("SpawnTurret FAILED: Turret Is Enonugh"));
+        return false;
+    }
+    
     if (!TurretClassToSpawn)
     {
         UE_LOG(LogTemp, Error, TEXT("SpawnTurret FAILED: TurretClassToSpawn is NULL."));
         return false;
     }
 
-    if (TurretSpawnTransforms.IsValidIndex(SpawnPointIndex))
+    if (TurretSpawnTransforms.IsValidIndex(CurrentTurretNum))
     {
-        FTransform SpawnTransform = TurretSpawnTransforms[SpawnPointIndex];
+        FTransform SpawnTransform = TurretSpawnTransforms[CurrentTurretNum];
 
         GetWorld()->SpawnActor<ATurret>(TurretClassToSpawn, SpawnTransform);
 
-        UE_LOG(LogTemp, Log, TEXT("Turret spawned at index %d"), SpawnPointIndex);
+        UE_LOG(LogTemp, Log, TEXT("Turret spawned at index %d"), CurrentTurretNum);
+
+        CurrentTurretNum++;
+
         return true;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("SpawnTurret FAILED: Invalid SpawnPointIndex %d"), SpawnPointIndex);
+    UE_LOG(LogTemp, Warning, TEXT("SpawnTurret FAILED: Invalid SpawnPointIndex %d"), CurrentTurretNum);
     return false;
 }
 
@@ -396,13 +417,13 @@ void UGameManager::HandleEnemyKilled(ABaseCharacter* DiedEnemy)
     }
 }
 
-void UGameManager::UpgradeDoorBattery(float time)
+void UGameManager::UpgradeDoorBattery()
 {
     for (ADoorControlPanel* Panel : AllControlPanelsInLevel)
     {
         if (Panel)
         {
-            Panel->UpgradeBattery(time);
+            Panel->UpgradeBattery();
         }
     }
 }

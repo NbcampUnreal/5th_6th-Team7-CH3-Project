@@ -14,6 +14,7 @@
 #include "UI/IngameHUD.h"
 #include "Base/ZWaveGameState.h"
 #include "Player/InteractInterface.h"
+#include "Level/GameManager.h"
 
 ATaskPlayer::ATaskPlayer()
 {
@@ -63,6 +64,8 @@ void ATaskPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+
+	GameManager = GetWorld()->GetSubsystem<UGameManager>();
 
 	if (ActionComp && EquipComponent)
 	{
@@ -288,11 +291,11 @@ void ATaskPlayer::Die()
 
 }
 
-void ATaskPlayer::GameOver()
+void ATaskPlayer::GameOver(bool Result)
 {
 	if (ATaskPlayerController* PlayerController = Cast<ATaskPlayerController>(GetController()))
 	{
-		PlayerController->ShowResultHUD();
+		PlayerController->ShowResultHUD(Result);
 	}
 }
 
@@ -458,6 +461,12 @@ void ATaskPlayer::AddPlayerStat(EPlayerShopStat statType, float value)
 		break;
 	case EPlayerShopStat::ShotSpeedMultiplay:
 		ShotSpeedMultiplay += value;
+		break;
+	case EPlayerShopStat::TurretInstall:
+		GameManager->SpawnTurret();
+		break;
+	case EPlayerShopStat::MaxBatteryAmount:
+		GameManager->UpgradeDoorBattery();
 		break;
 	default:
 		break;

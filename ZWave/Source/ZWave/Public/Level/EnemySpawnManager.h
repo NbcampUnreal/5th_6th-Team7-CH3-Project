@@ -10,6 +10,7 @@
 
 class ABaseCharacter;
 class ASpawnPoint;
+class ABaseEnemy;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnemyDiedSignature, ABaseCharacter*);
 

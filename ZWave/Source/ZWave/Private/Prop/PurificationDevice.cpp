@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Prop/PurificationDevice.h"
@@ -108,6 +108,6 @@ void APurificationDevice::CallGameOver()
 	ATaskPlayer* TaskPlayer = static_cast<ATaskPlayer*>(PlayerController->GetCharacter());
 	if (TaskPlayer == nullptr) return;
 
-	TaskPlayer->GameOver();
+	TaskPlayer->GameOver(false);
 }
 

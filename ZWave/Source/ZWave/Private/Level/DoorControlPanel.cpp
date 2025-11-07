@@ -213,7 +213,7 @@ void ADoorControlPanel::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedCompon
     }
 }
 
-void ADoorControlPanel::UpgradeBattery(float time)
+void ADoorControlPanel::UpgradeBattery()
 {
-
+    MaxBattery += 20.0f;
 }
