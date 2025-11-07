@@ -27,6 +27,7 @@ public:
     float GetDoorAnimationTime() const { return DoorAnimationTime; }
 
 protected:
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     TObjectPtr<USceneComponent> Root;
 
@@ -38,6 +39,15 @@ protected:
 
     UPROPERTY(EditAnywhere, Category = "Door Control")
     float DoorAnimationTime = 1.0f;
+
+    UPROPERTY(EditAnywhere, Category = "SFX")
+    USoundWave* DoorSound = nullptr;
+
+    UPROPERTY(VisibleAnywhere, Category = "SFX")
+    UAudioComponent* DoorSoundAC = nullptr;
+
+    UPROPERTY(EditAnywhere, Category = "SFX")
+    USoundAttenuation* DoorSoundAttenuation = nullptr;
 
     FTimerHandle DoorAnimationTimerHandle;
 
@@ -55,4 +65,7 @@ protected:
 
     UFUNCTION(BlueprintImplementableEvent, Category = "Door Control")
     void PlayDoorAnimation(bool bIsOpening);
+
+    UFUNCTION()
+    void PlayDoorSound();
 };

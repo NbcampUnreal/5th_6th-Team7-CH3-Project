@@ -4,6 +4,7 @@
 #include "Level/ControllableDoor.h"
 #include "TimerManager.h"
 
+#include "Components/AudioComponent.h"
 AControllableDoor::AControllableDoor()
 {
     PrimaryActorTick.bCanEverTick = false;
@@ -17,6 +18,11 @@ AControllableDoor::AControllableDoor()
     DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
     DoorMesh->SetupAttachment(Root);
 
+    DoorSoundAC = CreateDefaultSubobject<UAudioComponent>(TEXT("DoorSoundAC"));
+    DoorSoundAC->SetupAttachment(GetRootComponent());
+    DoorSoundAC->bAutoActivate = false;
+    DoorSoundAC->bAutoDestroy = false;
+    DoorSoundAC->SetUISound(false);
     bIsClosed = false;
 }
 
@@ -40,10 +46,12 @@ void AControllableDoor::UpdateDoorStateVisuals()
 {
     if (bIsClosed)
     {
+        PlayDoorSound();
         PlayDoorAnimation(false);
     }
     else
     {
+        PlayDoorSound();
         PlayDoorAnimation(true);
     }
 
@@ -55,6 +63,17 @@ void AControllableDoor::UpdateDoorStateVisuals()
         &AControllableDoor::OnAnimationFinished,
         DoorAnimationTime,
         false);
+}
+
+void AControllableDoor::PlayDoorSound()
+{
+    if (!DoorSoundAC || !DoorSound) return;
+
+    DoorSoundAC->SetSound(DoorSound);    
+    if (DoorSoundAttenuation)
+        DoorSoundAC->AttenuationSettings = DoorSoundAttenuation;
+
+    DoorSoundAC->Play(0.f);
 }
 
 void AControllableDoor::OnAnimationFinished()
