@@ -31,14 +31,22 @@ private:
 	
 	class UIngameHUD* GetIngameHud();
 
+
+/// <summary>
+/// Teamp ID 관련
+/// </summary>
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	uint8 TeamID = 1;
+
+public:
+	virtual FGenericTeamId GetGenericTeamId() const override;
+
+
 /// <summary>
 /// 피격 관련
 /// </summary>
 protected:
-	UPROPERTY(EditAnywhere, Category = "Team")
-	uint8 TeamID = 1;
-	virtual FGenericTeamId GetGenericTeamId() const override;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float MaxHealth;
 	UPROPERTY(VisibleAnywhere)
