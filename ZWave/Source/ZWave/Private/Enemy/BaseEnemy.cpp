@@ -15,6 +15,8 @@
 #include "Prop/Turret.h"
 #include "AoE/AoEActor.h"
 
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 
 ABaseEnemy::ABaseEnemy()
 {
@@ -22,6 +24,11 @@ ABaseEnemy::ABaseEnemy()
 
 	StateComp = CreateDefaultSubobject<UEnemyStateComponent>(TEXT("UEnemyStateComponent"));
 	//MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("UMyActorComponent"));
+	BreathingAC = CreateDefaultSubobject<UAudioComponent>(TEXT("BreathingAC"));
+	BreathingAC->SetupAttachment(GetRootComponent());
+	BreathingAC->bAutoActivate = false;
+	BreathingAC->bAutoDestroy = false;
+	BreathingAC->SetUISound(false);
 }
 
 void ABaseEnemy::BeginPlay()
@@ -29,6 +36,13 @@ void ABaseEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	if (Breathing)
+	{
+		BreathingAC->SetSound(Breathing);
+		if (BreathAttenuation) BreathingAC->AttenuationSettings = BreathAttenuation;
+		BreathingAC->FadeIn(0.5f, 0.2f, 0.0f);
+	}
 }
 
 UAnimMontage* ABaseEnemy::GetAttackedMontage(EHitDir Direction)
@@ -172,6 +186,10 @@ void ABaseEnemy::Die()
 	StateComp->SetState(EEnemyStateType::EST_Death);
 }
 
+void ABaseEnemy::SoundOn()
+{
+	BreathingAC->FadeIn(0.3f, 0.2f);
+}
 
 int32 ABaseEnemy::GetMaxPriorityLv() const
 {
@@ -198,6 +216,15 @@ void ABaseEnemy::Attack()
 		if (AnimInstance)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
+			BreathingAC->FadeOut(0.4f, 0.0f);
+			float const AttackLen = AnimInstance->Montage_Play(AttackMontage);
+
+			GetWorld()->GetTimerManager().SetTimer(
+				StopMotionHandler,
+				FTimerDelegate::CreateUObject(this, &ABaseEnemy::SoundOn),
+				AttackLen - 0.1f,
+				false
+			);
 		}
 	}
 }

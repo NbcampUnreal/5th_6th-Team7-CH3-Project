@@ -47,7 +47,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
 	class UAnimMontage* DieMontage;
 
-
 	UPROPERTY(EditAnywhere, Category = "SFX")
 	USoundWave* Breathing = nullptr;
 
