@@ -33,6 +33,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect")
 	AActor* CauserActor;
 
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	TObjectPtr<USoundBase> GetItemSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	TObjectPtr<USoundAttenuation> GetItemAttenuation;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	TObjectPtr<USoundConcurrency> GetItemConcurrency;
+
 	UFUNCTION(BlueprintCallable, Category = "Initalize")
 	void Init(int32 ItemIndex);
 

@@ -5,6 +5,7 @@
 #include "Effect/HealthEffect.h"
 #include "Effect/SpareAmmoAddingEffect.h"
 #include "Effect/GainItemEffect.h"
+#include <Kismet/GameplayStatics.h>
 
 AFieldItem::AFieldItem()
 {
@@ -39,6 +40,21 @@ void AFieldItem::OnFieldItemBeingOverlap(UPrimitiveComponent* OtherlappedCompone
 	if (ATaskPlayer* Player = Cast<ATaskPlayer>(OtherActor))
 	{
 		CauserActor = Player;
+
+		//사운드 추가
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			GetItemSound,
+			GetActorLocation(),
+			FRotator::ZeroRotator,
+			1.f,
+			1.f,
+			0.f,
+			GetItemAttenuation,
+			GetItemConcurrency,
+			this
+		);
+
 		ActiveEffect(Player);
 	}
 
