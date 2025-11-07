@@ -14,6 +14,7 @@
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
 #include "AoE/AoEActor.h"
+
 #include "Components/AudioComponent.h"
 #include "Sound/SoundCue.h"
 
@@ -22,7 +23,7 @@ ABaseEnemy::ABaseEnemy()
 	TeamID = 2;
 
 	StateComp = CreateDefaultSubobject<UEnemyStateComponent>(TEXT("UEnemyStateComponent"));
-	//MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("UMyActorComponent")); 
+
 	BreathingAC = CreateDefaultSubobject<UAudioComponent>(TEXT("BreathingAC"));
 	BreathingAC->SetupAttachment(GetRootComponent());
 	BreathingAC->bAutoActivate = false;
@@ -39,8 +40,10 @@ void ABaseEnemy::BeginPlay()
 	if (Breathing)
 	{
 		BreathingAC->SetSound(Breathing);
-		if (BreathAttenuation) BreathingAC->AttenuationSettings = BreathAttenuation;
-		BreathingAC->FadeIn(0.5f , 0.2f , 0.0f );
+		if (BreathAttenuation) 
+			BreathingAC->AttenuationSettings = BreathAttenuation;
+
+		BreathingAC->FadeIn(0.5f, 0.2f, 0.0f);
 	}
 }
 
@@ -189,7 +192,6 @@ void ABaseEnemy::SoundOn()
 	BreathingAC->FadeIn(0.3f, 0.2f);
 }
 
-
 int32 ABaseEnemy::GetMaxPriorityLv() const
 {
 	return this->MaxPriorityLv;
@@ -207,8 +209,6 @@ float ABaseEnemy::GetSightRange() const
 
 void ABaseEnemy::Attack()
 {
-	//USkeletalMeshComponent* Mesh = GetMesh();
-
 	if (GetMesh() && AttackMontage)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
