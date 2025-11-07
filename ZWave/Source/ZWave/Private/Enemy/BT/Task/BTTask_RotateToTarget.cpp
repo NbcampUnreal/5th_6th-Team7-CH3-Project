@@ -30,8 +30,7 @@ EBTNodeResult::Type UBTTask_RotateToTarget::ExecuteTask(UBehaviorTreeComponent& 
 	FVector ToTargetVector = (TargetLocation - MyCharacter->GetActorLocation()).GetSafeNormal();
 
 	FRotator LookAtRot = ToTargetVector.Rotation();
-	FRotator CurrentRot = MyCharacter->GetActorRotation();
-	FRotator NewRot = FRotator(CurrentRot.Pitch, LookAtRot.Yaw, CurrentRot.Roll);
+	FRotator NewRot = FRotator(0, LookAtRot.Yaw, 0);
 
 	MyCharacter->SetActorRotation(NewRot);
 

@@ -5,6 +5,7 @@
 #include "Item/InventoryComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
+#include "Mode/ModeDefinition.h"
 #include "Shop/ShopTableData.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogShop, Log, All);
@@ -282,7 +283,7 @@ bool UShopManager::TryEquipModingToWeapon(APlayerController* Player, const FStri
 		return false;
 	}
 
-	const UWeaponDefinition* ModeDef = Cast<UWeaponDefinition>(ModingItemDef->Definition);
+	const UModeDefinition* ModeDef = Cast<UModeDefinition>(ModingItemDef->Definition);
 	if (ModeDef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TryEquipModingToWeapon: Item is not mode"));

@@ -8,35 +8,24 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Player/TaskPlayer.h"
 #include "State/EnemyStateComponent.h"
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
-#include "Components/AudioComponent.h"
-#include "Sound/SoundCue.h"
+#include "AoE/AoEActor.h"
+
 
 ABaseEnemy::ABaseEnemy()
 {
 	TeamID = 2;
 
 	StateComp = CreateDefaultSubobject<UEnemyStateComponent>(TEXT("UEnemyStateComponent"));
-	//MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("UMyActorComponent")); 
-	BreathingAC = CreateDefaultSubobject<UAudioComponent>(TEXT("BreathingAC"));
-	BreathingAC->SetupAttachment(GetRootComponent());
-	BreathingAC->bAutoActivate = false;
-	BreathingAC->bAutoDestroy = false;
-	BreathingAC->SetUISound(false);
+	//MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("UMyActorComponent"));
 }
 
 void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (Breathing)
-	{
-		BreathingAC->SetSound(Breathing);
-		if (BreathAttenuation) BreathingAC->AttenuationSettings = BreathAttenuation;
-		BreathingAC->FadeIn(0.5f , 0.2f , 0.0f );
-	}
 }
 
 UAnimMontage* ABaseEnemy::GetAttackedMontage(EHitDir Direction)
@@ -61,11 +50,16 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 	Super::Attacked(DamageCauser, Damage);
 
 	if (Health <= 0.f) return;
+	
 	CheckPriorityLv(DamageCauser);
 }
 
 void ABaseEnemy::PlayHitAnimMontage(AActor* DamageCauser)
 {
+	if (StateComp->GetCurrentState() == EEnemyStateType::EST_Stun) {
+		return;
+	}
+
 	if (GetMesh())
 	{
 		FVector SelfLocation = GetActorLocation();
@@ -112,19 +106,26 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 	if (AIController == nullptr) return;
 
 	int32 CurPriorityLv = AIController->GetValueAsIntFromBlackboard(FName(TEXT("CurPriorityLv")));
-	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && MaxPriorityLv >= 2)
+	if (DamageCauser->IsA(ATaskPlayer::StaticClass()) && CurPriorityLv < 3 && MaxPriorityLv >= 2)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 2);
 		SetNewTarget(DamageCauser);
 
 		PlayHitAnimMontage(DamageCauser);
 	}
-	else if (DamageCauser->IsA(ATurret::StaticClass()) && CurPriorityLv < 2 && MaxPriorityLv >= 1)
+	else if (DamageCauser->IsA(ATurret::StaticClass()))
 	{
-		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
-		SetNewTarget(DamageCauser);
-
+		if (CurPriorityLv < 2 && MaxPriorityLv >= 1)
+		{
+			AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
+			SetNewTarget(DamageCauser);
+		}
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
+	else if (DamageCauser->IsA(AAoEActor::StaticClass()))
+	{
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 3);
+		SetNewTarget(DamageCauser);
 	}
 }
 
@@ -133,12 +134,23 @@ void ABaseEnemy::SetNewTarget(AActor* DamageCauser)
 	ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController());
 	if (AIController == nullptr) return;
 
-	FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
-	FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
+	if(DamageCauser != nullptr)
+	{
+		FVector SecondaryTargetLocation = DamageCauser->GetActorLocation();
+		FVector AttackLocation = AIController->GetAttackLocation(SecondaryTargetLocation);
 
-	AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
-	AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
-	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+		AIController->SetValueAsObjectToBlackboard(FName(TEXT("SecondaryTarget")), DamageCauser);
+		AIController->SetValueAsVectorToBlackboard(FName(TEXT("AttackLocation")), AttackLocation);
+		AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), true);
+	}
+	else // 외부에서 타겟을 해제할수 있도록 해준다.
+	{
+		AIController->ClearValueFromBlackboard(FName(TEXT("SecondaryTarget")));
+		AIController->ClearValueFromBlackboard(FName(TEXT("AttackLocation")));
+		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 0);
+
+		AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsAggroed")), false);
+	}
 }
 
 void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
@@ -151,25 +163,7 @@ void ABaseEnemy::ApplyDamage(float Damage, bool CheckArmor)
 void ABaseEnemy::Die()
 {
 	//Super::Die();
-	if (ABaseAIController* AIController = static_cast<ABaseAIController*>(GetController()))
-	{
-		AIController->StopMovement();
-		AIController->StopBehaviorTree();
-	}
-
-	if (GetMesh() && DieMontage)
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance)
-		{
-			AnimInstance->Montage_Play(DieMontage);
-		}
-	}
-}
-
-void ABaseEnemy::SoundOn()
-{
-	BreathingAC->FadeIn(0.3f, 0.2f);
+	StateComp->SetState(EEnemyStateType::EST_Death);
 }
 
 
@@ -197,16 +191,7 @@ void ABaseEnemy::Attack()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
-			BreathingAC->FadeOut(0.4f, 0.0f);
-			float const AttackLen = AnimInstance->Montage_Play(AttackMontage);
-
-			GetWorld()->GetTimerManager().SetTimer(
-				StopMotionHandler,
-				FTimerDelegate::CreateUObject(this, &ABaseEnemy::SoundOn),
-				AttackLen - 0.1f,
-				false
-			);
+			AnimInstance->Montage_Play(AttackMontage);
 		}
-
 	}
 }

@@ -6,6 +6,8 @@
 #include "Components/TextBlock.h"
 #include "UI/ShopUI.h"
 #include "UI/IngamePauseMenu.h"
+#include "Base/ZWaveGameState.h"
+#include "Level/ZWaveTypes.h"
 
 ATaskPlayerController::ATaskPlayerController()
 	:InputMappingContext(nullptr),
@@ -50,6 +52,8 @@ void ATaskPlayerController::BeginPlay()
 	{
 		ShowGameHUD();
 	}
+
+	GameState = GetWorld()->GetGameState<AZWaveGameState>();
 }
 
 void ATaskPlayerController::ShowMainMenu()
@@ -80,6 +84,11 @@ void ATaskPlayerController::ShowMainMenu()
 
 void ATaskPlayerController::ShowShopUI()
 {
+	if (EGameState::EGS_Preparing != GameState->GetCurrentGameState())
+	{
+		return;
+	}
+
 	if (ShopHUD)
 	{
 		ShopHUD->RemoveFromParent();

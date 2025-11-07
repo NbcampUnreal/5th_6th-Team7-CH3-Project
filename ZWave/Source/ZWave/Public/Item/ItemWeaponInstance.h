@@ -28,7 +28,13 @@ public:
     bool AttachMod(UItemModeInstance* ModeInstance);
 
     UFUNCTION(BlueprintCallable, Category = "Weapon Instance")
+    bool AttachModSlot(UItemModeInstance* ModeInstance, int32 ModingSlot);
+
+    UFUNCTION(BlueprintCallable, Category = "Weapon Instance")
     void DetachMod(UItemModeInstance* ModInstance);
+
+    UFUNCTION(BlueprintCallable, Category = "Weapon Instance")
+    void DetachModSlot(UItemModeInstance* ModInstance, int32 ModingSlot);
 
     UFUNCTION(BlueprintPure, Category = "Weapon Instance")
     bool IsModAttached(UItemModeInstance* ModInstance) const;

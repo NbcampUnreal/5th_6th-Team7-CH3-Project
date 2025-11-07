@@ -11,6 +11,8 @@
 #include "Weapon/EquipComponent.h"
 #include "Weapon/WeaponBase.h"
 #include "Enemy/BaseEnemy.h"
+#include "Effect/EffectApplyManager.h"
+#include "DamageCalculator/DamageCalculator.h"
 
 // Sets default values
 ATurret::ATurret()
@@ -48,10 +50,7 @@ void ATurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bShouldRot)
-	{
-		RotateToTarget(DeltaTime);
-	}
+	RotateToTarget(DeltaTime);
 }
 
 void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -60,20 +59,38 @@ void ATurret::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		if (Target == nullptr)
 		{
-			Target = static_cast<ABaseEnemy*>(OtherActor);
-			bShouldRot = true;
+			SetTarget(static_cast<ABaseEnemy*>(OtherActor));
 			
 			//Attack();
-			//GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
+			GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 		}
 	}
+}
+
+FGenericTeamId ATurret::GetGenericTeamId() const
+{
+	return this->TeamID;
+}
+
+float ATurret::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (const FZWaveDamageEvent* CustomDamageEvent = static_cast<const FZWaveDamageEvent*>(&DamageEvent))
+	{
+		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
+		{
+			EffectManager->ApplyEffect(this, CustomDamageEvent->EffectArray, CustomDamageEvent->Duration);
+		}
+
+
+		Attacked(DamageCauser, DamageAmount); //데미지 계산 후 넘겨줄 수도 있고 아니면 그냥 이렇게 쓸 수도 있을 듯
+	}
+
+	return DamageAmount;
 }
 
 void ATurret::Attacked(AActor* DamageCauser, float Damage)
 {
 	ApplyDamage(Damage, false);
-
-	UE_LOG(LogTemp, Display, TEXT("DC: %s"), *DamageCauser->GetActorNameOrLabel());
 }
 
 void ATurret::ApplyDamage(float Damage, bool CheckArmor)
@@ -89,16 +106,49 @@ void ATurret::ApplyDamage(float Damage, bool CheckArmor)
 
 void ATurret::Die()
 {
-	SetLifeSpan(0.5f);
+
+	/*SetLifeSpan(0.5f);*/	
+	if (Mesh != nullptr) {
+		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+
+		if (AnimInstance != nullptr) {
+			AnimInstance->Montage_Play(Montage_Destory);
+		}
+	}
+}
+
+
+void ATurret::SetTarget(ABaseEnemy* NewTarget)
+{
+	if (NewTarget == nullptr)
+	{
+		Target = nullptr;
+	} 
+	else
+	{
+		if (Target == nullptr)
+		{
+			Target = NewTarget;
+			UE_LOG(LogTemp, Display, TEXT("New Target: %s"), *NewTarget->GetActorNameOrLabel());
+		}
+	}
 }
 
 void ATurret::Attack()
 {
-	if (Target == nullptr) {
-		UE_LOG(LogTemp, Display, TEXT("Null Target"));
+	if (Target == nullptr || Health <= 0.f) {
 		return;
 	}
 
+	FVector TargetDirection = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	FRotator TargetRot = FRotator(0, TargetDirection.Rotation().Yaw, 0);
+
+	FRotator CurrentRot = GetActorRotation();
+
+	if (FMath::Abs(TargetRot.Yaw - CurrentRot.Yaw) > 10) {
+
+		return;
+	}
 	//Weapon->Attack();
 	if (Mesh != nullptr) {
 		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
@@ -125,18 +175,11 @@ void ATurret::RotateToTarget(float DeltaTime)
 	FRotator CurrentRot = GetActorRotation();
 	FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, RotationSpeed);
 	SetActorRotation(NewRot);
-
-	if (FMath::Abs(TargetRot.Yaw - CurrentRot.Yaw) < 1) {
-		bShouldRot = false;
-
-		Attack();
-		GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
-	}
 }
 
 void ATurret::StopAttack()
 {
-	Target = nullptr;
+	SetTarget(nullptr);
 
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
 	SearchEnemy();
@@ -161,11 +204,12 @@ void ATurret::SearchEnemy()
 		{
 			if (Hit.GetActor()->IsA(ABaseEnemy::StaticClass()))
 			{
-				Target = static_cast<ABaseEnemy*>(Hit.GetActor());
+				ABaseEnemy* Temp = static_cast<ABaseEnemy*>(Hit.GetActor());
 
-				if (Target->GetHealth() > 0)
+				if (Temp->GetHealth() > 0)
 				{
-					bShouldRot = true;
+					SetTarget(Temp);
+					GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &ATurret::Attack, FireInterval, true);
 					break;
 				}
 			}

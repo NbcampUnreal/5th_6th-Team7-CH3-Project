@@ -4,6 +4,17 @@
 #include "Prop/PurificationDevice.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+
+#include "Effect/EffectApplyManager.h"
+#include "DamageCalculator/DamageCalculator.h"
+#include "Base/ZWaveGameState.h"
+#include "UI/IngameHUD.h"
+#include "Player/TaskPlayer.h"
 
 // Sets default values
 APurificationDevice::APurificationDevice()
@@ -13,6 +24,9 @@ APurificationDevice::APurificationDevice()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
+
+	ExplodeLocation = CreateDefaultSubobject<USceneComponent>(TEXT("ExplodeLocation"));
+	ExplodeLocation->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -20,24 +34,83 @@ void APurificationDevice::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	Health = MaxHealth;
+	UE_LOG(LogTemp, Display, TEXT("Team id: %d"), TeamID);
+	//GetIngameHud()->OnObjectHealthChange(0, Health);
 }
 
-// Called every frame
-void APurificationDevice::Tick(float DeltaTime)
+UIngameHUD* APurificationDevice::GetIngameHud()
 {
-	Super::Tick(DeltaTime);
+	if (UWorld* World = GetWorld())
+	{
+		if (AZWaveGameState* ZGS = Cast<AZWaveGameState>(World->GetGameState()))
+		{
+			return ZGS->IngameHUD;
+		}
+	}
 
+	return nullptr;
+}
+
+FGenericTeamId APurificationDevice::GetGenericTeamId() const
+{
+	return this->TeamID;
+}
+
+float APurificationDevice::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Display, TEXT("Puri dev attcekd by :%s"), *DamageCauser->GetActorNameOrLabel());
+	if (const FZWaveDamageEvent* CustomDamageEvent = static_cast<const FZWaveDamageEvent*>(&DamageEvent))
+	{
+		if (UEffectApplyManager* EffectManager = GetWorld()->GetSubsystem<UEffectApplyManager>())
+		{
+			EffectManager->ApplyEffect(this, CustomDamageEvent->EffectArray, CustomDamageEvent->Duration);
+		}
+		
+
+		Attacked(DamageCauser, DamageAmount); //데미지 계산 후 넘겨줄 수도 있고 아니면 그냥 이렇게 쓸 수도 있을 듯
+	}
+
+	return DamageAmount;
 }
 
 void APurificationDevice::Attacked(AActor* DamageCauser, float Damage)
 {
+	ApplyDamage(Damage);
 }
 
 void APurificationDevice::ApplyDamage(float Damage, bool CheckArmor)
 {
+	float CurHealth = Health;
+	Health -= Damage;
+	GetIngameHud()->OnObjectHealthChange(CurHealth, Health);
+
+	if (Health <= 0.f)
+	{
+		Die();
+	}
 }
 
 void APurificationDevice::Die()
 {
+	if (bIsEnd == false)
+	{
+		bIsEnd = true;
+		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Niagara_Explode, ExplodeLocation->GetComponentLocation(), FRotator::ZeroRotator);
+
+		GetWorld()->GetTimerManager().SetTimer(GameOverTimerHandle, this, &APurificationDevice::CallGameOver, 3, false);
+	}
+}
+
+void APurificationDevice::CallGameOver()
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController == nullptr) return;
+
+	ATaskPlayer* TaskPlayer = static_cast<ATaskPlayer*>(PlayerController->GetCharacter());
+	if (TaskPlayer == nullptr) return;
+
+	TaskPlayer->GameOver();
 }
 

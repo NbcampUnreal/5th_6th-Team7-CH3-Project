@@ -3,11 +3,7 @@
 #include "Effect/EffectApplyManager.h"
 #include "Player/TaskPlayer.h"
 #include "Enemy/BaseEnemy.h"
-
 #include "State/EnemyStateComponent.h"
-
-
-
 
 UStaggerEffect::UStaggerEffect()
 {
@@ -18,41 +14,25 @@ void UStaggerEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 {
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(TargetActor))
 	{
-		if (Enemy->StateComp->GetCurrentState() == EEnemyStateType::EST_Stagger) {
-			return;
-		}
-		else
+		if (Enemy->StateComp->GetCurrentState() != EEnemyStateType::EST_Stagger)
 		{
 			Enemy->StateComp->SetState(EEnemyStateType::EST_Stagger);
-		}
-		/*if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
-		{
-			if (StateComp->GetCurrentState() == EStateType::EST_Stagger)
-			{
-				return;
-			}
-			else
-			{
-				StateComp->SetState(EStateType::EST_Stagger);
-			}
-		}*/
+			this->Target = Enemy;
+			Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() / StaggerSpeedMultiplier);
+			UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Active! EnemySpeed : %f"), Enemy->GetMoveSpeed());
 
-
-		this->Target = Enemy;
-		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() / StaggerSpeedMultiplier);
-		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect Active! EnemySpeed : %f"), Enemy->GetMoveSpeed());
-		
-		if (UObject* Outer = GetOuter())
-		{
-			if (UWorld* World = Outer->GetWorld())
+			if (UObject* Outer = GetOuter())
 			{
-				World->GetTimerManager().SetTimer(
-					Handle,
-					this,
-					&UStaggerEffect::RemoveEffect,
-					StaggerTime,
-					false
-				);
+				if (UWorld* World = Outer->GetWorld())
+				{
+					World->GetTimerManager().SetTimer(
+						Handle,
+						this,
+						&UStaggerEffect::RemoveEffect,
+						Duration,
+						false
+					);
+				}
 			}
 		}
 	}
@@ -72,12 +52,6 @@ void UStaggerEffect::RemoveEffect()
 	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
 	{
 		Enemy->StateComp->SetState(EEnemyStateType::EST_None);
-		/*if (UStateComponent* StateComp = Enemy->FindComponentByClass<UStateComponent>())
-		{
-			StateComp->SetState(EStateType::EST_None);
-		}*/
-
-
 		Enemy->SetMoveSpeed(Enemy->GetMoveSpeed() * StaggerSpeedMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("Stagger Effect DeActive! EnemySpeed : %f"), Enemy->GetMoveSpeed());
 	}

@@ -135,15 +135,6 @@ bool AShootWeapon::EquipModing(EModingSlot ModingSlot, UModingInstance* ModeInst
 		return false;
 	}
 
-	if (EquipModingMap.Contains(ModingSlot))
-	{
-		if (EquipModingMap[ModingSlot] != nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Need UnEquip Slot"));
-			return false;
-		}
-	}
-
 	EquipModingMap.Add(ModingSlot, ModeInstance);
 	EquipModingEffectClassMap.Add(ModingSlot,ModeInstance->GetModeEffectClass());
 	ApplyCurrentModing();
