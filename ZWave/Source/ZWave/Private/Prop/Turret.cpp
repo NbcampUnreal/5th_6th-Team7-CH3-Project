@@ -7,6 +7,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 
 #include "Weapon/EquipComponent.h"
 #include "Weapon/WeaponBase.h"
@@ -29,8 +31,10 @@ ATurret::ATurret()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(RootComponent);
 
-	SphereComp->SetSphereRadius(AwarenessRange*2);
+	SphereComp->SetSphereRadius(AwarenessRange);
 
+	MuzzleFlashLocation = CreateDefaultSubobject<USceneComponent>(TEXT("ExplodeLocation"));
+	MuzzleFlashLocation->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -106,13 +110,15 @@ void ATurret::ApplyDamage(float Damage, bool CheckArmor)
 
 void ATurret::Die()
 {
-
 	/*SetLifeSpan(0.5f);*/	
 	if (Mesh != nullptr) {
 		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 
 		if (AnimInstance != nullptr) {
 			AnimInstance->Montage_Play(Montage_Destory);
+
+			UGameplayStatics::PlaySoundAtLocation(this, SW_Explosion, GetActorLocation());
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Destroy, GetActorLocation(), FRotator::ZeroRotator);
 		}
 	}
 }
@@ -129,7 +135,6 @@ void ATurret::SetTarget(ABaseEnemy* NewTarget)
 		if (Target == nullptr)
 		{
 			Target = NewTarget;
-			UE_LOG(LogTemp, Display, TEXT("New Target: %s"), *NewTarget->GetActorNameOrLabel());
 		}
 	}
 }
@@ -159,6 +164,8 @@ void ATurret::Attack()
 	}
 
 	Target->Attacked(this, this->WeaponDamage);
+	UGameplayStatics::PlaySoundAtLocation(this, SW_Shot, GetActorLocation(), 0.25f);
+
 	if (Target->GetHealth() <= 0.f)
 	{
 		StopAttack();

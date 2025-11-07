@@ -54,7 +54,7 @@ protected:
     TArray<ASpawnPoint*> SpawnPoints;
 
     UPROPERTY()
-    TArray<ABaseCharacter*> ActiveEnemies;
+    TArray<ABaseEnemy*> ActiveEnemies;
 
 	UPROPERTY()
 	TArray<FSpawnRequest> SpawnQueue;
