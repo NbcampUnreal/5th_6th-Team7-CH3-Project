@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Player/TaskPlayer.h"
 #include "State/EnemyStateComponent.h"
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
@@ -105,7 +106,7 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 	if (AIController == nullptr) return;
 
 	int32 CurPriorityLv = AIController->GetValueAsIntFromBlackboard(FName(TEXT("CurPriorityLv")));
-	if (DamageCauser->IsA(ABaseCharacter::StaticClass()) && CurPriorityLv < 3 && MaxPriorityLv >= 2)
+	if (DamageCauser->IsA(ATaskPlayer::StaticClass()) && CurPriorityLv < 3 && MaxPriorityLv >= 2)
 	{
 		AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 2);
 		SetNewTarget(DamageCauser);

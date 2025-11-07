@@ -5,9 +5,16 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 #include "Effect/EffectApplyManager.h"
 #include "DamageCalculator/DamageCalculator.h"
+#include "Base/ZWaveGameState.h"
+#include "UI/IngameHUD.h"
+#include "Player/TaskPlayer.h"
 
 // Sets default values
 APurificationDevice::APurificationDevice()
@@ -17,6 +24,9 @@ APurificationDevice::APurificationDevice()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
+
+	ExplodeLocation = CreateDefaultSubobject<USceneComponent>(TEXT("ExplodeLocation"));
+	ExplodeLocation->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +35,20 @@ void APurificationDevice::BeginPlay()
 	Super::BeginPlay();
 	
 	Health = MaxHealth;
+	//GetIngameHud()->OnObjectHealthChange(0, Health);
+}
+
+UIngameHUD* APurificationDevice::GetIngameHud()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (AZWaveGameState* ZGS = Cast<AZWaveGameState>(World->GetGameState()))
+		{
+			return ZGS->IngameHUD;
+		}
+	}
+
+	return nullptr;
 }
 
 float APurificationDevice::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -50,7 +74,10 @@ void APurificationDevice::Attacked(AActor* DamageCauser, float Damage)
 
 void APurificationDevice::ApplyDamage(float Damage, bool CheckArmor)
 {
+	float CurHealth = Health;
 	Health -= Damage;
+	GetIngameHud()->OnObjectHealthChange(CurHealth, Health);
+
 	if (Health <= 0.f)
 	{
 		Die();
@@ -63,6 +90,20 @@ void APurificationDevice::Die()
 	{
 		bIsEnd = true;
 		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Niagara_Explode, ExplodeLocation->GetComponentLocation(), FRotator::ZeroRotator);
+
+		GetWorld()->GetTimerManager().SetTimer(GameOverTimerHandle, this, &APurificationDevice::CallGameOver, 3, false);
 	}
+}
+
+void APurificationDevice::CallGameOver()
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController == nullptr) return;
+
+	ATaskPlayer* TaskPlayer = static_cast<ATaskPlayer*>(PlayerController->GetCharacter());
+	if (TaskPlayer == nullptr) return;
+
+	TaskPlayer->GameOver();
 }
 

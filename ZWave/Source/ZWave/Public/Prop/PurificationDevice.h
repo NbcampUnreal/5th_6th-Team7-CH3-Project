@@ -26,7 +26,10 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> Mesh;
-
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USceneComponent> ExplodeLocation;
+	
+	class UIngameHUD* GetIngameHud();
 
 /// <summary>
 /// 피격 관련
@@ -39,10 +42,15 @@ protected:
 	float MaxHealth;
 	UPROPERTY(VisibleAnywhere)
 	float Health;
+	
 	bool bIsEnd = false;
+	FTimerHandle GameOverTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TObjectPtr<class USoundBase> ExplodeSound;
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	TObjectPtr<class UNiagaraSystem> Niagara_Explode;
+
 
 public:
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
@@ -50,4 +58,5 @@ public:
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;
 
+	void CallGameOver();
 };
