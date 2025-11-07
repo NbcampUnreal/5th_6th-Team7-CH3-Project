@@ -135,7 +135,6 @@ void ATurret::SetTarget(ABaseEnemy* NewTarget)
 		if (Target == nullptr)
 		{
 			Target = NewTarget;
-			UE_LOG(LogTemp, Display, TEXT("New Target: %s"), *NewTarget->GetActorNameOrLabel());
 		}
 	}
 }
