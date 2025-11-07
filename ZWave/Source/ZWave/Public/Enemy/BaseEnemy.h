@@ -6,7 +6,6 @@
 #include "Base/BaseCharacter.h"
 #include "BaseEnemy.generated.h"
 
-
 UENUM(BlueprintType)
 enum class EHitDir : uint8
 {
@@ -48,12 +47,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AnimMontage|Hit")
 	class UAnimMontage* DieMontage;
 
+
+	UPROPERTY(EditAnywhere, Category = "SFX")
+	USoundWave* Breathing = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "SFX")
+	UAudioComponent* BreathingAC = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	class USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "SFX")
+	USoundAttenuation* BreathAttenuation = nullptr;
 
 private:
 	UAnimMontage* GetAttackedMontage(EHitDir Direction);
 
+	FTimerHandle StopMotionHandler;
 public:
 	virtual void Attacked(AActor* DamageCauser, float Damage) override;
 
@@ -63,6 +73,8 @@ public:
 
 	virtual void ApplyDamage(float Damage, bool CheckArmor = true) override;
 	virtual void Die() override;
+
+	void SoundOn();
 
 /// <summary>
 /// 공격 관련

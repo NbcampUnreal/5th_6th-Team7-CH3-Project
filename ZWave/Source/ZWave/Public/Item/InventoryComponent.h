@@ -88,7 +88,6 @@ public:
 protected:
 	// EquipSlot의 WeaponActor를 찾아 WeaponItem에 장착된 모드를 장착시켜줌
 	void EquipModingOnWeaponActor(class UItemWeaponInstance* WeaponItem,EEquipSlot EquipSlot);
-	void UnequipModingOnWeaponActor(class UItemWeaponInstance* WeaponItem,EEquipSlot EquipWeaponSlot, int32 ModingSlot);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
