@@ -43,9 +43,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	TObjectPtr<class USphereComponent> SphereComp;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Team")
-	uint8 TeamID = 0;
 
+/// <summary>
+/// Teamp ID 관련
+/// </summary>
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	uint8 TeamID = 1;
+
+public:
+	virtual FGenericTeamId GetGenericTeamId() const override;
 
 /// <summary>
 /// 체력, 피격, 사망관련
