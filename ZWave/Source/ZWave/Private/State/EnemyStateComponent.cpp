@@ -20,27 +20,6 @@ UEnemyStateComponent::UEnemyStateComponent()
 void UEnemyStateComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OwningCharacter = static_cast<ABaseEnemy*>(GetOwner());
-	if (OwningCharacter == nullptr) return;
-
-	AIController = static_cast<ABaseAIController*>(OwningCharacter->GetController());
-	if (AIController == nullptr) return;
-
-	Mesh = OwningCharacter->GetMesh();
-	if (Mesh == nullptr) return;
-
-	AnimInstance = Mesh->GetAnimInstance();
-	if (AnimInstance == nullptr) return;
-
-	if (Montage_Stun)
-	{
-		MontageStunLength = Montage_Stun->GetPlayLength() / MontageStunPlayRate;
-	}
-	if (Montage_RecoverStun)
-	{
-		MontageRecoverStunLength = Montage_RecoverStun->GetPlayLength() / MontageRecoverStunPlayRate;
-	}
 }
 
 void UEnemyStateComponent::SetState(EEnemyStateType SetType, float Duration)
@@ -72,11 +51,35 @@ void UEnemyStateComponent::SetState(EEnemyStateType SetType, float Duration)
 
 void UEnemyStateComponent::OnNone()
 {
+	ABaseEnemy* MyCharacter = static_cast<ABaseEnemy*>(GetOwner());
+	if (MyCharacter == nullptr) return;
+
+	ABaseAIController* AIController = static_cast<ABaseAIController*>(MyCharacter->GetController());
+	if (AIController == nullptr) return;
+
+	USkeletalMeshComponent* Mesh = MyCharacter->GetMesh();
+	if (Mesh == nullptr) return;
+
+	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+	if (AnimInstance == nullptr) return;
+
 	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), false);
 }
 
 void UEnemyStateComponent::OnStun(const float Duration)
 {
+	ABaseEnemy* MyCharacter = static_cast<ABaseEnemy*>(GetOwner());
+	if (MyCharacter == nullptr) return;
+
+	ABaseAIController* AIController = static_cast<ABaseAIController*>(MyCharacter->GetController());
+	if (AIController == nullptr) return;
+
+	USkeletalMeshComponent* Mesh = MyCharacter->GetMesh();
+	if (Mesh == nullptr) return;
+
+	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+	if (AnimInstance == nullptr) return;
+
 	AIController->SetValueAsBoolToBlackboard(FName(TEXT("IsStunned")), true);
 
 	if (Montage_Stun != nullptr)
@@ -98,6 +101,18 @@ void UEnemyStateComponent::RecoverStun()
 	{
 		if (AnimInstance && Montage_RecoverStun != nullptr)
 		{
+			ABaseEnemy* MyCharacter = static_cast<ABaseEnemy*>(GetOwner());
+			if (MyCharacter == nullptr) return;
+
+			ABaseAIController* AIController = static_cast<ABaseAIController*>(MyCharacter->GetController());
+			if (AIController == nullptr) return;
+
+			USkeletalMeshComponent* Mesh = MyCharacter->GetMesh();
+			if (Mesh == nullptr) return;
+
+			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+			if (AnimInstance == nullptr) return;
+
 			AnimInstance->Montage_Play(Montage_RecoverStun, 2.0f);
 		}
 	}
@@ -105,6 +120,18 @@ void UEnemyStateComponent::RecoverStun()
 
 void UEnemyStateComponent::OnDeath()
 {
+	ABaseEnemy* MyCharacter = static_cast<ABaseEnemy*>(GetOwner());
+	if (MyCharacter == nullptr) return;
+
+	ABaseAIController* AIController = static_cast<ABaseAIController*>(MyCharacter->GetController());
+	if (AIController == nullptr) return;
+
+	USkeletalMeshComponent* Mesh = MyCharacter->GetMesh();
+	if (Mesh == nullptr) return;
+
+	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+	if (AnimInstance == nullptr) return;
+
 	if (AIController)
 	{
 		AIController->StopMovement();
