@@ -403,7 +403,7 @@ bool UInventoryComponent::EquipModingToWeapon(const UItemDefinition* WeaponItemD
 	UItemModeInstance* NowModingItem = WeaponItem->AttachedMods[TargetEquipModingSlot];
 	if (NowModingItem != nullptr)
 	{
-		WeaponItem->DetachMod(ModingItem);
+		WeaponItem->DetachModSlot(NowModingItem,TargetEquipModingSlot);
 	}
 
 	WeaponItem->AttachModSlot(ModingItem, TargetEquipModingSlot);
@@ -445,7 +445,7 @@ bool UInventoryComponent::UnequipModingToWeapon(const UItemDefinition* WeaponIte
 	if (ModingItem == nullptr)
 		return false;
 
-	WeaponItem->DetachMod(ModingItem);
+	WeaponItem->DetachModSlot(ModingItem, TargetUnEquipModingSlot);
 
 	if (WeaponItem->EquipSlot != EEquipSlot::None)
 	{

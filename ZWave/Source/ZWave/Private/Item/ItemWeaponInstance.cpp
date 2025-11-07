@@ -81,6 +81,17 @@ void UItemWeaponInstance::DetachMod(UItemModeInstance* ModInstance)
 
 }
 
+void UItemWeaponInstance::DetachModSlot(UItemModeInstance* ModInstance, int32 ModingSlot)
+{
+    if (!ModInstance || !IsModAttached(ModInstance))
+    {
+        return;
+    }
+
+    AttachedMods[ModingSlot] = nullptr;
+    ModInstance->OnUnequipped();
+}
+
 bool UItemWeaponInstance::IsModAttached(UItemModeInstance* ModInstance) const
 {
     if (!ModInstance) return false;
