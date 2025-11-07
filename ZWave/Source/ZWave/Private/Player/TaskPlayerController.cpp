@@ -144,6 +144,14 @@ void ATaskPlayerController::ShowResultHUD()
 	}
 }
 
+void ATaskPlayerController::InitHP(float MaxHealth)
+{
+	if (IngameHUD)
+	{
+		IngameHUD->InitPlayerHealthBar(MaxHealth);
+	}
+}
+
 void ATaskPlayerController::ShowGameHUD()
 {
 
