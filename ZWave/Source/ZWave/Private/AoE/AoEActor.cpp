@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "AoE/AoEData.h"
+#include "Effect/DecoyEffect.h"
 #include "DamageCalculator/DamageCalculator.h"
 
 AAoEActor::AAoEActor()
@@ -103,7 +104,15 @@ void AAoEActor::ApplyOverlapActorDOT()
 			{
 				DamageEvent.EffectArray.Add(AoEEffectClass);
 			}
-			UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+
+			if (AoEEffectClass == UDecoyEffect::StaticClass())
+			{
+				UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+			}
+			else
+			{
+				UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this->GetInstigator(), DamageEvent);
+			}
 		}
 	}
 }
@@ -127,7 +136,7 @@ void AAoEActor::ApplyOverlapActorDamage()
 			DamageEvent.EffectArray.Add(AoEEffectClass);
 		}
 
-		UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this, DamageEvent);
+		UDamageCalculator::DamageHelper(GetWorld(), OverlapActor, this->GetInstigator(), DamageEvent);
 	}
 }
 

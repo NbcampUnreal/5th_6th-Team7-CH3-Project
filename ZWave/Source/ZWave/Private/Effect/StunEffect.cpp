@@ -23,6 +23,11 @@ void UStunEffect::ApplyEffect(AActor* TargetActor, const float& Duration)
 
 void UStunEffect::RemoveEffect()
 {
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(Target))
+	{
+		Enemy->SetNewTarget(nullptr);
+	}
+
 	Super::RemoveEffect();
 }
 
