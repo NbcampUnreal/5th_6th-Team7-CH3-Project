@@ -35,8 +35,9 @@ private:
 /// 피격 관련
 /// </summary>
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Team")
-	uint8 TeamID = 0;
+	UPROPERTY(EditAnywhere, Category = "Team")
+	uint8 TeamID = 1;
+	virtual FGenericTeamId GetGenericTeamId() const override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float MaxHealth;
