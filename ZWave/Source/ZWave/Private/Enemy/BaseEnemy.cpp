@@ -123,7 +123,7 @@ void ABaseEnemy::CheckPriorityLv(AActor* DamageCauser)
 			AIController->SetValueAsIntToBlackboard(FName(TEXT("CurPriorityLv")), 1);
 			SetNewTarget(DamageCauser);
 		}
-		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation(), 0.25f);
 	}
 	else if (DamageCauser->IsA(AAoEActor::StaticClass()))
 	{
