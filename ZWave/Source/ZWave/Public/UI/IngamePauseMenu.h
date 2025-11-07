@@ -11,5 +11,5 @@ class ZWAVE_API UIngamePauseMenu : public UCommonActivatableWidget
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnGameOver();
+	void OnGameOver(bool bIsPlayerDie);
 };

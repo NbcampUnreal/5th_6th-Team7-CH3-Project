@@ -137,7 +137,7 @@ void ATaskPlayerController::ShowResultHUD()
 		{
 			SetPause(true);
 			ResultWidget->AddToViewport();
-			ResultWidget->OnGameOver();
+			ResultWidget->OnGameOver(false);
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}
