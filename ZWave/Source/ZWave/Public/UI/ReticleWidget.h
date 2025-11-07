@@ -21,4 +21,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnReloadWeapon(float ReloadTime);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnAmmoChanged(float CurrentAmmo, float MaxAmmo);
 };
