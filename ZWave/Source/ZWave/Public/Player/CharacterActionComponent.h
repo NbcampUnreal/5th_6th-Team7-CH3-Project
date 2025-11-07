@@ -82,6 +82,9 @@ public:
 	UFUNCTION()
 	void ChangeSpeedMultiply(float Multiply = 1.f);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Multiply")
+	float SpeedMultiply = 1.f;
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Anim")
 	TObjectPtr<UAnimMontage> RifleFireMontage = nullptr;
@@ -159,7 +162,6 @@ private:
 	float MaxSprintSpeed = 600.f;
 	float NormalWalkSpeed = 300.f;
 	float ShoulderSpeed = 150.f;
-	float SpeedMultiply = 1.f;
 
 	float NormalArmLength = 200.f;
 	float ShoulderArmLength = 65.f;

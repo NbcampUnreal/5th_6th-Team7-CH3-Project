@@ -11,19 +11,32 @@
 #include "State/EnemyStateComponent.h"
 #include "Enemy/BaseAIController.h"
 #include "Prop/Turret.h"
-
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 
 ABaseEnemy::ABaseEnemy()
 {
 	TeamID = 2;
 
 	StateComp = CreateDefaultSubobject<UEnemyStateComponent>(TEXT("UEnemyStateComponent"));
-	//MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("UMyActorComponent"));
+	//MyComp = CreateDefaultSubobject<UMyActorComponent>(TEXT("UMyActorComponent")); 
+	BreathingAC = CreateDefaultSubobject<UAudioComponent>(TEXT("BreathingAC"));
+	BreathingAC->SetupAttachment(GetRootComponent());
+	BreathingAC->bAutoActivate = false;
+	BreathingAC->bAutoDestroy = false;
+	BreathingAC->SetUISound(false);
 }
 
 void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (Breathing)
+	{
+		BreathingAC->SetSound(Breathing);
+		if (BreathAttenuation) BreathingAC->AttenuationSettings = BreathAttenuation;
+		BreathingAC->FadeIn(0.5f , 0.2f , 0.0f );
+	}
 }
 
 UAnimMontage* ABaseEnemy::GetAttackedMontage(EHitDir Direction)
@@ -48,7 +61,6 @@ void ABaseEnemy::Attacked(AActor* DamageCauser, float Damage)
 	Super::Attacked(DamageCauser, Damage);
 
 	if (Health <= 0.f) return;
-	
 	CheckPriorityLv(DamageCauser);
 }
 
@@ -155,6 +167,11 @@ void ABaseEnemy::Die()
 	}
 }
 
+void ABaseEnemy::SoundOn()
+{
+	BreathingAC->FadeIn(0.3f, 0.2f);
+}
+
 
 int32 ABaseEnemy::GetMaxPriorityLv() const
 {
@@ -180,7 +197,16 @@ void ABaseEnemy::Attack()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
-			AnimInstance->Montage_Play(AttackMontage);
+			BreathingAC->FadeOut(0.4f, 0.0f);
+			float const AttackLen = AnimInstance->Montage_Play(AttackMontage);
+
+			GetWorld()->GetTimerManager().SetTimer(
+				StopMotionHandler,
+				FTimerDelegate::CreateUObject(this, &ABaseEnemy::SoundOn),
+				AttackLen - 0.1f,
+				false
+			);
 		}
+
 	}
 }
