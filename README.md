@@ -107,8 +107,8 @@ Z-WAVE PROJECT <br/>
 
 ## 상세 설명
 
-[캐릭터 이동 / 상태 변환](https://www.notion.so/teamsparta/2a52dc3ef5148059a079de23770847e7)
-[애니메이션 리타게팅](https://www.notion.so/10-20-10-24-2966e3215b3a80469443d5c4fddbf0d9)
-[원거리 몬스터](https://www.notion.so/teamsparta/2a52dc3ef514808ea3c8e14ee5db3273)
-[벽타기 몬스터](https://www.notion.so/teamsparta/2a52dc3ef51480aabea1eb4da3bf226d)
+[캐릭터 이동 / 상태 변환](https://www.notion.so/teamsparta/2a52dc3ef5148059a079de23770847e7)<br/>
+[애니메이션 리타게팅](https://www.notion.so/10-20-10-24-2966e3215b3a80469443d5c4fddbf0d9)<br/>
+[원거리 몬스터](https://www.notion.so/teamsparta/2a52dc3ef514808ea3c8e14ee5db3273)<br/>
+[벽타기 몬스터](https://www.notion.so/teamsparta/2a52dc3ef51480aabea1eb4da3bf226d)<br/>
  
