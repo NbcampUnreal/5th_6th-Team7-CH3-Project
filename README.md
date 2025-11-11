@@ -109,9 +109,9 @@ Z-WAVE PROJECT <br/>
 
 [캐릭터 이동 / 상태 변환](https://www.notion.so/teamsparta/2a52dc3ef5148059a079de23770847e7)<br/>
 [애니메이션 리타게팅](https://www.notion.so/10-20-10-24-2966e3215b3a80469443d5c4fddbf0d9)<br/>
+[BaseAI](https://www.notion.so/teamsparta/Enemy-2a72dc3ef51480c3ae95da1125538157)  
 [원거리 몬스터](https://www.notion.so/teamsparta/2a52dc3ef514808ea3c8e14ee5db3273)<br/>
 [벽타기 몬스터](https://www.notion.so/teamsparta/2a52dc3ef51480aabea1eb4da3bf226d)<br/>
 [인벤토리와 Item, Weapon](https://www.notion.so/teamsparta/WeaponActor-2a72dc3ef51480fea9ced1a19d8b9523)<br/>
 [UI](https://iris-capri-7ee.notion.site/CH03-2a5ec2a939d4801fb77de53892b8f67e?pvs=74)<br/>
-[AI](https://www.notion.so/teamsparta/Enemy-2a72dc3ef51480c3ae95da1125538157)  
 [게임효과와Damage](https://www.notion.so/Effect-Damage-2a7ed759532f80b3a8f0dec4ec8f0f8d?source=copy_link)<br/>
